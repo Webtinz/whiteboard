@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers\Whiteboard;
 
-use App\Http\Controllers\Controller;
+use App\Models\Message;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
 class MessageController extends Controller
 {
@@ -84,10 +85,11 @@ class MessageController extends Controller
         ->get()
         ->groupBy('group_id'); // Grouper les messages par groupe
 
-        return response()->json([
-            'direct_conversations' => $directConversations,
-            'group_conversations' => $groupConversations,
-        ]);
+        // return response()->json([
+        //     'direct_conversations' => $directConversations,
+        //     'group_conversations' => $groupConversations,
+        // ]);
+        return view('ak_dir.chat.chat', compact('directConversations','groupConversations'));
     }
 
     // public function getUserConversations(){

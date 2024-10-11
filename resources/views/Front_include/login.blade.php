@@ -3,6 +3,7 @@
 
 
 <!-- Mirrored from preview.pichforest.com/probic/layouts/auth-singin.html by HTTrack Website Copier/3.x [XR&CO'2014], Tue, 08 Oct 2024 11:26:08 GMT -->
+
 <head>
 
     <meta charset="utf-8" />
@@ -13,7 +14,8 @@
     <!-- App favicon -->
     <link rel="shortcut icon" href="assets/images/favicon.ico">
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
     <link href="assets/css/app.min.css" id="app-style" rel="stylesheet" type="text/css" />
@@ -46,18 +48,24 @@
                                         <h5 class="mb-1">Welcome Back !</h5>
                                         <p class="text-muted">Sign in to continue to Probic.</p>
                                     </div>
-                                    <form class="form-horizontal mt-3">
+                                    <x-auth-session-status class="mb-4" :status="session('status')" />
+
+                                    <form method="POST" action="{{ route('login') }}" class="form-horizontal mt-3">
+                                        @csrf
                                         <div class="mb-3">
-                                            <label class="form-label" for="username">Username</label>
-                                            <input type="text" class="form-control" id="username"
+                                            <label class="form-label" for="username">Email</label>
+                                            <input type="email" name="email" class="form-control" id="email"
                                                 placeholder="Enter username">
                                         </div>
 
                                         <div class="form-password mb-3 auth-pass-inputgroup">
                                             <label class="form-label" for="userpassword">Password</label>
                                             <div class="position-relative">
-                                                <input type="password" class="form-control" id="password-input" placeholder="Enter password">
-                                                <button type="button" class="btn btn-link position-absolute h-100 end-0 top-0 shadow-none" id="password-addon">
+                                                <input type="password" name="password" class="form-control" id="password-input"
+                                                    placeholder="Enter password">
+                                                <button type="button"
+                                                    class="btn btn-link position-absolute h-100 end-0 top-0 shadow-none"
+                                                    id="password-addon">
                                                     <i class="mdi mdi-eye-outline font-size-16 text-muted"></i>
                                                 </button>
                                             </div>
@@ -89,7 +97,8 @@
                                     <div class="row position-relative mt-2">
                                         <div class="col-12">
                                             <div class="or-circle">
-                                                <a href="javascript: void(0);" class="social-list-item fw-bold font-size-12">
+                                                <a href="javascript: void(0);"
+                                                    class="social-list-item fw-bold font-size-12">
                                                     OR
                                                 </a>
                                             </div>
@@ -114,7 +123,8 @@
                             </div><!-- end card footer -->
                         </div><!-- end card -->
                         <div class="mt-3 text-center text-muted">
-                            <p class="mb-0">Don't have an account ? <a href="{{ route('signup') }}" class="fw-medium"> Signup
+                            <p class="mb-0">Don't have an account ? <a href="{{ route('signup') }}"
+                                    class="fw-medium"> Signup
                                     now </a></p>
                         </div>
                     </div><!-- end col -->
@@ -124,8 +134,10 @@
                     <div class="col-xl-12">
                         <div class="text-center text-muted p-4">
                             <p class="mb-0">©
-                                <script>document.write(new Date().getFullYear())</script> Probic. Crafted with <i
-                                    class="mdi mdi-heart text-danger"></i> by Pichforest
+                                <script>
+                                    document.write(new Date().getFullYear())
+                                </script> Probic. Crafted with <i class="mdi mdi-heart text-danger"></i>
+                                by Pichforest
                             </p>
                         </div>
                     </div><!-- end col -->
@@ -154,4 +166,5 @@
     <script src="assets/js/pages/pass-add.init.js"></script>
 
 </body>
+
 </html>

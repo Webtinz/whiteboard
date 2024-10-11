@@ -44,23 +44,34 @@
                                         <h5 class="mb-1">Register Account</h5>
                                         <p class="text-muted">Get your free Probic account now.</p>
                                     </div>
-                                    <form class="form-horizontal mt-3">
+                                    <form method="POST" action="{{ route('register') }}" class="form-horizontal mt-3">
+                                        @csrf
                                         <div class="mb-3">
                                             <label class="form-label" for="emailID">Email</label>
-                                            <input type="text" class="form-control" id="emailID"
+                                            <input type="email" name="email" class="form-control" id="emailID"
                                                 placeholder="Enter e-mail">
                                         </div>
 
                                         <div class="mb-3">
                                             <label class="form-label" for="userName">Username</label>
-                                            <input type="text" class="form-control" id="userName"
+                                            <input type="text" name="name" class="form-control" id="userName"
                                                 placeholder="Enter username">
                                         </div>
 
                                         <div class="form-password mb-3 auth-pass-inputgroup">
                                             <label class="form-label" for="userpassword">Password</label>
                                             <div class="position-relative">
-                                                <input type="password" class="form-control" id="password-input" placeholder="Enter password">
+                                                <input name="password" type="password" class="form-control" id="password-input" placeholder="Enter password">
+                                                <button type="button" class="btn btn-link position-absolute h-100 end-0 top-0 shadow-none" id="password-addon">
+                                                    <i class="mdi mdi-eye-outline font-size-16 text-muted"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-password mb-3 auth-pass-inputgroup">
+                                            <label class="form-label" for="userpassword">Password</label>
+                                            <div class="position-relative">
+                                                <input name="password_confirmation" type="password" class="form-control" id="password-input" placeholder="Enter password">
                                                 <button type="button" class="btn btn-link position-absolute h-100 end-0 top-0 shadow-none" id="password-addon">
                                                     <i class="mdi mdi-eye-outline font-size-16 text-muted"></i>
                                                 </button>
