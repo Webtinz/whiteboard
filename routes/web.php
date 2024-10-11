@@ -46,8 +46,8 @@ Route::get('signup', function () {
     Route::post('groups/{groupId}/add-member', [GroupController::class, 'addMember']);
     Route::delete('groups/{groupId}/remove-member/{userId}', [GroupController::class, 'removeMember']);
 
-    // Posts
-    Route::post('posts', [PostController::class, 'createPost']);
+    // Posts By Ak
+    // Route::post('posts', [PostController::class, 'createPost']);
 
     // Fichiers
     Route::post('messages/{messageId}/files', [FileController::class, 'uploadFile']);
