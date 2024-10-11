@@ -40,6 +40,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    //Post routes
     Route::resource('/posts', PostController::class);
     Route::post('posts/{post}/like', [PostController::class, 'like'])->name('posts.like');
     Route::post('posts/{post}/unlike', [PostController::class, 'unlike'])->name('posts.unlike');
