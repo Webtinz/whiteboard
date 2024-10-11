@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\FileController;
 use App\Http\Controllers\PostController;
 use Illuminate\Support\Facades\Route;
 
@@ -46,6 +48,12 @@ Route::middleware('auth')->group(function () {
     Route::post('posts/{post}/like', [PostController::class, 'like'])->name('posts.like');
     Route::post('posts/{post}/unlike', [PostController::class, 'unlike'])->name('posts.unlike');
     Route::post('posts/{post}/comment', [PostController::class, 'comment'])->name('posts.comment');
+
+    //Projects routes
+    Route::resource('projects', ProjectController::class);
+    Route::post('projects/{project}/files', [FileController::class, 'store'])->name('files.store');
+    Route::get('files/{file}/download', [FileController::class, 'download'])->name('files.download');
+
 });
 
 require __DIR__.'/auth.php';
