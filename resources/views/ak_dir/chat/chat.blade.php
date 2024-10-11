@@ -16,6 +16,8 @@
 
     <!-- lightbox css -->
     <link rel="stylesheet" href="{{ asset('assets/libs/glightbox/css/glightbox.min.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css" rel="stylesheet">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
 
     <!-- Bootstrap Css -->
     <link href="{{ asset('assets/css/bootstrap.min.css') }}" id="bootstrap-style" rel="stylesheet" type="text/css" />
@@ -715,47 +717,13 @@
                             </div>
                             <div class="search-box py-4">
                                 <div class="position-relative">
-                                    <input type="text" class="form-control rounded" id="search-chat" onkeyup="searchChat()" placeholder="Search...">
+                                    <input type="text" class="form-control rounded" id="search-chat" onkeyup="searchChat()" placeholder="Searchhhhhhhhhhhhhhhh...">
                                     <i class="bx bx-search-alt search-icon"></i>
                                 </div>
                             </div><!-- end search box -->
                         </div><!-- end card body -->
                         <div class="pb-4" id="all-chat">
                             <div class="px-3" data-simplebar style="max-height: 564px;">
-                                <div class="information-box chat-item-box">
-                                    <h6 class="text-uppercase mb-3 mt-1 font-size-13">informations</h6>
-                                    <ul class="list-unstyled chat-list group-chat">
-                                        <li class="active">
-                                            <a href="javascript: void(0);" class="fw-medium d-block">
-                                                <div class="d-flex align-items-center">
-                                                    <div class="avatar-sm">
-                                                        <span class="avatar-title bg-light text-muted font-size-16 rounded-circle">
-                                                            #
-                                                        </span>
-                                                    </div>
-                                                    <div class="ms-3 chat-text">
-                                                        Welcome
-                                                    </div>
-                                                </div>
-                                            </a>
-                                        </li><!-- end li -->
-                                        <li>
-                                            <a href="javascript: void(0);" class="fw-medium d-block">
-                                                <div class="d-flex align-items-center chat-title">
-                                                    <div class="avatar-sm">
-                                                        <span class="avatar-title bg-light text-muted font-size-16 rounded-circle">
-                                                            #
-                                                        </span>
-                                                    </div>
-                                                    <div class="ms-3 chat-text">
-                                                        Announcements
-                                                    </div>
-                                                </div>
-                                            </a>
-                                        </li><!-- end li -->
-                                    </ul><!-- end ul -->
-                                </div><!-- end -->
-
                                 <div class="group-box chat-list-box">
                                     <div class="float-end">
                                         <div class="avatar-sm">
@@ -767,76 +735,52 @@
                                     </div>
                                     <h6 class="text-uppercase font-size-13 mt-4 pt-2 mb-3">Groups</h6>
                                     <ul class="list-unstyled chat-list group-chat">
-                                        <li>
-                                            <a href="javascript: void(0);" class="fw-medium d-block">
-                                                <div class="d-flex align-items-center">
-                                                    <div class="avatar-sm">
-                                                        <span class="avatar-title bg-light text-muted font-size-14 rounded-circle">
-                                                            <i class="mdi mdi-lock"></i>
-                                                        </span>
+                                        @forelse ($groupConversations as $groupConversation)
+                                            {{ $groupConversation }}
+                                            <li>
+                                                <a href="javascript: void(0);" class="fw-medium d-block">
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="avatar-sm">
+                                                            <span class="avatar-title bg-light text-muted font-size-14 rounded-circle">
+                                                                <i class="mdi mdi-lock"></i>
+                                                            </span>
+                                                        </div>
+                                                        <div class="ms-3 chat-text">
+                                                            Designer
+                                                        </div>
                                                     </div>
-                                                    <div class="ms-3 chat-text">
-                                                        Designer
+                                                </a>
+                                            </li><!-- end li -->
+                                            <li>
+                                                <a href="javascript: void(0);" class="fw-medium d-block">
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="avatar-sm">
+                                                            <span class="avatar-title bg-light text-muted font-size-16 rounded-circle">
+                                                                <i class="mdi mdi-lock-open"></i>
+                                                            </span>
+                                                        </div>
+                                                        <div class="ms-3 chat-text">
+                                                            Random
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </a>
-                                        </li><!-- end li -->
-                                        <li>
-                                            <a href="javascript: void(0);" class="fw-medium d-block">
-                                                <div class="d-flex align-items-center">
-                                                    <div class="avatar-sm">
-                                                        <span class="avatar-title bg-light text-muted font-size-16 rounded-circle">
-                                                            #
-                                                        </span>
+                                                </a>
+                                            </li><!-- end li -->
+                                        @empty
+                                            <li>
+                                                <a href="#" class="fw-medium d-block"  style="background: rgb(241, 180, 76) !important; color: #fff">
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="avatar-sm">
+                                                            <span class="avatar-title bg-light text-muted font-size-16 rounded-circle">
+                                                                <i class="mdi mdi-alert"></i>
+                                                            </span>
+                                                        </div>
+                                                        <div class="ms-3 chat-text">
+                                                            <span class="alert warning">No group yet</span>
+                                                        </div>
                                                     </div>
-                                                    <div class="ms-3 chat-text">
-                                                        Random
-                                                    </div>
-                                                </div>
-                                            </a>
-                                        </li><!-- end li -->
-                                        <li>
-                                            <a href="javascript: void(0);" class="fw-medium d-block">
-                                                <div class="d-flex align-items-center">
-                                                    <div class="avatar-sm">
-                                                        <span class="avatar-title bg-light text-muted font-size-16 rounded-circle">
-                                                            #
-                                                        </span>
-                                                    </div>
-                                                    <div class="ms-3 chat-text">
-                                                        General
-                                                    </div>
-                                                </div>
-                                            </a>
-                                        </li><!-- end li -->
-                                        <li>
-                                            <a href="javascript: void(0);" class="fw-medium d-block">
-                                                <div class="d-flex align-items-center">
-                                                    <div class="avatar-sm">
-                                                        <span class="avatar-title bg-light text-muted font-size-14 rounded-circle">
-                                                            <i class="mdi mdi-lock"></i>
-                                                        </span>
-                                                    </div>
-                                                    <div class="ms-3 chat-text">
-                                                        Coding Problems
-                                                    </div>
-                                                </div>
-                                            </a>
-                                        </li><!-- end li -->
-                                        <li>
-                                            <a href="javascript: void(0);" class="fw-medium d-block">
-                                                <div class="d-flex align-items-center">
-                                                    <div class="avatar-sm">
-                                                        <span class="avatar-title bg-light text-muted font-size-14 rounded-circle">
-                                                            <i class="mdi mdi-lock"></i>
-                                                        </span>
-                                                    </div>
-                                                    <div class="ms-3 chat-text">
-                                                        Share your content
-                                                    </div>
-                                                </div>
-                                            </a>
-                                        </li><!-- end li -->
+                                                </a>
+                                            </li><!-- end li -->                                            
+                                        @endforelse
                                     </ul><!-- end ul -->
                                 </div><!-- end -->
 
@@ -852,6 +796,7 @@
                                     <h6 class="text-uppercase mt-4 pt-2 mb-3 font-size-12 text-muted">Direct message
                                     </h6>
                                     <ul class="list-unstyled chat-list mb-0 single-chat">
+                                        @forelse ($directConversations as $directConversation)
                                         <li>
                                             <a href="javascript: void(0);" class="fw-medium d-block">
                                                 <div class="d-flex align-items-center">
@@ -866,6 +811,7 @@
                                                 </div>
                                             </a>
                                         </li><!-- end li -->
+
                                         <li>
                                             <a href="javascript: void(0);" class="fw-medium d-block">
                                                 <div class="d-flex align-items-center">
@@ -880,34 +826,22 @@
                                                 </div>
                                             </a>
                                         </li><!-- end li -->
-                                        <li>
-                                            <a href="javascript: void(0);" class="fw-medium  d-block">
-                                                <div class="d-flex align-items-center">
-                                                    <div class="chat-user-img online">
-                                                        <img src="{{ asset('assets/images/users/avatar-6.jpg') }}"
-                                                            class="img-fluid avatar-sm rounded-circle" alt="">
-                                                        <span class="user-status"></span>
+                                        @empty
+                                            <li>
+                                                <a href="#" class="fw-medium d-block"  style="background: rgb(241, 180, 76) !important; color: #fff">
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="avatar-sm">
+                                                            <span class="avatar-title bg-light text-muted font-size-16 rounded-circle">
+                                                                <i class="mdi mdi-alert"></i>
+                                                            </span>
+                                                        </div>
+                                                        <div class="ms-3 chat-text">
+                                                            <span class="alert warning">No chat yet</span>
+                                                        </div>
                                                     </div>
-                                                    <div class="ms-3 chat-text">
-                                                        Ayan Owen
-                                                    </div>
-                                                </div>
-                                            </a>
-                                        </li><!-- end li -->
-                                        <li>
-                                            <a href="javascript: void(0);" class="fw-medium d-block">
-                                                <div class="d-flex align-items-center">
-                                                    <div class="chat-user-img online">
-                                                        <img src="{{ asset('assets/images/users/avatar-8.jpg') }}"
-                                                            class="img-fluid avatar-sm rounded-circle" alt="">
-                                                        <span class="user-status"></span>
-                                                    </div>
-                                                    <div class="ms-3 chat-text">
-                                                        Romi Miller
-                                                    </div>
-                                                </div>
-                                            </a>
-                                        </li><!-- end li -->
+                                                </a>
+                                            </li><!-- end li -->                                            
+                                        @endforelse
                                     </ul><!-- end ul -->
                                 </div><!-- end -->
                             </div>
@@ -2375,10 +2309,10 @@
                             <label for="GroupName" class="form-label">Name</label>
                             <input type="text" class="form-control" id="GroupName" placeholder="Enter Name">
                         </div>
-                        <div class="mb-3">
+                        {{-- <div class="mb-3">
                             <label for="Groupdetails" class="form-label">Description</label>
                             <textarea type="text" class="form-control" rows="3" id="Groupdetails" placeholder="Enter Description"></textarea>
-                        </div>
+                        </div> --}}
                         <div class="form-check form-switch form-switch-md ps-0">
                             <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault">
                             <label class="form-check-label" for="flexSwitchCheckDefault">Make Private</label>
