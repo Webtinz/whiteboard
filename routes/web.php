@@ -1,7 +1,8 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PlatformUserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,7 +16,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('login1');
 });
 
 
@@ -23,11 +24,11 @@ Route::get('/home', function () {
     return view('Front_include.index');
 });
 
-Route::get('login1', function () {
+Route::get('/login1', function () {
     return view('Front_include.login');
 })->name('login1');
 
-Route::get('signup', function () {
+Route::get('/signup', function () {
     return view('Front_include.signup');
 })->name('signup');
 
@@ -42,3 +43,7 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/auth.php';
+
+Route::middleware(['auth', 'role:platform_master|platform_users_management'])->group(function () {
+});
+Route::resource('/admin_users', PlatformUserController::class);
