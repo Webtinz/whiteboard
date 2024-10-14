@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Whiteboard;
 
+use Carbon\Carbon;
 use App\Models\Message;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -16,6 +17,12 @@ class MessageController extends Controller
             'receiver_id' => 'nullable|exists:users,id',
             'group_id' => 'nullable|exists:groups,id',
         ]);
+        
+        // dd($validated);
+
+        if (!auth()->id()) {
+            return redirect()->route('login')->with('error', 'You need to be connected');
+        }
 
         $message = Message::create([
             'sender_id' => auth()->id(),
@@ -24,7 +31,12 @@ class MessageController extends Controller
             'content' => $validated['content'],
         ]);
 
-        return response()->json($message);
+        // return response()->json($message);
+        return response()->json([
+            'content' => $request->input('content'),
+            'receiver_id' => $request->input('receiver_id'),
+            'group_id' => $request->input('group_id')
+        ]);
     }
 
     // public function getConversationWithUser($receiverId)
@@ -55,7 +67,27 @@ class MessageController extends Controller
             ->orderBy('created_at', 'asc') // Ordonner par date d'envoi des messages
             ->get();
 
+            foreach ($messages as $message) {
+                $message['sender'] = $message->sender->name;
+                $message['sender_profile'] = asset('assets/images/users/avatar-'. $message->sender_id .'.jpg');
+
+                $message['receiver'] = $message->receiver->name;
+                $message['receiver_profile'] = asset('assets/images/users/avatar-'. $message->sender_id+1 .'.jpg');
+                // Supposons que $conversation est l'objet que vous envoyez au front
+                // $message->created_at = Carbon::parse($message->created_at)->format('H:i:s');
+
+                // dd($message);
+            }
         return response()->json($messages);
+    }
+
+    public function getGroupConversation($groupId){
+
+        $authUserId = auth()->id(); // Récupérer l'utilisateur authentifié
+
+        $groupMessages = Message::where('group_id', $authUserId);
+
+        return response()->json($groupMessages);
     }
 
     public function getAllConversations(){
@@ -63,19 +95,19 @@ class MessageController extends Controller
 
         // Récupérer les conversations directes (messages privés)
         $directConversations = Message::where(function ($query) use ($authUserId) {
-                $query->where('sender_id', $authUserId)
-                    ->orWhere('receiver_id', $authUserId);
-            })
-            ->whereNull('group_id') // S'assurer que ce sont des messages directs, pas des messages de groupe
-            ->with(['sender', 'receiver']) // Charger les informations sur l'expéditeur et le destinataire
-            ->get()
-            ->groupBy(function ($message) use ($authUserId) {
-                // Grouper les messages directs par utilisateur
-                return $message->sender_id === $authUserId ? $message->receiver_id : $message->sender_id;
-            });
+            $query->where('sender_id', $authUserId)
+                ->orWhere('receiver_id', $authUserId);
+        })
+        ->whereNull('group_id') // S'assurer que ce sont des messages directs, pas des messages de groupe
+        ->with(['sender', 'receiver']) // Charger les informations sur l'expéditeur et le destinataire
+        ->get()
+        ->groupBy(function ($message) use ($authUserId) {
+            // Grouper les messages directs par utilisateur
+            return $message->sender_id === $authUserId ? $message->receiver_id : $message->sender_id;
+        });
 
         // Récupérer les conversations de groupe
-        $groupConversations = Message::whereHas('group', function ($query) use ($authUserId) {
+        $groupMessages = Message::whereHas('group', function ($query) use ($authUserId) {
             // Vérifier si l'utilisateur est membre du groupe
             $query->whereHas('members', function ($q) use ($authUserId) {
                 $q->where('user_id', $authUserId);
@@ -84,7 +116,18 @@ class MessageController extends Controller
         ->with('group') // Charger les informations du groupe
         ->get()
         ->groupBy('group_id'); // Grouper les messages par groupe
+        // Pour formater le résultat comme désiré
 
+        $groupConversations = [];
+        foreach ($groupMessages as $groupId => $messages) {
+            $groupInfo = $messages->first()->group; // Prendre les infos du groupe
+            $groupConversations[$groupId] = [
+                'group' => $groupInfo,
+                'messages' => $messages
+            ];
+        }
+        // dd($groupConversations);
+        
         // return response()->json([
         //     'direct_conversations' => $directConversations,
         //     'group_conversations' => $groupConversations,

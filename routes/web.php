@@ -37,8 +37,9 @@ Route::get('signup', function () {
 
 
 // Messages
-Route::post('/messages/send', [MessageController::class, 'sendMessage']);
+Route::post('/messages/send', [MessageController::class, 'sendMessage'])->name('message.inbox.send');
 Route::get('/messages/{receiverId}', [MessageController::class, 'getConversationWithUser']);
+Route::get('/groupmessages/{groupId}', [MessageController::class, 'getGroupConversation']);
 
 // Récupérer toutes les conversations (directes et de groupe)
 Route::get('/conversations', [MessageController::class, 'getAllConversations'])->name('conversations');
