@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Whiteboard;
 
 use Carbon\Carbon;
+use App\Models\User;
 use App\Models\Message;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -85,14 +86,22 @@ class MessageController extends Controller
 
         $authUserId = auth()->id(); // Récupérer l'utilisateur authentifié
 
-        $groupMessages = Message::where('group_id', $authUserId);
+        $groupMessages = Message::where('group_id', $groupId)
+            ->orderBy('created_at', 'asc') // Ordonner par date d'envoi des messages
+            ->get();
+
+            foreach ($groupMessages as $groupMessage) {
+                $groupMessage['sender'] = $groupMessage->sender->name;
+                $groupMessage['sender_profile'] = asset('assets/images/users/avatar-'. $groupMessage->sender_id .'.jpg');
+                // dd($message);
+        }
 
         return response()->json($groupMessages);
     }
 
     public function getAllConversations(){
         $authUserId = auth()->id(); // Utilisateur actuellement authentifié
-
+        $allUsers = User::all();
         // Récupérer les conversations directes (messages privés)
         $directConversations = Message::where(function ($query) use ($authUserId) {
             $query->where('sender_id', $authUserId)
@@ -121,9 +130,14 @@ class MessageController extends Controller
         $groupConversations = [];
         foreach ($groupMessages as $groupId => $messages) {
             $groupInfo = $messages->first()->group; // Prendre les infos du groupe
+
+            // Compter les membres du groupe
+            $numberOfMembers = $groupInfo->members->count();
+
             $groupConversations[$groupId] = [
                 'group' => $groupInfo,
-                'messages' => $messages
+                'messages' => $messages,
+                'number_of_members' => $numberOfMembers // Ajouter le nombre de membres
             ];
         }
         // dd($groupConversations);
@@ -132,7 +146,7 @@ class MessageController extends Controller
         //     'direct_conversations' => $directConversations,
         //     'group_conversations' => $groupConversations,
         // ]);
-        return view('ak_dir.chat.chat', compact('directConversations','groupConversations'));
+        return view('ak_dir.chat.chat', compact('directConversations','groupConversations','allUsers'));
     }
 
     // public function getUserConversations(){

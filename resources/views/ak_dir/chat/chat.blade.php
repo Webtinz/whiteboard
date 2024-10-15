@@ -22,7 +22,11 @@
     {{-- <link href="{{ asset('assets/css/icons.min.css') }}" rel="stylesheet" type="text/css" /> --}}
     <!-- App Css-->
     <link href="{{ asset('assets/css/app.min.css') }}" id="app-style" rel="stylesheet" type="text/css" />
-
+    <style>
+        .default-display-none {
+            display: none; /* Cache par défaut les éléments avec cette classe */
+        }
+    </style>
 </head>
 
 <body data-sidebar="dark">
@@ -97,7 +101,7 @@
                                         <ul class="list-unstyled chat-list group-chat">
                                             @forelse ($groupConversations as $groupId => $groupData)
                                                 <li>
-                                                    <a href="javascript: void(0);" class="fw-medium d-block chat-group-link" data-group-id="{{ Auth::user()->id }}" data-group-name="{{ $groupData['group']->name }}" >
+                                                    <a href="javascript: void(0);" class="fw-medium d-block chat-group-link" data-group-id="{{ $groupData['group']->id }}" data-group-name="{{ $groupData['group']->name }}" data-group-member-number="{{ $groupData['number_of_members'] }}">
                                                         <div class="d-flex align-items-center">
                                                             <div class="avatar-sm">
                                                                 <span
@@ -191,7 +195,7 @@
                         </div><!-- end card -->
 
                         <!-- Group Chat -->
-                        <div id="group-chat-conversation" class="w-100 user-chat mt-4 mt-lg-0">
+                        <div id="group-chat-conversation" class="w-100 user-chat mt-4 mt-lg-0 default-display-none">
                             <div class="card rounded-0 shadow-none mb-0">
                                 <div class="p-3 border-bottom">
                                     <div class="row">
@@ -219,8 +223,8 @@
                                                         <a href="javascript: void(0);">
                                                             <div class="avatar-sm">
                                                                 <span
-                                                                    class="avatar-title rounded-circle bg-primary text-white">
-                                                                    +5
+                                                                    class="avatar-title rounded-circle bg-primary text-white" id="group-member-number">
+                                                                    +5 {{-- Group members number --}}
                                                                 </span>
                                                             </div>
                                                         </a>
@@ -321,7 +325,7 @@
                         </div><!-- end user chat -->
 
                         <!-- Direct Massage -->
-                        <div id="user-chat-conversation" class="w-100 user-chat mt-4 mt-lg-0 d-none">
+                        <div id="user-chat-conversation" class="w-100 user-chat mt-4 mt-lg-0 d-none default-display-none">
 
                         </div>
                     </div><!-- end row -->
@@ -367,7 +371,7 @@
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content border-0">
                         <div class="modal-header bg-soft-primary">
-                            <h5 class="modal-title font-size-16 text-primary" id="createGroupModal">All Direct Message
+                            <h5 class="modal-title font-size-16 text-primary" id="createGroupModal">New Message
                             </h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
                             </button>
@@ -384,44 +388,35 @@
                                 <div>
                                     <div class="card shadow-none rounded-3">
                                         <div class="card-body">
-                                            <div class="d-flex">
-                                                <div>
-                                                    <img src="{{ asset('assets/images/users/avatar-10.jpg') }}"
-                                                        class="img-fluid avatar-sm rounded" alt="">
-                                                </div>
-                                                <div class="flex-grow-1 ms-3">
-                                                    <h6 class="font-size-14 mb-0">Jansh Wells</h6>
-                                                </div>
-                                                <div>
-                                                    <p class="text-muted font-size-13 mb-0">6:57 PM</p>
-                                                </div>
-                                            </div><!-- end -->
-                                            <hr>
-                                            <div class="d-flex">
-                                                <div>
-                                                    <img src="{{ asset('assets/images/users/avatar-1.jpg') }}"
-                                                        class="img-fluid avatar-sm rounded" alt="">
-                                                </div>
-                                                <div class="flex-grow-1 ms-3">
-                                                    <h6 class="font-size-14 mb-0">Denny Silva</h6>
-                                                </div>
-                                                <div>
-                                                    <p class="text-muted font-size-13 mb-0">2:57 PM</p>
-                                                </div>
-                                            </div><!-- end -->
-                                            <hr>
-                                            <div class="d-flex">
-                                                <div>
-                                                    <img src="{{ asset('assets/images/users/avatar-2.jpg') }}"
-                                                        class="img-fluid avatar-sm rounded" alt="">
-                                                </div>
-                                                <div class="flex-grow-1 ms-3">
-                                                    <h6 class="font-size-14 mb-0">Archange DEGUENON</h6>
-                                                </div>
-                                                <div>
-                                                    <p class="text-muted font-size-13 mb-0">2:57 PM</p>
-                                                </div>
-                                            </div><!-- end -->
+                                            @forelse ($allUsers as $eachUser)
+                                                <div class="d-flex chat-user-link" data-user-id="{{ $eachUser->id }}" data-user-name="{{ $eachUser->id == Auth::user()->id ? "Yourself" : $eachUser->name }}"  data-bs-dismiss="modal">
+                                                    <div>
+                                                        <img src="{{ asset('assets/images/users/avatar-10.jpg') }}"
+                                                            class="img-fluid avatar-sm rounded" alt="">
+                                                    </div>
+                                                    <div class="flex-grow-1 ms-3">
+                                                        <h6 class="font-size-14 mb-0">{{ $eachUser->id == Auth::user()->id ? "Yourself" : $eachUser->name }}</h6>
+                                                    </div>
+                                                    <div>
+                                                        <p class="text-muted font-size-13 mb-0">{{ $eachUser->last_online_time ?? "Online" }} {{-- Last time user online if onlinestatus is no --}}</p>
+                                                    </div>
+                                                </div><!-- end -->
+                                                <hr>
+                                            @empty
+                                                <div class="d-flex">
+                                                    <div>
+                                                        {{-- <img src="{{ asset('assets/images/users/avatar-10.jpg') }}"
+                                                            class="img-fluid avatar-sm rounded" alt=""> --}}
+                                                    </div>
+                                                    <div class="flex-grow-1 ms-3">
+                                                        <h6 class="font-size-14 mb-0 alert alert-warning text-center">No User found</h6>
+                                                    </div>
+                                                    <div>
+                                                        <p class="text-muted font-size-13 mb-0"></p>
+                                                    </div>
+                                                </div><!-- end -->
+                                                <hr>
+                                            @endforelse
                                         </div><!-- end card body -->
                                     </div><!-- end card -->
                                 </div>
@@ -455,8 +450,8 @@
                                 <ul class="nav nav-tabs nav-tabs-custom nav-justified" role="tablist">
                                     <li class="nav-item">
                                         <a class="nav-link active" data-bs-toggle="tab" href="#members"
-                                            role="tab">
-                                            Members (12)
+                                            role="tab" >
+                                            Members (<span id="span-group-member-number">0</span>)
                                         </a>
                                     </li>
                                     <!-- end li -->
@@ -537,10 +532,23 @@
     {{-- <script src="{{ asset('assets/js/pages/chat.init.js') }}"></script> --}}
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+
+    <script>
+        $(document).ready(function() {
+            // Cacher les éléments une fois la page chargée
+            $('.default-display-none').hide();
+        });
+    </script>
+    
     <script>
         $(document).ready(function() {
             // Écoute le clic sur les liens avec la classe 'chat-user-link'
             $('.chat-user-link').on('click', function() {
+
+                var elements = document.getElementsByClassName('default-display-none');
+                for (var i = 0; i < elements.length; i++) {
+                    elements[i].style.display = "block"; // Affiche les éléments masqués
+                }
                 // Récupérer l'ID de l'utilisateur sélectionné à partir de l'attribut data-user-id
                 var userId = $(this).data('user-id');
                 var userName = $(this).data('user-name');
@@ -548,7 +556,9 @@
                 // Mettre à jour la valeur de l'input avec l'ID 'receiver_id'
                 $('#receiver_id').val(userId);
 
-                document.getElementById('chatName').innerHTML = userName; 
+                document.getElementById('chatName').innerHTML = userName;
+                document.getElementById('group-member-number').style.display = "none";
+
 
                 // Mettre à null la valeur de l'input du group avec l'ID 'group_id'
                 $('#group_id').val(null);
@@ -558,16 +568,24 @@
 
     <script>
         $(document).ready(function() {
+        var elements = document.getElementsByClassName('default-display-none');
+        for (var i = 0; i < elements.length; i++) {
+            elements[i].style.display = "block";
+        }
             // Écoute le clic sur les liens avec la classe 'chat-group-link'
             $('.chat-group-link').on('click', function() {
                 // Récupérer l'ID du groupe sélectionné à partir de l'attribut data-group-id
                 var groupId = $(this).data('group-id');
                 var groupName = $(this).data('group-name');
+                var groupMembersNumber = $(this).data('group-member-number');
                 
                 // Mettre à jour la valeur de l'input avec l'ID 'group_id'
                 $('#group_id').val(groupId);
 
-                document.getElementById('chatName').innerHTML = groupName; 
+                document.getElementById('chatName').innerHTML = groupName;
+                document.getElementById('group-member-number').style.display = "";
+                document.getElementById('group-member-number').innerHTML = "+" + groupMembersNumber;
+                document.getElementById('span-group-member-number').innerHTML = groupMembersNumber;
 
                 // Mettre à null la valeur de l'input de l'utilisateur avec l'ID 'receiver_id'
                 $('#receiver_id').val(null);
@@ -669,64 +687,77 @@
                 e.preventDefault(); // Empêche le comportement par défaut du lien
                 
                 const groupId = $(this).data('group-id'); // Récupérer l'ID de l'utilisateur depuis l'attribut data
+                const authUserId  = {{ Auth::user()->id }};
         
                 // Effectuer une requête AJAX pour récupérer les conversations
                 $.ajax({
                     url: '/groupmessages/' + groupId,
                     method: 'GET',
                     success: function(data) {
+                        console.log(data);
                         // Vider la liste actuelle des conversations
                         $('#chat-conversation-list').empty();
                         
-                        // Vérifier si les données sont vides
-                        if ($.isEmptyObject(data)) {
-                            // Si vide, afficher un message ou une indication
+                        // Parcourir les données et ajouter les conversations à la liste
+                        $.each(data, function(index, conversation) {  
+                            // Supposons que vous ayez une variable conversation avec une date au format ISO
+                            const conversationDate = conversation.created_at; // e.g., "2024-10-14T00:00:00.000000Z"
+
+                            // Créez un objet Date à partir de la chaîne de caractères
+                            const date = new Date(conversationDate);
+
+                            // Formatez le jour, le mois et l'année
+                            const formattedDate = date.toLocaleDateString('en-EN', {
+                                weekday: 'long', // Jour de la semaine en lettres
+                                year: 'numeric', // Année en chiffres
+                                month: 'long', // Mois en lettres
+                                day: 'numeric' // Jour en chiffres
+                            });
+
+                            // Formatez l'heure, les minutes et les secondes
+                            const formattedTime = date.toLocaleTimeString([], {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                second: '2-digit'
+                            });
+                            // Combiner les formats de date et d'heure
+                            const fullFormattedDateTime = `${formattedDate} at ${formattedTime}`;
+                            
                             $('#chat-conversation-list').append(`
-                                <li class="chat-list">
+                                <li class="chat-list ${conversation.sender_id == authUserId ? 'right' : ''}">
                                     <div class="conversation-list">
-                                        <p class="text-muted text-center">Aucune conversation disponible.</p>
-                                    </div>
-                                </li>
-                            `);
-                        } else {
-                            // Parcourir les données et ajouter les conversations à la liste
-                            $.each(data, function(index, conversation) {
-                                $('#chat-conversation-list').append(`
-                                    <li class="chat-list">
-                                        <div class="conversation-list">
-                                            <div class="d-flex">
-                                                <div class="chat-user">
-                                                    <img src="${conversation.avatar}" class="avatar-sm img-fluid rounded-circle" alt="">
+                                        <div class="d-flex">
+                                            <div class="chat-user">
+                                                <img src="${conversation.sender_profile}" class="avatar-sm img-fluid rounded-circle" alt="">
+                                            </div>
+                                            <div class="flex-1 chat-arrow">
+                                                <div class="d-flex">
+                                                    <div class="ctext-wrap">
+                                                        <p class="mb-0">${conversation.content}</p>
+                                                    </div>
+                                                    <div class="dropdown align-self-end">
+                                                        <a class="dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                            <i class="bx bx-dots-vertical-rounded"></i>
+                                                        </a>
+                                                        <div class="dropdown-menu">
+                                                            <a class="dropdown-item fw-medium text-muted" href="javascript: void(0);"><i class="mdi mdi-content-copy me-2"></i>Copy</a>
+                                                            <a class="dropdown-item fw-medium text-muted" href="javascript: void(0);"><i class="mdi mdi-star-outline me-2"></i>Star</a>
+                                                            <a class="dropdown-item fw-medium text-muted" href="javascript: void(0);"><i class="mdi mdi-reply-all-outline me-2"></i>Reply</a>
+                                                            <a class="dropdown-item fw-medium text-muted" href="javascript: void(0);"><i class="mdi mdi-share-all-outline me-2"></i>Forward</a>
+                                                            <div class="dropdown-divider"></div>
+                                                            <a class="dropdown-item fw-medium text-danger delete-chat-item" href="javascript: void(0);"><i class="mdi mdi-trash-can-outline me-2"></i>Delete</a>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                                <div class="flex-1 chat-arrow">
-                                                    <div class="d-flex">
-                                                        <div class="ctext-wrap">
-                                                            <p class="mb-0">${conversation.message}</p>
-                                                        </div>
-                                                        <div class="dropdown align-self-end">
-                                                            <a class="dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                                <i class="bx bx-dots-vertical-rounded"></i>
-                                                            </a>
-                                                            <div class="dropdown-menu">
-                                                                <a class="dropdown-item fw-medium text-muted" href="javascript: void(0);"><i class="mdi mdi-content-copy me-2"></i>Copy</a>
-                                                                <a class="dropdown-item fw-medium text-muted" href="javascript: void(0);"><i class="mdi mdi-star-outline me-2"></i>Star</a>
-                                                                <a class="dropdown-item fw-medium text-muted" href="javascript: void(0);"><i class="mdi mdi-reply-all-outline me-2"></i>Reply</a>
-                                                                <a class="dropdown-item fw-medium text-muted" href="javascript: void(0);"><i class="mdi mdi-share-all-outline me-2"></i>Forward</a>
-                                                                <div class="dropdown-divider"></div>
-                                                                <a class="dropdown-item fw-medium text-danger delete-chat-item" href="javascript: void(0);"><i class="mdi mdi-trash-can-outline me-2"></i>Delete</a>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="conversation-name fw-medium text-primary mb-2 mt-1">
-                                                        ${conversation.sender_name} <small class="chat-time text-muted fw-medium">${conversation.time}</small>
-                                                    </div>
+                                                <div class="conversation-name fw-medium text-primary mb-2 mt-1">
+                                                    ${conversation.sender_id == authUserId ? 'You' : conversation.sender.name} <small class="chat-time text-muted fw-medium">${fullFormattedDateTime}</small>
                                                 </div>
                                             </div>
-                                        </div><!-- end conversation list -->
-                                    </li><!-- end li -->
-                                `);
-                            });
-                        }
+                                        </div>
+                                    </div><!-- end conversation list -->
+                                </li><!-- end li -->
+                            `);
+                        });
                     },
                     error: function(err) {
                         console.error(err);
