@@ -17,6 +17,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->foreignId('created_by')->constrained('users')->onDelete('cascade');
             $table->date('deadline')->nullable();
+            $table->text('status')->nullable();
             $table->timestamps();
         });
     }

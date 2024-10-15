@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class File extends Model
 {
-    protected $fillable = ['name', 'path', 'project_id', 'uploaded_by'];
+    protected $fillable = ['name', 'path', 'project_id', 'uploaded_by', 'type', 'updated_at', 'created_at'];
 
     public function project()
     {
