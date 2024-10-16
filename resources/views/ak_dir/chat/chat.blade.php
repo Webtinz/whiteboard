@@ -26,7 +26,25 @@
         .default-display-none {
             display: none; /* Cache par défaut les éléments avec cette classe */
         }
+        .card.rounded-0.shadow-none.mb-0 {
+            min-height: 100% !important;
+        }
+        #min-height-100{
+            min-height: 100% !important;
+        }
+        div#chat-conversation {
+            min-height: 70vh !important;
+        }
+        #page-content-chat {
+            min-height: 50vh; /* Hauteur minimale : 50% de la hauteur de la fenêtre */
+            max-height: 100vh; /* Hauteur maximale : 100% de la hauteur de la fenêtre */
+            overflow-y: auto; /* Permet le scroll interne si le contenu dépasse */
+            scrollbar-width: none; /* Pour cacher la barre de défilement sur Firefox */
+            /* background-color: white; Fond blanc */
+            /* padding: 0px; Optionnel, pour un peu d'espace intérieur */
+        }
     </style>
+  <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
 </head>
 
 <body data-sidebar="dark">
@@ -40,7 +58,7 @@
         <div class="main-content" style="margin: auto">
 
             <div class="page-content" style="padding: 5px !important;">
-                <div class="container-fluid">
+                <div class="container-fluid" id="page-content-chat">
 
                     <!-- start page title -->
                     <div class="row">
@@ -167,7 +185,7 @@
                                                             <span class="user-status"></span>
                                                         </div>
                                                         <div class="ms-3 chat-text">
-                                                            {{ $otherUser->name == Auth::user()->name ? "Yourself" : $otherUser->name }}
+                                                            {{ $otherUser->name == Auth::user()->name ? "Yourself" : $otherUser->name }} <span class="bg-bg-info" id="unread-counter-{{ $userId }}"></span>
                                                         </div>
                                                     </div>
                                                 </a>
@@ -235,7 +253,7 @@
                                     </div><!-- end row -->
                                 </div>
 
-                                <div>
+                                <div id="min-height-100">
                                     <div class="chat-conversation py-3" id="chat-conversation" data-simplebar
                                         style="max-height: 602px; margin-bottom:25px;">
                                         <ul class="list-unstyled mb-0 px-3 chat-conversation-list" id="chat-conversation-list">
@@ -610,7 +628,9 @@
                         
                         // Vider la liste actuelle des conversations
                         $('#chat-conversation-list').empty();
-        
+                        // Variable pour stocker la date du dernier message
+                        let lastMessageDate = null;
+
                         // Parcourir les données et ajouter les conversations à la liste
                         $.each(data, function(index, conversation) {  
                             // Supposons que vous ayez une variable conversation avec une date au format ISO
@@ -633,43 +653,94 @@
                                 minute: '2-digit',
                                 second: '2-digit'
                             });
-                            // Combiner les formats de date et d'heure
-                            const fullFormattedDateTime = `${formattedDate} at ${formattedTime}`;
+
+                            // Si la date du message est différente de la dernière, insérer un élément pour la nouvelle date
+                            if (lastMessageDate !== formattedDate) {
+                                $('#chat-conversation-list').append(`
+                                    <li class="chat-list">
+                                        <div class="chat-day-title mt-2">
+                                            <span class="title border rounded-pill">${formattedDate}</span>
+                                        </div>
+                                    </li>
+                                `);
+                                // Mettre à jour la dernière date
+                                lastMessageDate = formattedDate;
+                            }
+
+                            // Combiner les formats de date et d'heure pour afficher le temps
+                            const fullFormattedDateTime = `${formattedTime}`;
                             
-                            $('#chat-conversation-list').append(`
-                                <li class="chat-list ${conversation.sender_id == authUserId ? 'right' : ''}">
-                                    <div class="conversation-list">
-                                        <div class="d-flex">
-                                            <div class="chat-user">
-                                                <img src="${conversation.sender_id == authUserId ? conversation.sender_profile : conversation.receiver_profile}" class="avatar-sm img-fluid rounded-circle" alt="">
-                                            </div>
-                                            <div class="flex-1 chat-arrow">
-                                                <div class="d-flex">
-                                                    <div class="ctext-wrap">
-                                                        <p class="mb-0">${conversation.content}</p>
-                                                    </div>
-                                                    <div class="dropdown align-self-end">
-                                                        <a class="dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                            <i class="bx bx-dots-vertical-rounded"></i>
-                                                        </a>
-                                                        <div class="dropdown-menu">
-                                                            <a class="dropdown-item fw-medium text-muted" href="javascript: void(0);"><i class="mdi mdi-content-copy me-2"></i>Copy</a>
-                                                            <a class="dropdown-item fw-medium text-muted" href="javascript: void(0);"><i class="mdi mdi-star-outline me-2"></i>Star</a>
-                                                            <a class="dropdown-item fw-medium text-muted" href="javascript: void(0);"><i class="mdi mdi-reply-all-outline me-2"></i>Reply</a>
-                                                            <a class="dropdown-item fw-medium text-muted" href="javascript: void(0);"><i class="mdi mdi-share-all-outline me-2"></i>Forward</a>
-                                                            <div class="dropdown-divider"></div>
-                                                            <a class="dropdown-item fw-medium text-danger delete-chat-item" href="javascript: void(0);"><i class="mdi mdi-trash-can-outline me-2"></i>Delete</a>
+                            if (conversation.sender_id == authUserId) {
+                                $('#chat-conversation-list').append(`
+                                    <li class="chat-list right">
+                                        <div class="conversation-list">
+                                            <div class="d-flex">
+                                                <div class="chat-user">
+                                                    <img src="${conversation.sender_profile}" class="avatar-sm img-fluid rounded-circle" alt="">
+                                                </div>
+                                                <div class="flex-1 chat-arrow">
+                                                    <div class="d-flex justify-content-end">
+                                                        <div class="ctext-wrap">
+                                                            <p class="mb-0">${conversation.content}</p>
+                                                        </div>
+                                                        <div class="dropdown align-self-end">
+                                                            <a class="dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                                <i class="bx bx-dots-vertical-rounded"></i>
+                                                            </a>
+                                                            <div class="dropdown-menu">
+                                                                <a class="dropdown-item fw-medium text-muted" href="javascript: void(0);"><i class="mdi mdi-content-copy me-2"></i>Copy</a>
+                                                                <a class="dropdown-item fw-medium text-muted" href="javascript: void(0);"><i class="mdi mdi-star-outline me-2"></i>Star</a>
+                                                                <a class="dropdown-item fw-medium text-muted" href="javascript: void(0);"><i class="mdi mdi-reply-all-outline me-2"></i>Reply</a>
+                                                                <a class="dropdown-item fw-medium text-muted" href="javascript: void(0);"><i class="mdi mdi-share-all-outline me-2"></i>Forward</a>
+                                                                <div class="dropdown-divider"></div>
+                                                                <a class="dropdown-item fw-medium text-danger delete-chat-item" href="javascript: void(0);"><i class="mdi mdi-trash-can-outline me-2"></i>Delete</a>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                                <div class="conversation-name fw-medium text-primary mb-2 mt-1">
-                                                    ${conversation.sender_id == authUserId ? 'You' : conversation.sender.name} <small class="chat-time text-muted fw-medium">${fullFormattedDateTime}</small>
+                                                    <div class="conversation-name fw-medium text-primary mb-2 mt-1">
+                                                        ${'You'} <small class="chat-time text-muted fw-medium">${fullFormattedDateTime}</small>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </div><!-- end conversation list -->
-                                </li><!-- end li -->
-                            `);
+                                        </div><!-- end conversation list -->
+                                    </li>
+                                `);                                
+                            } else {
+                                $('#chat-conversation-list').append(`                                 
+                                    <li class="chat-list">
+                                        <div class="conversation-list">
+                                            <div class="d-flex">
+                                                <div class="chat-user">
+                                                    <img src="${conversation.receiver_profile}" class="avatar-sm img-fluid rounded-circle" alt="">
+                                                </div>
+                                                <div class="flex-1 chat-arrow">
+                                                    <div class="d-flex">
+                                                        <div class="ctext-wrap">
+                                                            <p class="mb-0">${conversation.content}</p>
+                                                        </div>
+                                                        <div class="dropdown align-self-end">
+                                                            <a class="dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                                <i class="bx bx-dots-vertical-rounded"></i>
+                                                            </a>
+                                                            <div class="dropdown-menu">
+                                                                <a class="dropdown-item fw-medium text-muted" href="javascript: void(0);"><i class="mdi mdi-content-copy me-2"></i>Copy</a>
+                                                                <a class="dropdown-item fw-medium text-muted" href="javascript: void(0);"><i class="mdi mdi-star-outline me-2"></i>Star</a>
+                                                                <a class="dropdown-item fw-medium text-muted" href="javascript: void(0);"><i class="mdi mdi-reply-all-outline me-2"></i>Reply</a>
+                                                                <a class="dropdown-item fw-medium text-muted" href="javascript: void(0);"><i class="mdi mdi-share-all-outline me-2"></i>Forward</a>
+                                                                <div class="dropdown-divider"></div>
+                                                                <a class="dropdown-item fw-medium text-danger delete-chat-item" href="javascript: void(0);"><i class="mdi mdi-trash-can-outline me-2"></i>Delete</a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="conversation-name fw-medium text-primary mb-2 mt-1">
+                                                        ${conversation.sender.name} <small class="chat-time text-muted fw-medium">${fullFormattedDateTime}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div><!-- end conversation list -->
+                                    </li>
+                                `);                                
+                            }
                         });
                     },
                     error: function(err) {
@@ -697,7 +768,9 @@
                         console.log(data);
                         // Vider la liste actuelle des conversations
                         $('#chat-conversation-list').empty();
-                        
+                        // Variable pour stocker la date du dernier message
+                        let lastMessageDate = null;
+
                         // Parcourir les données et ajouter les conversations à la liste
                         $.each(data, function(index, conversation) {  
                             // Supposons que vous ayez une variable conversation avec une date au format ISO
@@ -720,44 +793,96 @@
                                 minute: '2-digit',
                                 second: '2-digit'
                             });
-                            // Combiner les formats de date et d'heure
-                            const fullFormattedDateTime = `${formattedDate} at ${formattedTime}`;
+
+                            // Si la date du message est différente de la dernière, insérer un élément pour la nouvelle date
+                            if (lastMessageDate !== formattedDate) {
+                                $('#chat-conversation-list').append(`
+                                    <li class="chat-list">
+                                        <div class="chat-day-title mt-2">
+                                            <span class="title border rounded-pill">${formattedDate}</span>
+                                        </div>
+                                    </li>
+                                `);
+                                // Mettre à jour la dernière date
+                                lastMessageDate = formattedDate;
+                            }
+
+                            // Combiner les formats de date et d'heure pour afficher le temps
+                            const fullFormattedDateTime = `${formattedTime}`;
                             
-                            $('#chat-conversation-list').append(`
-                                <li class="chat-list ${conversation.sender_id == authUserId ? 'right' : ''}">
-                                    <div class="conversation-list">
-                                        <div class="d-flex">
-                                            <div class="chat-user">
-                                                <img src="${conversation.sender_profile}" class="avatar-sm img-fluid rounded-circle" alt="">
-                                            </div>
-                                            <div class="flex-1 chat-arrow">
-                                                <div class="d-flex">
-                                                    <div class="ctext-wrap">
-                                                        <p class="mb-0">${conversation.content}</p>
-                                                    </div>
-                                                    <div class="dropdown align-self-end">
-                                                        <a class="dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                            <i class="bx bx-dots-vertical-rounded"></i>
-                                                        </a>
-                                                        <div class="dropdown-menu">
-                                                            <a class="dropdown-item fw-medium text-muted" href="javascript: void(0);"><i class="mdi mdi-content-copy me-2"></i>Copy</a>
-                                                            <a class="dropdown-item fw-medium text-muted" href="javascript: void(0);"><i class="mdi mdi-star-outline me-2"></i>Star</a>
-                                                            <a class="dropdown-item fw-medium text-muted" href="javascript: void(0);"><i class="mdi mdi-reply-all-outline me-2"></i>Reply</a>
-                                                            <a class="dropdown-item fw-medium text-muted" href="javascript: void(0);"><i class="mdi mdi-share-all-outline me-2"></i>Forward</a>
-                                                            <div class="dropdown-divider"></div>
-                                                            <a class="dropdown-item fw-medium text-danger delete-chat-item" href="javascript: void(0);"><i class="mdi mdi-trash-can-outline me-2"></i>Delete</a>
+                            if (conversation.sender_id == authUserId) {
+                                $('#chat-conversation-list').append(`
+                                    <li class="chat-list right">
+                                        <div class="conversation-list">
+                                            <div class="d-flex">
+                                                <div class="chat-user">
+                                                    <img src="${conversation.sender_profile}" class="avatar-sm img-fluid rounded-circle" alt="">
+                                                </div>
+                                                <div class="flex-1 chat-arrow">
+                                                    <div class="d-flex justify-content-end">
+                                                        <div class="ctext-wrap">
+                                                            <p class="mb-0">${conversation.content}</p>
+                                                        </div>
+                                                        <div class="dropdown align-self-end">
+                                                            <a class="dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                                <i class="bx bx-dots-vertical-rounded"></i>
+                                                            </a>
+                                                            <div class="dropdown-menu">
+                                                                <a class="dropdown-item fw-medium text-muted" href="javascript: void(0);"><i class="mdi mdi-content-copy me-2"></i>Copy</a>
+                                                                <a class="dropdown-item fw-medium text-muted" href="javascript: void(0);"><i class="mdi mdi-star-outline me-2"></i>Star</a>
+                                                                <a class="dropdown-item fw-medium text-muted" href="javascript: void(0);"><i class="mdi mdi-reply-all-outline me-2"></i>Reply</a>
+                                                                <a class="dropdown-item fw-medium text-muted" href="javascript: void(0);"><i class="mdi mdi-share-all-outline me-2"></i>Forward</a>
+                                                                <div class="dropdown-divider"></div>
+                                                                <a class="dropdown-item fw-medium text-danger delete-chat-item" href="javascript: void(0);"><i class="mdi mdi-trash-can-outline me-2"></i>Delete</a>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                                <div class="conversation-name fw-medium text-primary mb-2 mt-1">
-                                                    ${conversation.sender_id == authUserId ? 'You' : conversation.sender.name} <small class="chat-time text-muted fw-medium">${fullFormattedDateTime}</small>
+                                                    <div class="conversation-name fw-medium text-primary mb-2 mt-1">
+                                                        ${'You'} <small class="chat-time text-muted fw-medium">${fullFormattedDateTime}</small>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </div><!-- end conversation list -->
-                                </li><!-- end li -->
-                            `);
+                                        </div><!-- end conversation list -->
+                                    </li>
+                                `);                                
+                            } else {
+                                $('#chat-conversation-list').append(`                                 
+                                    <li class="chat-list">
+                                        <div class="conversation-list">
+                                            <div class="d-flex">
+                                                <div class="chat-user">
+                                                    <img src="${conversation.receiver_profile}" class="avatar-sm img-fluid rounded-circle" alt="">
+                                                </div>
+                                                <div class="flex-1 chat-arrow">
+                                                    <div class="d-flex">
+                                                        <div class="ctext-wrap">
+                                                            <p class="mb-0">${conversation.content}</p>
+                                                        </div>
+                                                        <div class="dropdown align-self-end">
+                                                            <a class="dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                                <i class="bx bx-dots-vertical-rounded"></i>
+                                                            </a>
+                                                            <div class="dropdown-menu">
+                                                                <a class="dropdown-item fw-medium text-muted" href="javascript: void(0);"><i class="mdi mdi-content-copy me-2"></i>Copy</a>
+                                                                <a class="dropdown-item fw-medium text-muted" href="javascript: void(0);"><i class="mdi mdi-star-outline me-2"></i>Star</a>
+                                                                <a class="dropdown-item fw-medium text-muted" href="javascript: void(0);"><i class="mdi mdi-reply-all-outline me-2"></i>Reply</a>
+                                                                <a class="dropdown-item fw-medium text-muted" href="javascript: void(0);"><i class="mdi mdi-share-all-outline me-2"></i>Forward</a>
+                                                                <div class="dropdown-divider"></div>
+                                                                <a class="dropdown-item fw-medium text-danger delete-chat-item" href="javascript: void(0);"><i class="mdi mdi-trash-can-outline me-2"></i>Delete</a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="conversation-name fw-medium text-primary mb-2 mt-1">
+                                                        ${conversation.sender.name} <small class="chat-time text-muted fw-medium">${fullFormattedDateTime}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div><!-- end conversation list -->
+                                    </li>
+                                `);                                
+                            }
                         });
+
                     },
                     error: function(err) {
                         console.error(err);
@@ -767,7 +892,6 @@
             });
         });
     </script>
-    
     <script type="text/javascript">
         $(document).ready(function() {
             // Gérer la soumission du formulaire avec AJAX
@@ -840,9 +964,9 @@
                                             </a>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="conversation-name fw-medium text-primary mb-2 mt-1">
-                                    Jansh Wells <small class="chat-time text-muted fw-medium">${time}</small>
+                                    <div class="conversation-name fw-medium text-primary mb-2 mt-1">
+                                        Jansh Wells <small class="chat-time text-muted fw-medium">${time}</small>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -877,6 +1001,116 @@
             }
         }
     </script>
+    
+    <script>
+        Pusher.logToConsole = true;
+    
+        var pusher = new Pusher('7b58256c7e5bb4ae5d01', {
+            cluster: 'eu'
+        });
+    
+        var channel = pusher.subscribe('user-messages');
+        const myId = {{ Auth::user()->id }};
+        var currentConversationId;
+        var currentGroupId;
+
+        document.querySelectorAll('.chat-user-link').forEach(function(element) {
+            element.addEventListener('click', function() {
+                // Récupérer l'ID de conversation sélectionné à partir de l'attribut data-group-id
+                var currentConversationId = this.getAttribute('chat-user-link');   
+            });
+        });
+        
+        document.querySelectorAll('.chat-group-link').forEach(function(element) {
+            element.addEventListener('click', function() {
+                // Récupérer l'ID du groupe sélectionné à partir de l'attribut data-group-id
+                var currentGroupId = this.getAttribute('data-group-id');      
+            });
+        });
+    
+        channel.bind('user-message', function(data) {
+            console.log(JSON.stringify(data));
+    
+            // Vérifier si le message est pour la discussion courante (privée ou de groupe)
+            if (data.conversation_id === currentConversationId || data.group_id === currentGroupId) {
+                if (data.sender_id != myId) {
+                    
+                    // Fonction pour ajouter le message dans la liste de discussion
+                    var getChatListIncomming = function(message, listId) {
+                        var time = (new Date()).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+                        var listElement = document.getElementById(listId);
+                
+                        listElement.insertAdjacentHTML("beforeend", `
+                            <li class="chat-list">
+                                <div class="conversation-list">
+                                    <div class="d-flex">
+                                        <div class="chat-user">
+                                            <img src="assets/images/users/avatar-10.jpg" class="avatar-sm img-fluid rounded-circle" alt="">
+                                        </div>
+                                        <div class="flex-1 chat-arrow">
+                                            <div class="d-flex justify-content-end">
+                                                <div class="ctext-wrap">
+                                                    <p class="mb-0">${message}</p>
+                                                </div>
+                                                <div class="dropdown align-self-end">
+                                                    <a class="dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                        <i class="bx bx-dots-vertical-rounded"></i>
+                                                    </a>
+                                                    <div class="dropdown-menu">
+                                                        <a class="dropdown-item fw-medium text-muted" href="javascript: void(0);">
+                                                            <i class="mdi mdi-content-copy me-2"></i>Copy
+                                                        </a>
+                                                        <a class="dropdown-item fw-medium text-muted" href="javascript: void(0);">
+                                                            <i class="mdi mdi-star-outline me-2"></i>Star
+                                                        </a>
+                                                        <a class="dropdown-item fw-medium text-muted" href="javascript: void(0);">
+                                                            <i class="mdi mdi-reply-all-outline me-2"></i>Reply
+                                                        </a>
+                                                        <a class="dropdown-item fw-medium text-muted" href="javascript: void(0);">
+                                                            <i class="mdi mdi-share-all-outline me-2"></i>Forward
+                                                        </a>
+                                                        <div class="dropdown-divider"></div>
+                                                        <a class="dropdown-item fw-medium text-danger delete-chat-item" href="javascript: void(0);">
+                                                            <i class="mdi mdi-trash-can-outline me-2"></i>Delete
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                <div class="conversation-name fw-medium text-primary mb-2 mt-1">
+                                                    Jansh Wells <small class="chat-time text-muted fw-medium">${time}</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        `);
+                
+                        // Attacher des événements aux nouveaux éléments pour la suppression
+                        attachDeleteEvent(listElement);
+                    };
+                    // Ajouter le message à la discussion courante (côté gauche)
+                    getChatListIncomming(data.content, "chat-conversation-list");
+
+                    // Faire défiler jusqu'en bas après l'ajout du message
+                    scrollToBottom("chat-conversation-list", "chat-conversation");
+                }
+            } else {
+                // Afficher une notification pour des messages dans une autre discussion
+                // Exemple : mettre à jour un compteur de messages non lus
+                updateUnreadMessageCounter(data.conversation_id);
+            }
+        });
+    
+        // Fonction pour mettre à jour le compteur de messages non lus
+        function updateUnreadMessageCounter(conversationId) {
+            var counter = document.getElementById("unread-counter-" + conversationId);
+            if (counter) {
+                var count = parseInt(counter.innerText, 10) || 0;
+                counter.innerText = count + 1;
+            }
+        }
+    </script>
+    
 
     <!-- Bootstrap JS -->
     <script src="{{ asset('assets/libs/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
