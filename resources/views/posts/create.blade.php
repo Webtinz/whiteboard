@@ -702,54 +702,30 @@
                                     <div class="card-body">
                                         <div class="row">
                                             <div class="col-xl-6">
-                                                <div class="mb-3 row">
-                                                    <label for="example-text-input" class="col-md-2 col-form-label">Text</label>
-                                                    <div class="col-md-10">
-                                                        <input class="form-control" type="text" value="Artisanal kale" id="example-text-input">
+                                                
+                                                <form action="{{ route('posts.store') }}" method="POST" enctype="multipart/form-data">
+                                                    @csrf
+                                                    <div class="mb-3">
+                                                        <label for="content" class="form-label">Post Content</label>
+                                                        <textarea name="content" class="form-control" id="content" rows="3"></textarea>
                                                     </div>
-                                                </div><!-- end row -->
-                                                <div class="mb-3 row">
-                                                    <label for="example-search-input" class="col-md-2 col-form-label">Search</label>
-                                                    <div class="col-md-10">
-                                                        <input class="form-control" type="search" value="How do I shoot web" id="example-search-input">
+                                                    <div class="mb-3">
+                                                        <label for="team_id" class="form-label">Team</label>
+                                                        <select name="team_id" id="team_id" class="form-control" required>
+                                                            @foreach ($teams as $team)
+                                                                <option value="{{ $team->id }}">{{ $team->name }}</option>
+                                                            @endforeach
+                                                        </select>
                                                     </div>
-                                                </div><!-- end row -->
-                                                <div class="mb-3 row">
-                                                    <label for="example-email-input" class="col-md-2 col-form-label">Email</label>
-                                                    <div class="col-md-10">
-                                                        <input class="form-control" type="email" value="bootstrap@example.com" id="example-email-input">
+                                                
+                                                    <div class="mb-3">
+                                                        <label for="image" class="form-label">Upload Image</label>
+                                                        <input type="file" name="image" class="form-control" id="image">
                                                     </div>
-                                                </div><!-- end row -->
-                                                <div class="mb-3 row">
-                                                    <label for="example-url-input" class="col-md-2 col-form-label">URL</label>
-                                                    <div class="col-md-10">
-                                                        <input class="form-control" type="url" value="https://getbootstrap.com" id="example-url-input">
-                                                    </div>
-                                                </div><!-- end row -->
-                                                <div class="mb-3 row">
-                                                    <label for="example-tel-input" class="col-md-2 col-form-label">Telephone</label>
-                                                    <div class="col-md-10">
-                                                        <input class="form-control" type="tel" value="1-(555)-555-5555" id="example-tel-input">
-                                                    </div>
-                                                </div><!-- end row -->
-                                                <div class="mb-3 row">
-                                                    <label for="example-password-input" class="col-md-2 col-form-label">Password</label>
-                                                    <div class="col-md-10">
-                                                        <input class="form-control" type="password" value="hunter2" id="example-password-input">
-                                                    </div>
-                                                </div><!-- end row -->
-                                                <div class="mb-3 row">
-                                                    <label for="example-number-input" class="col-md-2 col-form-label">Number</label>
-                                                    <div class="col-md-10">
-                                                        <input class="form-control" type="number" value="42" id="example-number-input">
-                                                    </div>
-                                                </div><!-- end row -->
-                                                <div class="mb-3 mb-lg-0 row">
-                                                    <label for="example-datetime-local-input" class="col-md-2 col-form-label">Date and time</label>
-                                                    <div class="col-md-10">
-                                                        <input class="form-control" type="datetime-local" value="2019-08-19T13:45:00" id="example-datetime-local-input">
-                                                    </div>
-                                                </div><!-- end row -->
+                                                
+                                                    <button type="submit" class="btn btn-primary">Add Post</button>
+                                                </form>
+                                                
                                             </div><!-- end col -->
     
                                             

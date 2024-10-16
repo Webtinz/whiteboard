@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Post extends Model
 {
 
-    protected $fillable = ['content', 'author_id', 'team_id'];
+    protected $fillable = ['content', 'author_id', 'team_id', 'image'];
 
     // Relation avec le modèle User (auteur du post)
     public function author()

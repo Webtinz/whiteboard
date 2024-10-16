@@ -48,11 +48,10 @@ Route::middleware('auth')->group(function () {
     Route::post('posts/{post}/like', [PostController::class, 'like'])->name('posts.like');
     Route::post('posts/{post}/unlike', [PostController::class, 'unlike'])->name('posts.unlike');
     Route::post('posts/{post}/comment', [PostController::class, 'comment'])->name('posts.comment');
+    Route::get('/posts/filter/{teamId}', [PostController::class, 'filterByTeam'])->name('posts.filterByTeam');
 
     //Projects routes
     Route::resource('projects', ProjectController::class);
-    // Route::post('projects', [ProjectController::class, 'store'])->name('projects.store');
-    // Route::get('projects', [ProjectController::class, 'index'])->name('projects.index');
     Route::get('projects/delete/{project_id}', [ProjectController::class, 'delete'])->name('projects.delete');
     Route::post('projects/{project}/files', [FileController::class, 'store'])->name('files.store');
     Route::get('files/{file}/download', [FileController::class, 'download'])->name('files.download');

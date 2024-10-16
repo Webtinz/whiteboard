@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('posts', function (Blueprint $table) {
             $table->id(); // Identifiant unique de l'post
             $table->text('content'); // Contenu du post
+            $table->text('image')->nullable(); // Image du post
             $table->unsignedBigInteger('author_id'); // Relation avec l'utilisateur (auteur du post)
             $table->unsignedBigInteger('team_id'); // Relation avec l'équipe
             $table->timestamps();

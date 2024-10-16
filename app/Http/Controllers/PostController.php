@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Post;
+use App\Models\Comment;
+use App\Models\Team;
 
 class PostController extends Controller
 {
@@ -12,10 +14,9 @@ class PostController extends Controller
      */
     public function index()
     {
-        // Récupère tous les posts avec l'auteur
-        $posts = Post::with('author')->get();
-        
-        return view('posts.index', compact('posts'));
+        $posts = Post::with('author', 'team')->orderBy('created_at', 'desc')->get();
+        $teams = Team::all();
+        return view('posts.index', compact('posts','teams'));
     }
 
     /**
@@ -24,24 +25,48 @@ class PostController extends Controller
     // Affiche le formulaire de création d'un post
     public function create()
     {
-        return view('posts.create');
+        $teams = Team::all(); // Lister les équipes disponibles
+        return view('posts.create', compact('teams'));
     }
 
     // Enregistre un nouveau post
     public function store(Request $request)
     {
+        // Validation des données
         $request->validate([
-            'content' => 'required|string',
+            'content' => 'required|string|max:1000',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'team_id' => 'required|exists:teams,id',
         ]);
 
-        // Crée un nouveau post avec l'auteur authentifié
+        // Traitement de l'image
+        $imagePath = null;
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $imagePath = $image->store('posts_images', 'public');
+        }
+        
+
+        // Création du post
         Post::create([
             'content' => $request->content,
-            'author_id' => auth()->id(),
+            'team_id' => $request->input('team_id'),
+            'image' => $imagePath,
+            'author_id' => auth()->user()->id,  // Assume que l'utilisateur est connecté
         ]);
 
-        return redirect()->route('posts.index')->with('success', 'Post créé avec succès !');
+        // Redirection après la création du post
+        return redirect()->route('posts.index')->with('success', 'Post created successfully!');
     }
+
+    public function filterByTeam($teamId)
+    {
+        $posts = Post::with('author', 'team')->where('team_id', $teamId)->orderBy('created_at', 'desc')->get();
+        $teams = Team::all(); // Récupérer toutes les équipes
+
+        return view('posts.index', compact('posts', 'teams'));
+    }
+
 
     // Affiche le formulaire d'édition d'un post
     public function edit($post_id)
