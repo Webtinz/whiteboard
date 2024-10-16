@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Whiteboard;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Message;
+use App\Events\SendMessage;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
@@ -31,6 +32,8 @@ class MessageController extends Controller
             'group_id' => $validated['group_id'],
             'content' => $validated['content'],
         ]);
+        // Broadcast the message using the SendMessage event
+        event(new SendMessage($message));
 
         // return response()->json($message);
         return response()->json([

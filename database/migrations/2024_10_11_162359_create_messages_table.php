@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('receiver_id')->nullable()->constrained('users')->onDelete('cascade'); // Null si c'est dans un groupe
             $table->foreignId('group_id')->nullable()->constrained('groups')->onDelete('cascade');
             $table->text('content');
+            $table->boolean('seen')->default(false);
             $table->timestamps();
         });
     }
