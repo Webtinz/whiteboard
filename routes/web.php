@@ -5,8 +5,6 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\FileController;
 use App\Http\Controllers\PostController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Whiteboard\FileController;
-use App\Http\Controllers\Whiteboard\PostController;
 use App\Http\Controllers\Whiteboard\GroupController;
 use App\Http\Controllers\Whiteboard\MessageController;
 
