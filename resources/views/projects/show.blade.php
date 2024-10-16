@@ -707,8 +707,8 @@
                                     <select class="form-control" data-trigger name="type" id="team-status">
                                         <option value="">Choose...</option>
                                         <option value="Requirement">Requirement</option>
-                                        <option value="Progress">Progress</option>
-                                        <option value="Pending">Pending</option>
+                                        <option value="Documentation">Documentation</option>
+                                        <option value="Image">Image</option>
                                     </select>
                                 </div><!-- end col -->
                             </div><!-- end row -->
@@ -734,8 +734,29 @@
                                 <div class="card">
                                     <div class="card-body">
                                         <div class="mt-4">
+                                            <div class="row mb-3">
+                                                <div class="col-md-4">
+                                                    <input type="text" id="searchInput" class="form-control" placeholder="Search by name...">
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <select id="sortOrder" class="form-select">
+                                                        <option value="newest">Lastest</option>
+                                                        <option value="oldest">Oldest</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <select id="typeFilter" class="form-select">
+                                                        <option value="">All</option>
+                                                        <!-- Ajoutez dynamiquement les options en PHP -->
+                                                        @foreach($files->pluck('type')->unique() as $type)
+                                                            <option value="{{ $type }}">{{ $type }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            </div>
+                                                                                        
                                             <div class="table-responsive">
-                                                <table class="table align-middle mb-0">
+                                                <table class="table align-middle mb-0" id="filesTable">
                                                     <thead>
                                                         <tr>
                                                             <th colspan="2" scope="col">Name</th>
@@ -1087,6 +1108,49 @@
 <script src="{{ asset('assets/js/pages/file-manager.init.js')}}"></script>
 <!-- custom js -->
 <script src="{{ asset('assets/js/app.js')}}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const typeFilter = document.getElementById('typeFilter');
+    const sortOrder = document.getElementById('sortOrder');
+    const table = document.getElementById('filesTable');
+    const tbody = table.querySelector('tbody');
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+
+    function filterAndSortTable() {
+        const searchText = searchInput.value.toLowerCase();
+        const selectedType = typeFilter.value.toLowerCase();
+        const isNewestFirst = sortOrder.value === 'newest';
+
+        const filteredRows = rows.filter(row => {
+            const name = row.querySelector('td:nth-child(2) a').textContent.toLowerCase();
+            const type = row.querySelector('td:nth-child(4)').textContent.toLowerCase();
+            
+            const nameMatch = name.includes(searchText);
+            const typeMatch = selectedType === '' || type === selectedType;
+
+            return nameMatch && typeMatch;
+        });
+
+        filteredRows.sort((a, b) => {
+            const dateA = new Date(a.querySelector('td:nth-child(3)').textContent);
+            const dateB = new Date(b.querySelector('td:nth-child(3)').textContent);
+            return isNewestFirst ? dateB - dateA : dateA - dateB;
+        });
+
+        tbody.innerHTML = '';
+        filteredRows.forEach(row => tbody.appendChild(row));
+    }
+
+    searchInput.addEventListener('input', filterAndSortTable);
+    typeFilter.addEventListener('change', filterAndSortTable);
+    sortOrder.addEventListener('change', filterAndSortTable);
+
+    // Initial sort
+    filterAndSortTable();
+});
+</script>
+
 <script>
      document.addEventListener('DOMContentLoaded', function() {
 Dropzone.options.myDropzone = {

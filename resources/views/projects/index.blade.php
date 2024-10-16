@@ -694,7 +694,7 @@
                         </div>
                         <div class="search-box mt-3 mt-sm-0">
                             <div class="position-relative">
-                                <input type="text" class="form-control rounded" id="search-team" onkeyup="searchTeam()"
+                                <input type="text" class="form-control rounded" id="projectSearch"
                                     placeholder="Search...">
                                 <i class="uil uil-search search-icon"></i>
                             </div>
@@ -740,7 +740,15 @@
                                     </div>
                                     <div class="d-flex">
                                         <div class="align-self-end">
-                                            <span class="badge badge-soft-danger p-2 team-status">{{$project->status}}</span>
+                                            @if ($project->status == "Progress")
+                                                <span class="badge badge-soft-danger p-2 team-status">{{$project->status}}</span>
+                                            @endif
+                                            @if ($project->status == "Pending")
+                                                <span class="badge badge-soft-warning p-2 team-status">{{$project->status}}</span>
+                                            @endif
+                                            @if ($project->status == "Completed")
+                                                <span class="badge badge-soft-success p-2 team-status">{{$project->status}}</span>
+                                            @endif
                                         </div>
                                     </div>
                                 </div><!-- end card body-->
@@ -999,23 +1007,20 @@
 <script src="assets/js/app.js"></script>
 
 <script>
-    function loadItemData(itemId) {
-    // Faire une requête AJAX pour récupérer les données de l'élément à modifier
-    $.ajax({
-        url: 'projects.show' + itemId, // URL de l'API pour récupérer l'élément
-        type: 'GET',
-        success: function(data) {
-            // Remplir les champs du formulaire dans le modal
-            $('#item-id').val(data.id);
-            $('#item-name').val(data.name);
-            $('#item-description').val(data.description);
+    document.getElementById('projectSearch').addEventListener('keyup', function() {
+        var searchValue = this.value.toLowerCase();
+        var projectItems = document.querySelectorAll('.team-box');
 
-            // Mettre à jour l'action du formulaire
-            $('#editItemForm').attr('action', '/items/' + data.id);
-        }
+        projectItems.forEach(function(project) {
+            var projectName = project.querySelector('.team-title').textContent.toLowerCase();
+
+            if (projectName.includes(searchValue)) {
+                project.style.display = ''; // Affiche l'élément
+            } else {
+                project.style.display = 'none'; // Masque l'élément
+            }
+        });
     });
-}
-
 </script>
 
 </body>

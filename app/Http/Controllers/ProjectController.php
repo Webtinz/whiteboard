@@ -11,7 +11,7 @@ class ProjectController extends Controller
     public function index()
     {
         // Affiche tous les projets
-        $projects = Project::all();
+        $projects = Project::orderBy('created_at', 'desc')->get();
         return view('projects.index', compact('projects'));
     }
 
