@@ -2,6 +2,9 @@
 
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Http\Request;
+// Dans index.php ou autoload.php
+require_once __DIR__ . '/../app/Http/Controllers/Utils.php';
+
 
 define('LARAVEL_START', microtime(true));
 
