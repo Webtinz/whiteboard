@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Post;
 use App\Models\Comment;
 use App\Models\Team;
+use App\Models\Like;
 
 class PostController extends Controller
 {
@@ -14,9 +15,11 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts = Post::with('author', 'team')->orderBy('created_at', 'desc')->get();
+        // $posts = Post::with('author', 'team')->orderBy('created_at', 'desc')->get();
+        $posts = Post::with('likes')->orderBy('created_at', 'desc')->get();
+        $user = auth()->user();
         $teams = Team::all();
-        return view('posts.index', compact('posts','teams'));
+        return view('posts.index', compact('posts','teams', 'user'));
     }
 
     /**
@@ -61,10 +64,11 @@ class PostController extends Controller
 
     public function filterByTeam($teamId)
     {
-        $posts = Post::with('author', 'team')->where('team_id', $teamId)->orderBy('created_at', 'desc')->get();
-        $teams = Team::all(); // Récupérer toutes les équipes
-
-        return view('posts.index', compact('posts', 'teams'));
+        // $posts = Post::with('author', 'team')->orderBy('created_at', 'desc')->get();
+        $posts = Post::with('likes')->where('team_id', $teamId)->orderBy('created_at', 'desc')->get();
+        $user = auth()->user();
+        $teams = Team::all();
+        return view('posts.index', compact('posts','teams', 'user'));
     }
 
 
@@ -104,17 +108,16 @@ class PostController extends Controller
     public function like($post_id)
     {
         $post = Post::findOrFail($post_id);
-        $post->likes()->attach(auth()->id());
+        $isLike = Like::where('user_id', auth()->id())
+                        ->where('post_id', $post_id)->first();
+        // dd($isLike);
+        if($isLike){
+            $post->likes()->detach(auth()->id());
+        }else{
+            $post->likes()->attach(auth()->id());
+        }
 
         return redirect()->back()->with('success', 'Post liké avec succès !');
-    }
-
-    public function unlike($post_id)
-    {
-        $post = Post::findOrFail($post_id);
-        $post->likes()->detach(auth()->id());
-
-        return redirect()->back()->with('success', 'Like retiré avec succès !');
     }
 
     public function comment(Request $request, $post_id)

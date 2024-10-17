@@ -185,6 +185,12 @@
                         </a>
                     </li>
                     <li>
+                        <a href="{{route('posts.index')}}">
+                            <i class="icon nav-icon" data-feather="briefcase"></i>
+                            <span class="menu-item" data-key="t-contacts">Posts</span>
+                        </a>
+                    </li>
+                    <li>
                         <a href="{{route('projects.index')}}">
                             <i class="icon nav-icon" data-feather="briefcase"></i>
                             <span class="menu-item" data-key="t-contacts">Projects</span>
