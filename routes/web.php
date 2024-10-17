@@ -7,6 +7,7 @@ use App\Http\Controllers\PostController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Whiteboard\GroupController;
 use App\Http\Controllers\Whiteboard\MessageController;
+// use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PlatformUserController;
 
 /*
@@ -21,6 +22,11 @@ use App\Http\Controllers\PlatformUserController;
 */
 
 Route::get('/', function () {
+    return redirect()->route('login1');
+});
+
+
+Route::get('/home', function () {
     return view('Front_include.index');
 })->name('welcome');
 
@@ -48,6 +54,13 @@ Route::get('activityzone', function () {
 // Route::get('/signup', function () {
 //     return view('Front_include.signup');
 // })->name('signup');
+Route::get('/login1', function () {
+    return view('Front_include.login');
+})->name('login1');
+
+Route::get('/signup', function () {
+    return view('Front_include.signup');
+})->name('signup');
 
 
 // Messages
@@ -100,7 +113,7 @@ Route::middleware('auth')->group(function () {
 
 });
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';
 
 Route::middleware(['auth', 'role:platform_master|platform_users_management'])->group(function () {
 });
