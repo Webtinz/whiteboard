@@ -14,4 +14,7 @@
             </div>
         </div>
     </div>
+    <div class="btn btn-info">
+        <a href="{{ route('conversations') }}">conversations list</a>
+    </div>
 </x-app-layout>

@@ -29,7 +29,7 @@
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto">
         <li class="nav-item dropdown active">
-          <a class="nav-link dropdown-toggle" href="{{ route('signup') }}" data-toggle="dropdown">Sign Up
+          <a class="nav-link dropdown-toggle" href="{{ route('register') }}" data-toggle="dropdown">Sign Up
             <span><i class="ti-angle-down"></i></span>
           </a>
         </li>

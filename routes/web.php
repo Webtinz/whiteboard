@@ -5,6 +5,9 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\FileController;
 use App\Http\Controllers\PostController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Whiteboard\GroupController;
+use App\Http\Controllers\Whiteboard\MessageController;
+use App\Http\Controllers\PlatformUserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,21 +21,56 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
-});
-
-
-Route::get('/home', function () {
     return view('Front_include.index');
-});
+})->name('welcome');
 
-Route::get('login1', function () {
-    return view('Front_include.login');
-})->name('login1');
+Route::get('dashboarduser', function () {
+    return view('layouts.dashboardlayout');
+})->name('dashboarduser');
 
-Route::get('signup', function () {
-    return view('Front_include.signup');
-})->name('signup');
+// vue temporaire
+Route::get('allemployee', function () {
+    return view('Front_include.allemployee');
+})->name('allemployee');
+
+Route::get('kanbanboard', function () {
+    return view('Front_include.kanbanboard');
+})->name('kanbanboard');
+
+Route::get('task', function () {
+    return view('Front_include.task');
+})->name('task');
+
+Route::get('activityzone', function () {
+    return view('Front_include.activityzone');
+})->name('activityzone');
+
+// Route::get('/signup', function () {
+//     return view('Front_include.signup');
+// })->name('signup');
+
+
+// Messages
+Route::post('/messages/send', [MessageController::class, 'sendMessage'])->name('message.inbox.send');
+Route::get('/messages/{receiverId}', [MessageController::class, 'getConversationWithUser']);
+Route::get('/groupmessages/{groupId}', [MessageController::class, 'getGroupConversation']);
+
+// Récupérer toutes les conversations (directes et de groupe)
+Route::get('/conversations', [MessageController::class, 'getAllConversations'])->name('conversations');
+// // Récupérer toutes les conversations (directes et groupes) pour l'utilisateur connecté
+// Route::get('user/conversations', [MessageController::class, 'getUserConversations']);
+
+
+// Groupes
+Route::post('/groups/create', [GroupController::class, 'createGroup']);
+Route::post('/groups/{groupId}/add-member', [GroupController::class, 'addMember']);
+Route::delete('/groups/{groupId}/remove-member/{userId}', [GroupController::class, 'removeMember']);
+
+// Posts By Ak
+// Route::post('posts', [PostController::class, 'createPost']);
+
+// Fichiers
+Route::post('messages/{messageId}/files', [FileController::class, 'uploadFile']);
 
 Route::get('/dashboard', function () {
     return view('dashboard');
@@ -61,4 +99,8 @@ Route::middleware('auth')->group(function () {
 
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
+
+Route::middleware(['auth', 'role:platform_master|platform_users_management'])->group(function () {
+});
+Route::resource('/admin_users', PlatformUserController::class);
