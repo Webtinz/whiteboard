@@ -275,28 +275,26 @@
                                                         </a>
                                                         <div class="dropdown-menu">
                                                             <a class="dropdown-item fw-medium text-muted"
-                                                                href="javascript: void(0);">
+                                                                href="javascript: void(0);" id="cameraBtn">
                                                                 <i class="mdi mdi-camera-outline me-2"></i>Camera</a>
                                                             <a class="dropdown-item fw-medium text-muted"
-                                                                href="javascript: void(0);">
+                                                                href="javascript: void(0);" id="photosBtn">
                                                                 <i
                                                                     class="mdi mdi-image-multiple-outline me-2"></i>Photos</a>
                                                             <a class="dropdown-item fw-medium text-muted"
-                                                                href="javascript: void(0);">
+                                                                href="javascript: void(0);" id="audioBtn">
                                                                 <i
-                                                                    class="mdi mdi-map-marker-outline me-2"></i>Locations</a>
+                                                                    class="mdi mdi-microphone me-2"></i>Audio</a>
                                                             <a class="dropdown-item fw-medium text-muted"
-                                                                href="javascript: void(0);">
+                                                                href="javascript: void(0);" id="documentsBtn">
                                                                 <i
                                                                     class="mdi mdi-file-document-outline me-2"></i>Documents</a>
-                                                            <a class="dropdown-item fw-medium text-muted"
-                                                                href="javascript: void(0);">
-                                                                <i
-                                                                    class="mdi mdi-account-box-outline me-2"></i>Contact</a>
                                                         </div>
                                                     </div>
                                                 </div><!-- end col -->
                                                 <div class="col">
+                                                    <!-- Un seul input file -->
+                                                    <input type="file" id="fileInput" style="display: none;" name="file[]" multiple>
                                                     <input type="hidden" name="receiver_id" id="receiver_id" value="{{ Auth::user()->id }}"
                                                         class="@error('receiver_id') is-invalid @enderror">
                                                     @error('receiver_id')
@@ -549,7 +547,44 @@
 
     {{-- <script src="{{ asset('assets/js/pages/chat.init.js') }}"></script> --}}
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
+{{-- data-dowload-file-id --}}
+    <script>
+        // Référence au champ input unique
+        let fileInput = document.getElementById('fileInput');
+        
+        // Gestion des clics pour chaque bouton
+        
+        // Activer la caméra directement
+        document.getElementById('cameraBtn').addEventListener('click', function() {
+            fileInput.accept = "image/*"; // Autoriser uniquement les images capturées par la caméra
+            fileInput.capture = "camera"; // Activer la capture par la caméra
+            fileInput.click();
+        });
+        
+        // Autoriser uniquement les photos/images
+        document.getElementById('photosBtn').addEventListener('click', function() {
+            fileInput.accept = "image/*"; // Autoriser uniquement les images
+            fileInput.removeAttribute('capture'); // Désactiver la capture directe (utilisation de la galerie)
+            fileInput.click();
+            console.log('Photo clique');
+            
+        });
+        
+        // Autoriser uniquement les fichiers audio
+        document.getElementById('audioBtn').addEventListener('click', function() {
+            fileInput.accept = "audio/*"; // Autoriser uniquement les fichiers audio
+            fileInput.removeAttribute('capture'); // Utiliser la galerie d'audio
+            fileInput.click();
+        });
+        
+        // Autoriser uniquement les documents
+        document.getElementById('documentsBtn').addEventListener('click', function() {
+            fileInput.accept = ".zip,.pdf,.doc,.docx,.txt,.xls,.xlsx,.ppt,.pptx,.txt"; // Documents autorisés
+            fileInput.removeAttribute('capture'); // Aucun besoin de capture
+            fileInput.click();
+        });
+        
+    </script>
 
     <script>
         $(document).ready(function() {
@@ -625,8 +660,7 @@
                     method: 'GET',
                     success: function(data) {
                         // console.log(data);
-                        
-                        // Vider la liste actuelle des conversations
+                       // Vider la liste actuelle des conversations
                         $('#chat-conversation-list').empty();
                         // Variable pour stocker la date du dernier message
                         let lastMessageDate = null;
@@ -641,10 +675,10 @@
 
                             // Formatez le jour, le mois et l'année
                             const formattedDate = date.toLocaleDateString('en-EN', {
-                                weekday: 'long', // Jour de la semaine en lettres
-                                year: 'numeric', // Année en chiffres
-                                month: 'long', // Mois en lettres
-                                day: 'numeric' // Jour en chiffres
+                                weekday: 'long',
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric'
                             });
 
                             // Formatez l'heure, les minutes et les secondes
@@ -669,7 +703,56 @@
 
                             // Combiner les formats de date et d'heure pour afficher le temps
                             const fullFormattedDateTime = `${formattedTime}`;
-                            
+
+                            // Vérification et génération du HTML pour les fichiers
+                            let fileHtml = '';
+                            if (conversation.files && conversation.files.length > 0) {
+                                fileHtml = `<div class="chat-files">
+                                    <div class="chat-file">
+                                        <ul class="d-flex flex-wrap gap-2 list-inline message-img mb-0">`;
+                                conversation.files.forEach(function(file) {
+                                    // Vérifiez l'extension du fichier
+                                    const fileExtension = file.file_path.split('.').pop().toLowerCase();
+                                    // console.log(fileExtension);
+                                    if (fileExtension == 'jpeg' || fileExtension == 'jpg' || fileExtension == 'png' || fileExtension == 'gif' || fileExtension == 'webp' || fileExtension == 'svg' || fileExtension == 'bmp' || fileExtension == 'ico') {
+                                        fileHtml += `
+                                                    <li class="list-inline-item message-img-list me-0">
+                                                        <div>
+                                                            <a href="/storage/${file.file_path}" class="thumb preview-thumb image-popup" style="padding:0px !important">
+                                                                <img src="/storage/${file.file_path}" class="img-fluid" alt="${file.fileName || file.file_path.split('/').pop()}">
+                                                            </a>
+                                                        </div>
+                                                    </li> <!-- end li -->`;
+                                        
+                                    } else {
+                                        fileHtml += `<div class="card shadow-none p-2 mb-0">
+                                                                    <div class="d-flex align-items-center">
+                                                                        <div class="avatar-sm me-3 ms-0 flex-shrink-0">
+                                                                            <div class="avatar-title bg-light text-muted rounded font-size-20">
+                                                                                <i class="mdi mdi-file-document-outline"></i>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="flex-1">
+                                                                            <div class="text-start">
+                                                                                <h5 class="font-size-14 mb-1">
+                                                                                    ${file.fileName}</h5>
+                                                                                <p class="text-muted font-size-13 mb-0">
+                                                                                    ${file.fileSize}</p>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="ms-5">
+                                                                            <a href="/storage/${file.file_path}" data-dowload-file-id="{{ 'file-id' }}" data-bs-toggle="tooltip" data-bs-placement="top" aria-label="Download" data-bs-original-title="Download"><i class="mdi mdi-download text-muted fs-5"></i></a>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>`;                                        
+                                    }
+                                });
+                                fileHtml += `
+                                                        </ul>
+                                                    </div>
+                                                </div>`;
+                            }
+
                             if (conversation.sender_id == authUserId) {
                                 $('#chat-conversation-list').append(`
                                     <li class="chat-list right">
@@ -682,6 +765,7 @@
                                                     <div class="d-flex justify-content-end">
                                                         <div class="ctext-wrap">
                                                             <p class="mb-0">${conversation.content}</p>
+                                                            ${fileHtml} <!-- Afficher les fichiers s'ils existent -->
                                                         </div>
                                                         <div class="dropdown align-self-end">
                                                             <a class="dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -704,7 +788,7 @@
                                             </div>
                                         </div><!-- end conversation list -->
                                     </li>
-                                `);                                
+                                `);
                             } else {
                                 $('#chat-conversation-list').append(`                                 
                                     <li class="chat-list">
@@ -717,6 +801,7 @@
                                                     <div class="d-flex">
                                                         <div class="ctext-wrap">
                                                             <p class="mb-0">${conversation.content}</p>
+                                                            ${fileHtml} <!-- Afficher les fichiers s'ils existent -->
                                                         </div>
                                                         <div class="dropdown align-self-end">
                                                             <a class="dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -742,6 +827,7 @@
                                 `);                                
                             }
                         });
+
                     },
                     error: function(err) {
                         console.error(err);
@@ -892,6 +978,7 @@
             });
         });
     </script>
+
     <script type="text/javascript">
         $(document).ready(function() {
             // Gérer la soumission du formulaire avec AJAX
@@ -909,8 +996,10 @@
                     contentType: false, // Nécessaire pour l'envoi de fichiers
                     success: function(response) {
                         // Met à jour l'interface avec le nouveau message sans recharger
-                        getChatList(response.content, "chat-conversation-list");
+                        getChatList(response.content, "chat-conversation-list", response.sender);
     
+                        // console.log(response.files.file_path);
+                        
                         // Efface le champ de message après envoi
                         $('#chat-input').val('');
     
@@ -923,12 +1012,29 @@
                 });
             });
         });
-    
+
         // Fonction pour ajouter le message dans la liste de discussion
-        var getChatList = function(message, listId) {
+        var getChatList = function(message, listId, name) {
             var time = (new Date()).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
             var listElement = document.getElementById(listId);
-    
+
+            // Ajoute une vérification si des fichiers sont attachés
+            var fileHtml = '';
+// console.log(message.files);
+
+            if (message.files && message.files.length > 0) { // Vérifie si des fichiers existent
+                fileHtml = '<div class="chat-files">';
+                message.files.forEach(function(file) {
+                    // Ajuster le chemin d'accès à l'image ou au fichier pour le frontend
+                    fileHtml += `<div class="chat-file">
+                                    <a href="/storage/${file.file_path}" target="_blank">Télécharger ${file.file_path.split('/').pop()}</a>
+                                </div>`;
+                });
+                fileHtml += '</div>';
+            }
+            // console.log(name);
+            
+
             listElement.insertAdjacentHTML("beforeend", `
                 <li class="chat-list right">
                     <div class="conversation-list">
@@ -940,6 +1046,7 @@
                                 <div class="d-flex justify-content-end">
                                     <div class="ctext-wrap">
                                         <p class="mb-0">${message}</p>
+                                        ${fileHtml} <!-- Afficher les fichiers s'ils existent -->
                                     </div>
                                     <div class="dropdown align-self-end">
                                         <a class="dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -965,7 +1072,7 @@
                                         </div>
                                     </div>
                                     <div class="conversation-name fw-medium text-primary mb-2 mt-1">
-                                        Jansh Wells <small class="chat-time text-muted fw-medium">${time}</small>
+                                        ${name} <small class="chat-time text-muted fw-medium">${time}</small>
                                     </div>
                                 </div>
                             </div>
@@ -973,7 +1080,7 @@
                     </div>
                 </li>
             `);
-    
+
             // Attacher des événements aux nouveaux éléments pour la suppression
             attachDeleteEvent(listElement);
         };
@@ -1036,7 +1143,56 @@
                 if (data.sender_id != myId) {
                     
                     // Fonction pour ajouter le message dans la liste de discussion
-                    var getChatListIncomming = function(message, listId) {
+                        var getChatListIncomming = function(message, files, listId) {
+                            let fileHtml = ''; // Initialiser fileHtml
+                            if (files.length > 0) {
+                                // Boucle pour récupérer chaque file_path
+                                files.forEach(function(file) {
+                                    // console.log(file.file_path);
+                                    // console.log(file.id);
+                                    // console.log(file.type);
+                                    var filePath = file.file_path; // Assurez-vous que file_path est la bonne clé
+                                    var fileId = file.id; // Assurez-vous que id est la bonne clé
+                                    var fileType = file.type; // Assurez-vous que type est la bonne clé-
+                                    var fileSize = file.size; // Assurez-vous que size est la bonne clé-
+                                    // Vérifiez l'extension du fichier
+                                    const fileExtension = file.file_path.split('.').pop().toLowerCase();
+                                    // console.log(fileExtension);
+                                    if (fileExtension == 'jpeg' || fileExtension == 'jpg' || fileExtension == 'png' || fileExtension == 'gif' || fileExtension == 'webp' || fileExtension == 'svg' || fileExtension == 'bmp' || fileExtension == 'ico') {
+                                        fileHtml += `<ul class="d-flex flex-wrap gap-2 list-inline message-img mb-2">
+                                                        <li class="list-inline-item message-img-list me-0">
+                                                            <div>
+                                                                <a href="/storage/${file.file_path}" target="_blank" class="thumb preview-thumb image-popup" style="padding:0px !important">
+                                                                    <img src="/storage/${file.file_path}" class="img-fluid" alt="${file.file_path || file.file_path.split('/').pop()}" style="border: 1px solid gray; border-radius: 5px">
+                                                                </a>
+                                                            </div>
+                                                        </li> <!-- end li -->
+                                                    </ul>`;
+                                    }else{
+                                        fileHtml += `<div class="card shadow-none p-2 mb-0">
+                                                                    <div class="d-flex align-items-center">
+                                                                        <div class="avatar-sm me-3 ms-0 flex-shrink-0">
+                                                                            <div class="avatar-title bg-light text-muted rounded font-size-20">
+                                                                                <i class="mdi mdi-file-document-outline"></i>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="flex-1">
+                                                                            <div class="text-start">
+                                                                                <h5 class="font-size-14 mb-1">
+                                                                                    ${file.file_path}</h5>
+                                                                                <p class="text-muted font-size-13 mb-0">
+                                                                                    ${file.size}</p>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="ms-5">
+                                                                            <a href="/storage/${file.file_path}" target="_blank" data-dowload-file-id="{{ 'file-id' }}" data-bs-toggle="tooltip" data-bs-placement="top" aria-label="Download" data-bs-original-title="Download"><i class="mdi mdi-download text-muted fs-5"></i></a>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>`;                                        
+                                    }
+                            });
+                        }
+                            
                         var time = (new Date()).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
                         var listElement = document.getElementById(listId);
                 
@@ -1050,7 +1206,8 @@
                                         <div class="flex-1 chat-arrow">
                                             <div class="d-flex justify-content-end">
                                                 <div class="ctext-wrap">
-                                                    <p class="mb-0">${message}</p>
+                                                    <p class="mb-0">${message ?? ""}</p>
+                                                    <p class="mb-0">${fileHtml ?? ""}</p>
                                                 </div>
                                                 <div class="dropdown align-self-end">
                                                     <a class="dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -1076,7 +1233,7 @@
                                                     </div>
                                                 </div>
                                                 <div class="conversation-name fw-medium text-primary mb-2 mt-1">
-                                                    Jansh Wells <small class="chat-time text-muted fw-medium">${time}</small>
+                                                    ${data.user.name} <small class="chat-time text-muted fw-medium">${time}</small>
                                                 </div>
                                             </div>
                                         </div>
@@ -1089,7 +1246,7 @@
                         attachDeleteEvent(listElement);
                     };
                     // Ajouter le message à la discussion courante (côté gauche)
-                    getChatListIncomming(data.content, "chat-conversation-list");
+                    getChatListIncomming(data.content, data.files, "chat-conversation-list");
 
                     // Faire défiler jusqu'en bas après l'ajout du message
                     scrollToBottom("chat-conversation-list", "chat-conversation");

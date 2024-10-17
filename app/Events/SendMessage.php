@@ -54,6 +54,7 @@ class SendMessage implements ShouldBroadcastNow
                 'receiver_id' => $this->message->receiver_id,
                 'group_id' => $this->message->group_id,
                 'sender_id' => $this->message->sender_id,
+                'files' => $this->message->files,
                 'user' => [
                     'id' => $user->id,
                     'name' => $user->name,

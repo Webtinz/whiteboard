@@ -11,11 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('files', function (Blueprint $table) {
+        Schema::create('chat_files', function (Blueprint $table) {
             $table->id();
             $table->foreignId('message_id')->constrained('messages')->onDelete('cascade');
             $table->string('file_path');
-            $table->string('type'); // audio, image, video
+            $table->string('type'); // audio, image, video-
+            $table->string('size')->nullable(); //
             $table->timestamps();
         });
     }
@@ -25,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('files');
+        Schema::dropIfExists('chat_files');
     }
 };
