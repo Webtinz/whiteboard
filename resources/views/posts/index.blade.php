@@ -30,7 +30,7 @@
 
                         <div class="row vh-100">
                             <!-- Partie droite : Barre latérale ou contenu supplémentaire -->
-                            <div class="col-xl-2 position-sticky">
+                            <div class="col-xl-3 position-sticky">
                                 <div class="card position-sticky" style="top: 20px;">
                                     <div class="card">
                                         <div class="card-header bg-primary text-white">
@@ -57,7 +57,7 @@
                                 </div>
                             </div>                            
                             <!-- Partie gauche : Contenu principal -->
-                            <div class="col-xl-8" style="height: 100vh; overflow-y: auto;">
+                            <div class="col-xl-7" style="height: 100vh; overflow-y: auto;">
                                 <div class="card">
                                     <div class="card-body">
                                         <h4 class="card-title mb-5">Activity</h4>
@@ -87,8 +87,13 @@
                                                 <p>{{ $post->content }}</p>
                         
                                                 <!-- Image associée au post -->
-                                                @if($post->image)
-                                                <img src="{{ Storage::url($post->image) }}" alt="Post Image" class="img-fluid rounded mb-3">
+                                                @if(Str::endsWith($post->image, ['.jpg', '.jpeg', '.png', '.gif']))
+                                                    <img class="img-fluid rounded mb-3" src="{{ Storage::url($post->image) }}" alt="Image">
+                                                @elseif(Str::endsWith($post->image, ['.mp4', '.mkv', '.avi', '.mov']))
+                                                    <video controls class="img-fluid rounded mb-3">
+                                                        <source src="{{ Storage::url($post->image) }}" type="video/mp4">
+                                                        Your browser does not support the video tag.
+                                                    </video>
                                                 @endif
                         
                                                 <!-- Boutons Like, Commenter, Partager -->
@@ -96,13 +101,13 @@
                                                     <!-- Bouton Like -->
                                                     <form action="{{ route('posts.like', $post->id) }}" method="POST" class="me-2">
                                                         @csrf
-                                                        <button type="submit" class="btn btn-link text-muted">
+                                                        <button type="button" class="btn btn-link text-muted like-button" data-post-id="{{ $post->id }}">
                                                             @if($post->isLikedByUser($user->id))
-                                                                <i class="far fa-thumbs-up" style="color: blue"></i> Like ({{ $post->likes->count() }})
-                                                                @else
-                                                                    <i class="far fa-thumbs-up"></i> Like ({{ $post->likes->count() }})
+                                                                <i class="far fa-thumbs-up" style="color: blue"></i> <span class="like-count">Like ({{ $post->likes->count() }})</span>
+                                                            @else
+                                                                <i class="far fa-thumbs-up"></i> <span class="like-count">Like ({{ $post->likes->count() }})</span>
                                                             @endif
-                                                        </button>
+                                                        </button>                                                        
                                                     </form>
                         
                                                     <!-- Bouton Commenter -->
@@ -120,24 +125,27 @@
                                                 <div class="collapse" id="comment-section-{{ $post->id }}">
                                                     <div class="card-footer">
                                                         <!-- Formulaire pour ajouter un commentaire -->
-                                                        <form action="{{ route('posts.comment', $post->id) }}" method="POST" class="d-flex align-items-center mb-3">
+                                                        <form id="comment-form-{{ $post->id }}" class="d-flex align-items-center mb-3">
                                                             @csrf
                                                             <img src="{{ asset('assets/images/small/img-4.png') }}" alt="User Avatar" class="rounded-circle me-2" width="30" height="30">
-                                                            <input type="text" name="content" class="form-control" placeholder="Write a comment..." required>
-                                                            <button class="btn btn-primary ms-2" type="submit">Post</button>
+                                                            <input type="text" name="content" class="form-control comment-content" placeholder="Write a comment..." required>
+                                                            <button class="btn btn-primary ms-2 submit-comment" data-post-id="{{ $post->id }}" type="button">Post</button>
                                                         </form>
-                        
+                                                        
                                                         <!-- Affichage des commentaires existants -->
-                                                        @foreach ($post->comments as $comment)
-                                                        <div class="d-flex align-items-center mb-2">
-                                                            <img src="{{ asset('assets/images/small/img-4.png') }}" alt="Comment Author Avatar" class="rounded-circle me-2" width="30" height="30">
-                                                            <div class="bg-light rounded p-2 w-100">
-                                                                <strong>{{$comment->user->name}}</strong>
-                                                                <p class="mb-1">{{ $comment->content }}</p>
-                                                                <small class="text-muted">{{ $comment->created_at->diffForHumans() }}</small>
+                                                        <div class="comment-section">
+                                                            @foreach ($post->comments as $comment)
+                                                            <div class="d-flex align-items-center mb-2">
+                                                                <img src="{{ asset('assets/images/small/img-4.png') }}" alt="Comment Author Avatar" class="rounded-circle me-2" width="30" height="30">
+                                                                <div class="bg-light rounded p-2 w-100">
+                                                                    <strong>{{$comment->user->name}}</strong>
+                                                                    <p class="mb-1">{{ $comment->content }}</p>
+                                                                    <small class="text-muted">{{ $comment->created_at->diffForHumans() }}</small>
+                                                                </div>
                                                             </div>
+                                                            @endforeach
                                                         </div>
-                                                        @endforeach
+                                                        
                                                     </div>
                                                 </div>
                                             </div>
@@ -170,4 +178,67 @@
 </div>
 @endsection
 @section('js')
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).on('click', '.like-button', function (e) {
+        e.preventDefault();
+        var postId = $(this).data('post-id');
+        var likeButton = $(this);
+
+        $.ajax({
+            url: '/posts/' + postId + '/like',
+            type: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+            },
+            success: function (response) {
+                if (response.liked) {
+                    likeButton.find('i').css('color', 'blue');
+                } else {
+                    likeButton.find('i').css('color', '');
+                }
+                likeButton.find('.like-count').text('Like (' + response.likeCount + ')');
+            },
+            error: function (xhr) {
+                console.log(xhr.responseText);
+            }
+        });
+    });
+</script>
+<script>
+    $(document).on('click', '.submit-comment', function (e) {
+        e.preventDefault();
+        var postId = $(this).data('post-id');
+        var commentForm = $('#comment-form-' + postId);
+        var content = commentForm.find('.comment-content').val();
+        var commentSection = commentForm.next('.comment-section');
+
+        $.ajax({
+            url: '/posts/' + postId + '/comment',
+            type: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                content: content
+            },
+            success: function (response) {
+                // Ajouter le nouveau commentaire à la section des commentaires
+                var newComment = `
+                    <div class="d-flex align-items-center mb-2">
+                        <img src="{{ asset('assets/images/small/img-4.png') }}" alt="Comment Author Avatar" class="rounded-circle me-2" width="30" height="30">
+                        <div class="bg-light rounded p-2 w-100">
+                            <strong>${response.comment.user.name}</strong>
+                            <p class="mb-1">${response.comment.content}</p>
+                            <small class="text-muted">Just now</small>
+                        </div>
+                    </div>
+                `;
+                commentSection.append(newComment);
+                commentForm.find('.comment-content').val(''); // Effacer le champ de saisie
+            },
+            error: function (xhr) {
+                console.log(xhr.responseText);
+            }
+        });
+    });
+</script>
 @endsection

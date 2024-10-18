@@ -83,7 +83,7 @@ Route::middleware('auth')->group(function () {
 
     //Post routes
     Route::resource('/posts', PostController::class);
-    Route::post('posts/{post}/like', [PostController::class, 'like'])->name('posts.like');
+    Route::post('/posts/{post}/like', [PostController::class, 'like'])->name('posts.like');
     Route::post('posts/{post}/unlike', [PostController::class, 'unlike'])->name('posts.unlike');
     Route::post('posts/{post}/comment', [PostController::class, 'comment'])->name('posts.comment');
     Route::get('/posts/filter/{teamId}', [PostController::class, 'filterByTeam'])->name('posts.filterByTeam');

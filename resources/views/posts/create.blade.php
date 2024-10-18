@@ -46,6 +46,9 @@
                                                         <label for="image" class="form-label">Upload Image</label>
                                                         <input type="file" name="image" class="form-control" id="image">
                                                     </div>
+                                                    <button type="submit" class="btn btn-primary">Add Post</button>
+                                                </form>
+
                                             </div><!-- end col -->
             </div><!-- end row -->
 

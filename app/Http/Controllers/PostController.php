@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Post;
 use App\Models\Comment;
+use App\Models\Group;
 use App\Models\Team;
+use App\Models\User;
 use App\Models\Like;
 
 class PostController extends Controller
@@ -19,6 +21,7 @@ class PostController extends Controller
         $posts = Post::with('likes')->orderBy('created_at', 'desc')->get();
         $user = auth()->user();
         $teams = Team::all();
+        // $teams = Group::all();
         return view('posts.index', compact('posts','teams', 'user'));
     }
 
@@ -29,6 +32,8 @@ class PostController extends Controller
     public function create()
     {
         $teams = Team::all(); // Lister les équipes disponibles
+        // $user = User::with('groups')->find(auth()->id());
+        // $teams = $user->groups;
         return view('posts.create', compact('teams'));
     }
 
@@ -38,7 +43,7 @@ class PostController extends Controller
         // Validation des données
         $request->validate([
             'content' => 'required|string|max:1000',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4,mkv,avi,mov|max:100240',
             'team_id' => 'required|exists:teams,id',
         ]);
 
@@ -68,6 +73,7 @@ class PostController extends Controller
         $posts = Post::with('likes')->where('team_id', $teamId)->orderBy('created_at', 'desc')->get();
         $user = auth()->user();
         $teams = Team::all();
+        // $teams = Group::all();
         return view('posts.index', compact('posts','teams', 'user'));
     }
 
@@ -110,14 +116,19 @@ class PostController extends Controller
         $post = Post::findOrFail($post_id);
         $isLike = Like::where('user_id', auth()->id())
                         ->where('post_id', $post_id)->first();
-        // dd($isLike);
-        if($isLike){
+
+        if ($isLike) {
             $post->likes()->detach(auth()->id());
-        }else{
+            $liked = false;
+        } else {
             $post->likes()->attach(auth()->id());
+            $liked = true;
         }
 
-        return redirect()->back()->with('success', 'Post liké avec succès !');
+        return response()->json([
+            'liked' => $liked,
+            'likeCount' => $post->likes->count()
+        ]);
     }
 
     public function comment(Request $request, $post_id)
@@ -126,13 +137,16 @@ class PostController extends Controller
             'content' => 'required|string|max:1000',
         ]);
 
-        Comment::create([
+        $comment = Comment::create([
             'content' => $request->content,
             'post_id' => $post_id,
             'user_id' => auth()->id(),
         ]);
 
-        return redirect()->back()->with('success', 'Commentaire ajouté avec succès !');
+        return response()->json([
+            'comment' => $comment->load('user'),
+            'message' => 'Commentaire ajouté avec succès !'
+        ]);
     }
 
 

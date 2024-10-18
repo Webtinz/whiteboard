@@ -22,6 +22,11 @@ class Post extends Model
         return $this->belongsTo(Team::class, 'team_id');
     }
 
+    // public function group()
+    // {
+    //     return $this->belongsTo(Group::class, 'team_id');
+    // }
+
     public function likes()
     {
         return $this->belongsToMany(User::class, 'likes')->withTimestamps();

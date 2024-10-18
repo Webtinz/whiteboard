@@ -22,6 +22,11 @@ class User extends Authenticatable
         return $this->hasMany(Comment::class);
     }
 
+    public function groups()
+    {
+        return $this->belongsToMany(Group::class, 'group_members', 'user_id', 'group_id');
+    }
+
 
     /**
      * The attributes that are mass assignable.
