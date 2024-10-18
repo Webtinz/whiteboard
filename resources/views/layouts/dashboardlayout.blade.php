@@ -13,16 +13,16 @@
     <!-- App favicon -->
     <link rel="shortcut icon" href="{{ asset('assets/images/favicon.ico') }}">
         
-    <link href="{{ asset('assets/libs/prismjs/themes/prism.css')}}" rel="stylesheet" type="text/css" />
-    <link href="{{ asset('assets/libs/prismjs/plugins/toolbar/prism-toolbar.css')}}" rel="stylesheet" type="text/css" />
-    <link href="{{ asset('assets/libs/prismjs/plugins/line-numbers/prism-line-numbers.css')}}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/libs/prismjs/themes/prism.css' )}}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/libs/prismjs/plugins/toolbar/prism-toolbar.css' )}}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/libs/prismjs/plugins/line-numbers/prism-line-numbers.css' )}}" rel="stylesheet" type="text/css" />
 
     <!-- Bootstrap Css -->
-    <link href="{{ asset('assets/css/bootstrap.min.css')}}" id="bootstrap-style" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/css/bootstrap.min.css' )}}" id="bootstrap-style" rel="stylesheet" type="text/css" />
     <!-- Icons Css -->
-    <link href="{{ asset('assets/css/icons.min.css')}}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/css/icons.min.css' )}}" rel="stylesheet" type="text/css" />
     <!-- App Css-->
-    <link href="{{ asset('assets/css/app.min.css')}}" id="app-style" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/css/app.min.css' )}}" id="app-style" rel="stylesheet" type="text/css" />
 
     {{-- <style>
        #layout-wrapper .nav-icon{
@@ -179,7 +179,7 @@
                 <ul class="metismenu list-unstyled" id="side-menu">
 
                     <li>
-                        <a href="{{route('kanbanboard')}}">
+                        <a href="{{route('kanbanboard' )}}">
                             <i class="icon nav-icon" data-feather="trello"></i>
                             <span class="menu-item" data-key="t-kanban-board">Kanban Board</span>
                         </a>
@@ -198,7 +198,7 @@
                     </li>
 
                     <li>
-                        <a href="{{route('task')}}">
+                        <a href="{{route('task' )}}">
                             <i class="icon nav-icon" data-feather="message-square"></i>
                             <span class="menu-item" data-key="t-chat">Tasks</span>
                         </a>
@@ -218,13 +218,13 @@
                         </a>
                     </li>
                     <li>
-                        <a href="{{route('conversations')}}">
+                        <a href="{{route('conversations' )}}">
                             <i class="icon nav-icon" data-feather="message-square"></i>
                             <span class="menu-item" data-key="t-chat">Chat</span>
                         </a>
                     </li>
                     <li>
-                        <a href="{{route('activityzone')}}">
+                        <a href="{{route('activityzone' )}}">
                             <i class="icon nav-icon" data-feather="message-square"></i>
                             <span class="menu-item" data-key="t-chat">Activity Zone</span>
                         </a>
@@ -235,7 +235,7 @@
                             <span class="menu-item" data-key="t-team-overview">Team Overview</span>
                         </a>
                         <ul class="sub-menu" aria-expanded="false">
-                            <li><a href="{{route('allemployee')}}" data-key="t-employee">Employee</a></li>
+                            <li><a href="{{route('allemployee' )}}" data-key="t-employee">Employee</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -387,27 +387,29 @@
 
 <!-- JAVASCRIPT -->
 @yield('js')
-<script src="{{ asset('assets/libs/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
+@if (request()->url() != route('conversations'))
+    <script src="{{ asset('assets/libs/bootstrap/js/bootstrap.bundle.min.js' )}}"></script>
 
-<!-- Metismenu Js -->
-<script src="{{ asset('assets/libs/metismenujs/metismenujs.min.js')}}"></script>
+    <!-- Metismenu Js -->
+    <script src="{{ asset('assets/libs/metismenujs/metismenujs.min.js' )}}"></script>
 
-<!-- Simplebar Js -->
-<script src="{{ asset('assets/libs/simplebar/simplebar.min.js')}}"></script>
+    <!-- Simplebar Js -->
+    <script src="{{ asset('assets/libs/simplebar/simplebar.min.js' )}}"></script>
 
-<!-- Feather Js -->
-<script src="{{ asset('assets/libs/feather-icons/feather.min.js')}}"></script>
+    <!-- Feather Js -->
+    <script src="{{ asset('assets/libs/feather-icons/feather.min.js' )}}"></script>
 
 
-<!-- prismjs plugin -->
-<script src="{{ asset('assets/libs/prismjs/prism.js')}}"></script>
+    <!-- prismjs plugin -->
+    <script src="{{ asset('assets/libs/prismjs/prism.js' )}}"></script>
 
-<script src="{{ asset('assets/libs/prismjs/plugins/toolbar/prism-toolbar.min.js')}}"></script>
+    <script src="{{ asset('assets/libs/prismjs/plugins/toolbar/prism-toolbar.min.js' )}}"></script>
 
-<script src="{{ asset('assets/libs/prismjs/plugins/copy-to-clipboard/prism-copy-to-clipboard.min.js')}}"></script>
+    <script src="{{ asset('assets/libs/prismjs/plugins/copy-to-clipboard/prism-copy-to-clipboard.min.js' )}}"></script>
 
-<!-- Custom js -->
-<script src="{{ asset('assets/js/app.js')}}"></script>
+    <!-- Custom js -->
+    <script src="{{ asset('assets/js/app.js' )}}"></script>    
+@endif
 
 </body>
 
