@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Whiteboard;
 
 use Carbon\Carbon;
 use App\Models\User;
+use App\Models\Group;
 use App\Models\Message;
 use App\Events\SendMessage;
 use Illuminate\Http\Request;
@@ -160,32 +161,34 @@ class MessageController extends Controller
             // Grouper les messages directs par utilisateur
             return $message->sender_id === $authUserId ? $message->receiver_id : $message->sender_id;
         });
-
+        
         // Récupérer les conversations de groupe
-        $groupMessages = Message::whereHas('group', function ($query) use ($authUserId) {
+        $groupMessages = Group::whereHas('members', function ($query) use ($authUserId) {
             // Vérifier si l'utilisateur est membre du groupe
-            $query->whereHas('members', function ($q) use ($authUserId) {
-                $q->where('user_id', $authUserId);
-            });
+            $query->where('user_id', $authUserId);
         })
-        ->with(['group', 'files']) // Charger les informations du groupe et les fichiers
-        ->get()
-        ->groupBy('group_id'); // Grouper les messages par groupe
+        ->with(['messages.files']) // Charger les messages et les fichiers associés aux messages
+        ->get();
 
         // Formater le résultat comme désiré
         $groupConversations = [];
-        foreach ($groupMessages as $groupId => $messages) {
-            $groupInfo = $messages->first()->group; // Prendre les infos du groupe
-    
+        foreach ($groupMessages as $group) {
+            // Prendre les infos du groupe
+            $groupInfo = $group; // $group est déjà un objet Group
+
             // Compter les membres du groupe
             $numberOfMembers = $groupInfo->members->count();
-    
-            $groupConversations[$groupId] = [
+
+            // Récupérer les messages du groupe
+            $messages = $groupInfo->messages;
+
+            $groupConversations[$groupInfo->id] = [ // Utiliser l'ID du groupe comme clé
                 'group' => $groupInfo,
                 'messages' => $messages,
                 'number_of_members' => $numberOfMembers // Ajouter le nombre de membres
             ];
         }
+
         // dd();
         
         // Retourner la vue avec les conversations et fichiers

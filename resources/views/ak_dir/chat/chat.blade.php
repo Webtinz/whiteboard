@@ -116,10 +116,10 @@
                                             </div>
                                         </div>
                                         <h6 class="text-uppercase font-size-13 mt-4 pt-2 mb-3">Groups</h6>
-                                        <ul class="list-unstyled chat-list group-chat">
+                                        <ul class="list-unstyled chat-list group-chat" id="groupList">
                                             @forelse ($groupConversations as $groupId => $groupData)
                                                 <li>
-                                                    <a href="javascript: void(0);" class="fw-medium d-block chat-group-link" data-group-id="{{ $groupData['group']->id }}" data-group-name="{{ $groupData['group']->name }}" data-group-member-number="{{ $groupData['number_of_members'] }}">
+                                                    <a href="javascript: void(0);" class="fw-medium d-block chat-group-link" data-group-id="{{ $groupData['group']->id }}" data-group-name="{{ $groupData['group']->name }}" data-group-member-number="{{ $groupData['number_of_members'] }}" onclick="updateFormAction({{ $groupData['group']->id }})">
                                                         <div class="d-flex align-items-center">
                                                             <div class="avatar-sm">
                                                                 <span
@@ -263,7 +263,7 @@
 
                                     <div class="p-3 chat-input-section">
                                         <form class="chatinput-form" data-id="chat-conversation-list" action="{{ route('message.inbox.send') }}"
-                                            method="post" enctype="multipart/form-data">
+                                            method="post" enctype="multipart/form-data" id="send-message-form">
                                             @csrf
                                             <div class="row align-items-center">
                                                 <div class="col-auto">
@@ -352,33 +352,36 @@
             <!-- Create groups Modal -->
             <div class="modal fade create-new-groups" tabindex="-1" role="dialog"
                 aria-labelledby="createGroupModal" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content border-0">
-                        <div class="modal-header bg-soft-primary">
-                            <h5 class="modal-title font-size-16 text-primary" id="createGroupModal">Create Groups</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-                            </button>
-                        </div>
-                        <div class="modal-body p-4">
-                            <div class="mb-3">
-                                <label for="GroupName" class="form-label">Name</label>
-                                <input type="text" class="form-control" id="GroupName" placeholder="Enter Name">
+                <form action="{{ route('create.group') }}" method="post" enctype="multipart/form-data" id="createGroupForm">
+                    @csrf
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content border-0">
+                            <div class="modal-header bg-soft-primary">
+                                <h5 class="modal-title font-size-16 text-primary" id="createGroupModal">Create Groups</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                                </button>
                             </div>
-                            {{-- <div class="mb-3">
-                            <label for="Groupdetails" class="form-label">Description</label>
-                            <textarea type="text" class="form-control" rows="3" id="Groupdetails" placeholder="Enter Description"></textarea>
-                        </div> --}}
-                            <div class="form-check form-switch form-switch-md ps-0">
-                                <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault">
-                                <label class="form-check-label" for="flexSwitchCheckDefault">Make Private</label>
+                            <div class="modal-body p-4">
+                                <div class="mb-3">
+                                    <label for="GroupName" class="form-label">Name</label>
+                                    <input type="text" class="form-control" id="GroupName" name="name" placeholder="Enter Name">
+                                </div>
+                                {{-- <div class="mb-3">
+                                <label for="Groupdetails" class="form-label">Description</label>
+                                <textarea type="text" class="form-control" rows="3" id="Groupdetails" placeholder="Enter Description"></textarea>
+                            </div> --}}
+                                <div class="form-check form-switch form-switch-md ps-0">
+                                    <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault">
+                                    <label class="form-check-label" for="flexSwitchCheckDefault">Make Private</label>
+                                </div>
                             </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
-                            <button type="button" class="btn btn-soft-primary">Create Group</button>
-                        </div>
-                    </div><!-- /.modal-content -->
-                </div><!-- /.modal-dialog -->
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-soft-primary" data-bs-dismiss="modal">Create Group</button>
+                            </div>
+                        </div><!-- /.modal-content -->
+                    </div><!-- /.modal-dialog -->
+                </form>
             </div><!-- /.modal -->
 
             <!-- Create Direct Mesaage Modal -->
@@ -451,7 +454,7 @@
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content border-0">
                         <div class="modal-header bg-soft-primary">
-                            <h5 class="modal-title font-size-16 text-primary" id="groupDetailModal"># Welcome</h5>
+                            <h5 class="modal-title font-size-16 text-primary" id="groupDetailModal" ># Members</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
                             </button>
                         </div>
@@ -477,6 +480,20 @@
                             <div class="tab-content pt-3">
                                 <div class="tab-pane show active" id="members" data-simplebar
                                     style="max-height: 264px;">
+                                    <ul class="list-unstyled member-list mb-0" id="u-member-list">
+                                        <li class="chat-list">
+                                            {{-- <a href="#" class="fw-medium member-list d-block"> --}}
+                                                <div class="d-flex align-items-center text-center alert alert-warning mx-2">
+                                                    <div class="flex-grow-1 ms-3">
+                                                        <center>
+                                                            <h5 class="font-size-15 mb-1">No members yet</h5>
+                                                        </center>
+                                                    </div>
+                                                </div>
+                                            {{-- </a> --}}
+                                        </li><!-- end li -->
+                                    </ul><!-- end ul -->
+                                    <hr>
                                     <ul class="list-unstyled member-list mb-0">
                                         <li class="chat-list">
                                             <a href="javascript: void(0);" class="fw-medium d-block">
@@ -487,52 +504,61 @@
                                                         </span>
                                                     </div>
                                                     <div class="ms-3">
-                                                        <h5 class="font-size-15 mb-0">Add people</h5>
+                                                        <h5 class="font-size-15 mb-0">Add new</h5>
                                                     </div>
                                                 </div>
                                             </a>
                                         </li><!-- end li -->
-                                        <li class="chat-list">
-                                            <a href="javascript: void(0);" class="fw-medium d-block">
-                                                <div class="d-flex align-items-center">
-                                                    <div>
-                                                        <img src="{{ asset('assets/images/users/avatar-10.jpg') }}"
-                                                            class="img-fluid avatar rounded" alt="">
+                                        @forelse ($allUsers as $eachUser)
+                                            <li class="chat-list">
+                                                <a href="javascript: void(0);" class="fw-medium member-list d-block">
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="flex-shrink-0">
+                                                            <img src="{{ asset('assets/images/users/avatar-5.jpg') }}"
+                                                                class="img-fluid avatar rounded" alt="">
+                                                        </div>
+                                                        <div class="flex-grow-1 ms-3">
+                                                            <h5 class="font-size-15 mb-1">{{ $eachUser->name }}</h5>
+                                                            <p class="text-muted font-size-13 mb-0">{{ $eachUser->role }}</p>
+                                                        </div>
+                                                        <div>
+                                                            <span class="text-muted font-size-13 mb-0">
+                                                                <form action="/groups/1/add-member" method="post" class="add-user-to-group">
+                                                                    @csrf
+                                                                    {{-- id="span-group-member-number" --}}
+                                                                    <input type="text" hidden name="user_id" value="{{ $eachUser->id }}">
+                                                                    <button type="submit" style="border: 0px !important; padding: 0px !important;background-color: #fff;"><i class="mdi mdi-plus"></i> Add</button>
+                                                                </form>
+                                                                <form action="/groups/1/add-member" method="post" class="delete-user-from-group">
+                                                                    @csrf
+                                                                    <input type="text" hidden name="user_id" value="{{ $eachUser->id }}">
+                                                                    <button type="submit"  style="border: 0px !important; padding: 0px !important;background-color: #fff;"><i class="mdi mdi-delete"></i> Remove</button>
+                                                                </form>
+                                                            </span>
+                                                        </div>
                                                     </div>
-                                                    <div class="flex-grow-1 ms-3">
-                                                        <h5 class="font-size-15 mb-1">Jansh wells</h5>
-                                                        <p class="text-muted font-size-13 mb-0">Web Developer</p>
+                                                </a>
+                                            </li><!-- end li -->
+                                        @empty
+                                            <li class="chat-list">
+                                                {{-- <a href="#" class="fw-medium member-list d-block"> --}}
+                                                    <div class="d-flex align-items-center text-center alert alert-warning mx-2">
+                                                        <div class="flex-grow-1 ms-3">
+                                                            <center>
+                                                                <h5 class="font-size-15 mb-1">No users yet</h5>
+                                                            </center>
+                                                        </div>
                                                     </div>
-                                                    <div>
-                                                        <p class="text-muted font-size-13 mb-0">Remove</p>
-                                                    </div>
-                                                </div>
-                                            </a>
-                                        </li><!-- end li -->
-                                        <li class="chat-list">
-                                            <a href="javascript: void(0);" class="fw-medium member-list d-block">
-                                                <div class="d-flex align-items-center">
-                                                    <div class="flex-shrink-0">
-                                                        <img src="{{ asset('assets/images/users/avatar-5.jpg') }}"
-                                                            class="img-fluid avatar rounded" alt="">
-                                                    </div>
-                                                    <div class="flex-grow-1 ms-3">
-                                                        <h5 class="font-size-15 mb-1">Ayaan Curry</h5>
-                                                        <p class="text-muted font-size-13 mb-0">Python Developer</p>
-                                                    </div>
-                                                    <div>
-                                                        <p class="text-muted font-size-13 mb-0">Remove</p>
-                                                    </div>
-                                                </div>
-                                            </a>
-                                        </li><!-- end li -->
+                                                {{-- </a> --}}
+                                            </li><!-- end li -->                                            
+                                        @endforelse
                                     </ul><!-- end ul -->
                                 </div><!-- end -->
                             </div>
                         </div><!-- /.modal body -->
                         <div class="modal-footer">
                             <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
-                            <button type="button" class="btn btn-soft-primary">Done</button>
+                            <button type="button" class="btn btn-soft-primary" data-bs-dismiss="modal">Done</button>
                         </div>
                     </div><!-- /.modal-content -->
                 </div><!-- /.modal-dialog -->
@@ -547,7 +573,74 @@
 
     {{-- <script src="{{ asset('assets/js/pages/chat.init.js') }}"></script> --}}
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-{{-- data-dowload-file-id --}}
+    
+    {{-- data-dowload-file-id --}}
+
+    <script>
+        function updateFormAction(groupId) {
+            var forms = document.getElementsByClassName('add-user-to-group');
+    
+            // Boucle sur chaque formulaire et mise à jour de l'attribut action
+            Array.prototype.forEach.call(forms, function(form) {
+                form.action = `/groups/${groupId}/add-member`;
+            });
+            
+            var formsDelete = document.getElementsByClassName('delete-user-from-group');
+    
+            // Boucle sur chaque formulaire et mise à jour de l'attribut action
+            Array.prototype.forEach.call(formsDelete, function(formDelete) {
+                formDelete.action = `/groups/${groupId}/remove-member`;
+            });
+        }    
+        // Appel de la fonction avec un groupId dynamique (par exemple)
+        updateFormAction(groupId); // Change 1 par groupId
+    </script>
+
+    <script>
+        $(document).ready(function() {
+            // Gérer la soumission du formulaire "add-user-to-group" sans rechargement
+            $(".add-user-to-group").on("submit", function(e) {
+                e.preventDefault(); // Empêche le rechargement de la page
+                var form = $(this);
+                $.ajax({
+                    url: form.attr("action"),
+                    type: form.attr("method"),
+                    data: form.serialize(),
+                    success: function(response) {
+                        // Traiter la réponse du serveur (par exemple, mettre à jour la liste des membres)
+                        // console.log("User added:", response);
+                        alert("User added");
+                    },
+                    error: function(error) {
+                        console.error("Error adding user:", error);
+                        alert("An error occurred. Please try again.");
+                    }
+                });
+            });
+
+            // Gérer la soumission du formulaire "delete-user-from-group" sans rechargement
+            $(".delete-user-from-group").on("submit", function(e) {
+                e.preventDefault(); // Empêche le rechargement de la page
+                var form = $(this);
+                $.ajax({
+                    url: form.attr("action"),
+                    type: form.attr("method"),
+                    data: form.serialize(),
+                    success: function(response) {
+                        // Traiter la réponse du serveur (par exemple, mettre à jour la liste des membres)
+                        // console.log("User removed:", response);
+                        alert("User removed");
+                    },
+                    error: function(error) {
+                        console.error("Error removing user:", error);
+                        alert("An error occurred. Please try again.");
+                    }
+                });
+            });
+        });
+
+    </script>
+
     <script>
         // Référence au champ input unique
         let fileInput = document.getElementById('fileInput');
@@ -584,6 +677,98 @@
             fileInput.click();
         });
         
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            // Intercepter la soumission du formulaire
+            $("#createGroupForm").off("submit").on("submit", function (e) {
+                e.preventDefault(); // Empêche le rechargement de la page
+
+                // Récupérer les données du formulaire
+                var formData = $(this).serialize(); // Sérialiser les données du formulaire
+
+                // Envoyer la requête AJAX
+                $.ajax({
+                    url: $(this).attr("action"), // Récupérer l'URL spécifiée dans l'attribut action du formulaire
+                    type: $(this).attr("method"), // Récupérer la méthode du formulaire (POST ou GET)
+                    data: formData,
+                    success: function (response) {
+                        // Traiter la réponse du serveur
+                        console.log(response); // Afficher la réponse dans la console
+                        $("#groupList").html(response); // Mettre à jour uniquement la liste des groupes
+                    },
+                    error: function (error) {
+                        // Gérer les erreurs
+                        console.error(error);
+                        alert("Une erreur s'est produite. Veuillez réessayer.");
+                    },
+                });
+            });
+        });
+    </script>
+
+    <script>
+    $(document).ready(function() {
+        $('#group-member-number').on('click', function() {
+            var groupId = $('#group_id').val(); // Récupérer l'ID du groupe sélectionné
+
+            // Appeler une fonction pour récupérer les membres du groupe
+            fetchGroupMembers(groupId);
+        });
+    });
+
+    function fetchGroupMembers(groupId) {
+        $.ajax({
+            url: '/group-members/' + groupId, // Remplace avec l'URL de ton API
+            type: 'GET', // ou 'POST' si nécessaire
+            data: { group_id: groupId },
+            success: function(response) {
+                if (response.length > 0) {
+                    // Remplacer le contenu de la liste avec les membres récupérés
+                    updateMemberList(response);
+                    // console.log(response);
+                }
+            },
+            error: function(error) {
+                console.error("Erreur lors de la récupération des membres :", error);
+            }
+        });
+    }
+
+    function updateMemberList(members) {
+        var memberList = $('#u-member-list');
+        memberList.empty(); // Vider la liste existante
+
+        // Ajouter les membres récupérés
+        members.forEach(function(member) {
+            memberList.append(`
+                <li class="chat-list">
+                    <a href="javascript: void(0);" class="fw-medium d-block">
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <img src="/assets/images/users/avatar-${member.id}.jpg" class="img-fluid avatar rounded" alt="">
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h5 class="font-size-15 mb-1">${member.name}</h5>
+                                <p class="text-muted font-size-13 mb-0">${member.role}</p>
+                            </div>
+                            <div>
+                                <p class="text-muted font-size-13 mb-0">Remove</p>
+                            </div>
+                        </div>
+                    </a>
+                </li>
+            `);
+        });
+
+        // Mettre à jour le nombre de membres affiché
+        $('#span-group-member-number').text(members.length);
+    }
+
+
+
+
     </script>
 
     <script>
@@ -845,13 +1030,14 @@
                 
                 const groupId = $(this).data('group-id'); // Récupérer l'ID de l'utilisateur depuis l'attribut data
                 const authUserId  = {{ Auth::user()->id }};
-        
+                // console.log(groupId);
+                
                 // Effectuer une requête AJAX pour récupérer les conversations
                 $.ajax({
                     url: '/groupmessages/' + groupId,
                     method: 'GET',
                     success: function(data) {
-                        console.log(data);
+                        // console.log(data);
                         // Vider la liste actuelle des conversations
                         $('#chat-conversation-list').empty();
                         // Variable pour stocker la date du dernier message
@@ -981,8 +1167,8 @@
 
     <script type="text/javascript">
         $(document).ready(function() {
-            // Gérer la soumission du formulaire avec AJAX
-            $('form').on('submit', function(e) {
+            // Gérer la soumission du formulaire avec AJAX 
+            $('#send-message-form').off("submit").on("submit", function (e) {
                 e.preventDefault(); // Empêche le rechargement de la page
     
                 var formData = new FormData(this); // Récupère le contenu du formulaire
@@ -1020,18 +1206,18 @@
 
             // Ajoute une vérification si des fichiers sont attachés
             var fileHtml = '';
-// console.log(message.files);
+            // console.log(message.files);
 
-            if (message.files && message.files.length > 0) { // Vérifie si des fichiers existent
-                fileHtml = '<div class="chat-files">';
-                message.files.forEach(function(file) {
-                    // Ajuster le chemin d'accès à l'image ou au fichier pour le frontend
-                    fileHtml += `<div class="chat-file">
-                                    <a href="/storage/${file.file_path}" target="_blank">Télécharger ${file.file_path.split('/').pop()}</a>
-                                </div>`;
-                });
-                fileHtml += '</div>';
-            }
+            // if (message.files && message.files.length > 0) { // Vérifie si des fichiers existent
+            //     fileHtml = '<div class="chat-files">';
+            //     message.files.forEach(function(file) {
+            //         // Ajuster le chemin d'accès à l'image ou au fichier pour le frontend
+            //         fileHtml += `<div class="chat-file">
+            //                         <a href="/storage/${file.file_path}" target="_blank">Télécharger ${file.file_path.split('/').pop()}</a>
+            //                     </div>`;
+            //     });
+            //     fileHtml += '</div>';
+            // }
             // console.log(name);
             
 
