@@ -21,7 +21,7 @@ return new class extends Migration
 
             // Définition des clés étrangères
             $table->foreign('author_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('team_id')->references('id')->on('teams')->onDelete('cascade'); // Vérifie que teams.id est correct
+            $table->foreign('team_id')->references('id')->on('groups')->onDelete('cascade'); // Vérifie que teams.id est correct
         });
     }
 

@@ -17,15 +17,15 @@ class Post extends Model
     }
 
     // Relation avec le modèle Team (équipe associée au post)
-    public function team()
-    {
-        return $this->belongsTo(Team::class, 'team_id');
-    }
-
-    // public function group()
+    // public function team()
     // {
-    //     return $this->belongsTo(Group::class, 'team_id');
+    //     return $this->belongsTo(Team::class, 'team_id');
     // }
+
+    public function group()
+    {
+        return $this->belongsTo(Group::class, 'team_id');
+    }
 
     public function likes()
     {

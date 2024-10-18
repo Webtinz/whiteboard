@@ -20,8 +20,8 @@ class PostController extends Controller
         // $posts = Post::with('author', 'team')->orderBy('created_at', 'desc')->get();
         $posts = Post::with('likes')->orderBy('created_at', 'desc')->get();
         $user = auth()->user();
-        $teams = Team::all();
-        // $teams = Group::all();
+        // $teams = Team::all();
+        $teams = Group::all();
         return view('posts.index', compact('posts','teams', 'user'));
     }
 
@@ -31,9 +31,9 @@ class PostController extends Controller
     // Affiche le formulaire de création d'un post
     public function create()
     {
-        $teams = Team::all(); // Lister les équipes disponibles
-        // $user = User::with('groups')->find(auth()->id());
-        // $teams = $user->groups;
+        // $teams = Team::all(); // Lister les équipes disponibles
+        $user = User::with('groups')->find(auth()->id());
+        $teams = $user->groups;
         return view('posts.create', compact('teams'));
     }
 
@@ -72,8 +72,8 @@ class PostController extends Controller
         // $posts = Post::with('author', 'team')->orderBy('created_at', 'desc')->get();
         $posts = Post::with('likes')->where('team_id', $teamId)->orderBy('created_at', 'desc')->get();
         $user = auth()->user();
-        $teams = Team::all();
-        // $teams = Group::all();
+        // $teams = Team::all();
+        $teams = Group::all();
         return view('posts.index', compact('posts','teams', 'user'));
     }
 

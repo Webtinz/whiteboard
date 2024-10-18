@@ -68,7 +68,7 @@
                                                 <div class="d-flex align-items-center mb-3">
                                                     <img src="{{ asset('assets/images/small/img-4.png') }}" alt="User Avatar" class="rounded-circle me-2" width="40" height="40">
                                                     <div>
-                                                        <h6 class="mb-0">Team {{ $post->team->name }} posted by {{ $post->author->name }}</h6>
+                                                        <h6 class="mb-0">Team {{ $post->group->name }} posted by {{ $post->author->name }}</h6>
                                                         <small class="text-muted">{{ $post->created_at->diffForHumans() }}</small>
                                                     </div>
                                                     {{-- <div class="ms-auto">
