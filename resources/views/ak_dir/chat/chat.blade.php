@@ -1,16 +1,5 @@
-<!doctype html>
-<html lang="en">
-<!-- Mirrored from preview.pichforest.com/probic/layouts/apps-chat.html by HTTrack Website Copier/3.x [XR&CO'2014], Tue, 08 Oct 2024 11:26:03 GMT -->
-<head>
-
-    <meta charset="utf-8" />
-    <title>Chat | Probic - Responsive Bootstrap 5 Admin Dashboard</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
-    <meta content="Pichforest" name="author" />
-    <!-- App favicon -->
-    <link rel="shortcut icon" href="{{ asset('assets/images/favicon.ico') }}">
-
+@extends('layouts.dashboardlayout')
+@section('links')
     <!-- lightbox css -->
     <link rel="stylesheet" href="{{ asset('assets/libs/glightbox/css/glightbox.min.css') }}">
     <link href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css" rel="stylesheet">
@@ -35,30 +24,16 @@
         div#chat-conversation {
             min-height: 70vh !important;
         }
-        #page-content-chat {
-            min-height: 50vh; /* Hauteur minimale : 50% de la hauteur de la fenêtre */
-            max-height: 100vh; /* Hauteur maximale : 100% de la hauteur de la fenêtre */
-            overflow-y: auto; /* Permet le scroll interne si le contenu dépasse */
-            scrollbar-width: none; /* Pour cacher la barre de défilement sur Firefox */
-            /* background-color: white; Fond blanc */
-            /* padding: 0px; Optionnel, pour un peu d'espace intérieur */
-        }
     </style>
-  <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
-</head>
+    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
 
-<body data-sidebar="dark">
-    <!-- <body data-layout="horizontal" data-topbar="colored"> -->
-    <!-- Begin page -->
-    <div id="layout-wrapper">
-        <!-- ============================================================== -->
-        <!-- Start right Content here -->
-        <!-- ============================================================== -->
+@endsection
+@section('content')
 
-        <div class="main-content" style="margin: auto">
+        <div class="main-content">
 
-            <div class="page-content" style="padding: 5px !important;">
-                <div class="container-fluid" id="page-content-chat">
+            <div class="page-content">
+                <div class="container-fluid">
 
                     <!-- start page title -->
                     <div class="row">
@@ -564,14 +539,10 @@
                 </div><!-- /.modal-dialog -->
             </div><!-- /.modal -->
         </div>
-        <!-- end main content-->
 
-    </div>
-    <!-- END layout-wrapper -->
-
-    <!-- JAVASCRIPT -->
-
-    {{-- <script src="{{ asset('assets/js/pages/chat.init.js') }}"></script> --}}
+<!-- end main content-->
+@endsection
+@section('js')
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     
     {{-- data-dowload-file-id --}}
@@ -709,66 +680,62 @@
     </script>
 
     <script>
-    $(document).ready(function() {
-        $('#group-member-number').on('click', function() {
-            var groupId = $('#group_id').val(); // Récupérer l'ID du groupe sélectionné
+        $(document).ready(function() {
+            $('#group-member-number').on('click', function() {
+                var groupId = $('#group_id').val(); // Récupérer l'ID du groupe sélectionné
 
-            // Appeler une fonction pour récupérer les membres du groupe
-            fetchGroupMembers(groupId);
+                // Appeler une fonction pour récupérer les membres du groupe
+                fetchGroupMembers(groupId);
+            });
         });
-    });
 
-    function fetchGroupMembers(groupId) {
-        $.ajax({
-            url: '/group-members/' + groupId, // Remplace avec l'URL de ton API
-            type: 'GET', // ou 'POST' si nécessaire
-            data: { group_id: groupId },
-            success: function(response) {
-                if (response.length > 0) {
-                    // Remplacer le contenu de la liste avec les membres récupérés
-                    updateMemberList(response);
-                    // console.log(response);
+        function fetchGroupMembers(groupId) {
+            $.ajax({
+                url: '/group-members/' + groupId, // Remplace avec l'URL de ton API
+                type: 'GET', // ou 'POST' si nécessaire
+                data: { group_id: groupId },
+                success: function(response) {
+                    if (response.length > 0) {
+                        // Remplacer le contenu de la liste avec les membres récupérés
+                        updateMemberList(response);
+                        // console.log(response);
+                    }
+                },
+                error: function(error) {
+                    console.error("Erreur lors de la récupération des membres :", error);
                 }
-            },
-            error: function(error) {
-                console.error("Erreur lors de la récupération des membres :", error);
-            }
-        });
-    }
+            });
+        }
 
-    function updateMemberList(members) {
-        var memberList = $('#u-member-list');
-        memberList.empty(); // Vider la liste existante
+        function updateMemberList(members) {
+            var memberList = $('#u-member-list');
+            memberList.empty(); // Vider la liste existante
 
-        // Ajouter les membres récupérés
-        members.forEach(function(member) {
-            memberList.append(`
-                <li class="chat-list">
-                    <a href="javascript: void(0);" class="fw-medium d-block">
-                        <div class="d-flex align-items-center">
-                            <div>
-                                <img src="/assets/images/users/avatar-${member.id}.jpg" class="img-fluid avatar rounded" alt="">
+            // Ajouter les membres récupérés
+            members.forEach(function(member) {
+                memberList.append(`
+                    <li class="chat-list">
+                        <a href="javascript: void(0);" class="fw-medium d-block">
+                            <div class="d-flex align-items-center">
+                                <div>
+                                    <img src="/assets/images/users/avatar-${member.id}.jpg" class="img-fluid avatar rounded" alt="">
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h5 class="font-size-15 mb-1">${member.name}</h5>
+                                    <p class="text-muted font-size-13 mb-0">${member.role}</p>
+                                </div>
+                                <div>
+                                    <p class="text-muted font-size-13 mb-0">Remove</p>
+                                </div>
                             </div>
-                            <div class="flex-grow-1 ms-3">
-                                <h5 class="font-size-15 mb-1">${member.name}</h5>
-                                <p class="text-muted font-size-13 mb-0">${member.role}</p>
-                            </div>
-                            <div>
-                                <p class="text-muted font-size-13 mb-0">Remove</p>
-                            </div>
-                        </div>
-                    </a>
-                </li>
-            `);
-        });
+                        </a>
+                    </li>
+                `);
+            });
 
-        // Mettre à jour le nombre de membres affiché
-        $('#span-group-member-number').text(members.length);
-    }
-
-
-
-
+            // Mettre à jour le nombre de membres affiché
+            $('#span-group-member-number').text(members.length);
+        }
     </script>
 
     <script>
@@ -1454,7 +1421,6 @@
         }
     </script>
     
-
     <!-- Bootstrap JS -->
     <script src="{{ asset('assets/libs/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
 
@@ -1472,8 +1438,4 @@
     <script src="{{ asset('assets/libs/glightbox/js/glightbox.min.js') }}"></script>
     <script src="{{ asset('assets/js/pages/lightbox.init.js') }}"></script>
 
-    <!-- custom js -->
-    {{-- <script src="{{ asset('assets/js/app.js') }}"></script> --}}
-
-</body>
-</html>
+    @endsection
