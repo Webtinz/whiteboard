@@ -44,9 +44,8 @@ class PostController extends Controller
         $request->validate([
             'content' => 'required|string|max:1000',
             'image' => 'nullable|file|mimes:jpeg,png,jpg,gif,mp4,mkv,avi,mov|max:100240',
-            'team_id' => 'required|exists:teams,id',
+            'team_id' => 'required|exists:groups,id',
         ]);
-
         // Traitement de l'image
         $imagePath = null;
         if ($request->hasFile('image')) {
