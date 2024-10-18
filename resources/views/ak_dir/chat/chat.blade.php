@@ -1,9 +1,6 @@
 @extends('layouts.dashboardlayout')
 @section('links')
     <!-- lightbox css -->
-    <link rel="stylesheet" href="{{ asset('assets/libs/glightbox/css/glightbox.min.css') }}">
-    <link href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css" rel="stylesheet">
-    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
 
     <!-- Bootstrap Css -->
     <link href="{{ asset('assets/css/bootstrap.min.css') }}" id="bootstrap-style" rel="stylesheet" type="text/css" />
@@ -24,6 +21,52 @@
         div#chat-conversation {
             min-height: 70vh !important;
         }
+
+        .preview-container {
+    display: flex;
+    flex-wrap: wrap; /* Pour que les éléments se regroupent sur plusieurs lignes */
+    gap: 15px; /* Espacement entre les fichiers */
+    padding: 10px; /* Espacement interne pour un peu d'air */
+    border: 2px solid #ddd; /* Bordure douce */
+    border-radius: 10px; /* Coins arrondis */
+    background-color: #f9f9f9; /* Légère couleur d'arrière-plan */
+    max-height: 200px; /* Hauteur maximale */
+    overflow-y: auto; /* Ajout d'une barre de défilement si le contenu dépasse */
+}
+
+.preview-container img, 
+.preview-container video {
+    max-width: 100px; /* Taille maximale des aperçus */
+    max-height: 100px;
+    border-radius: 8px; /* Coins arrondis pour les images et vidéos */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Effet d'ombre douce */
+}
+
+.preview-container span {
+    font-size: 50px; /* Taille des icônes pour les fichiers */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100px;
+    height: 100px;
+    background-color: #e2e2e2; /* Fond pour les fichiers non visuels */
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.preview-container::-webkit-scrollbar {
+    width: 8px; /* Largeur de la scrollbar */
+}
+
+.preview-container::-webkit-scrollbar-thumb {
+    background-color: #888; /* Couleur de la barre de défilement */
+    border-radius: 4px;
+}
+
+.preview-container::-webkit-scrollbar-thumb:hover {
+    background-color: #555; /* Changement de couleur au survol */
+}
+
     </style>
     <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
 
@@ -243,67 +286,35 @@
                                             <div class="row align-items-center">
                                                 <div class="col-auto">
                                                     <div class="dropdown">
-                                                        <a class="dropdown-toggle" href="#" role="button"
-                                                            data-bs-toggle="dropdown" aria-haspopup="true"
-                                                            aria-expanded="false">
+                                                        <a class="dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                             <i class="bx bx-plus fs-3"></i>
                                                         </a>
                                                         <div class="dropdown-menu">
-                                                            <a class="dropdown-item fw-medium text-muted"
-                                                                href="javascript: void(0);" id="cameraBtn">
+                                                            <a class="dropdown-item fw-medium text-muted" href="javascript: void(0);" id="cameraBtn">
                                                                 <i class="mdi mdi-camera-outline me-2"></i>Camera</a>
-                                                            <a class="dropdown-item fw-medium text-muted"
-                                                                href="javascript: void(0);" id="photosBtn">
-                                                                <i
-                                                                    class="mdi mdi-image-multiple-outline me-2"></i>Photos</a>
-                                                            <a class="dropdown-item fw-medium text-muted"
-                                                                href="javascript: void(0);" id="audioBtn">
-                                                                <i
-                                                                    class="mdi mdi-microphone me-2"></i>Audio</a>
-                                                            <a class="dropdown-item fw-medium text-muted"
-                                                                href="javascript: void(0);" id="documentsBtn">
-                                                                <i
-                                                                    class="mdi mdi-file-document-outline me-2"></i>Documents</a>
+                                                            <a class="dropdown-item fw-medium text-muted" href="javascript: void(0);" id="photosBtn">
+                                                                <i class="mdi mdi-image-multiple-outline me-2"></i>Photos</a>
+                                                            <a class="dropdown-item fw-medium text-muted" href="javascript: void(0);" id="audioBtn">
+                                                                <i class="mdi mdi-microphone me-2"></i>Audio</a>
+                                                            <a class="dropdown-item fw-medium text-muted" href="javascript: void(0);" id="documentsBtn">
+                                                                <i class="mdi mdi-file-document-outline me-2"></i>Documents</a>
                                                         </div>
                                                     </div>
                                                 </div><!-- end col -->
+                                                
                                                 <div class="col">
-                                                    <!-- Un seul input file -->
                                                     <input type="file" id="fileInput" style="display: none;" name="file[]" multiple>
-                                                    <input type="hidden" name="receiver_id" id="receiver_id" value="{{ Auth::user()->id }}"
-                                                        class="@error('receiver_id') is-invalid @enderror">
-                                                    @error('receiver_id')
-                                                        {{ $message }}
-                                                    @enderror
-                                                    <input type="hidden" name="group_id" id="group_id" value=""
-                                                        class="@error('group_id') is-invalid @enderror">
-                                                    @error('group_id')
-                                                        {{ $message }}
-                                                    @enderror
+                                                    <input type="hidden" name="receiver_id" id="receiver_id" value="{{ Auth::user()->id }}" class="@error('receiver_id') is-invalid @enderror">
+                                                    <input type="hidden" name="group_id" id="group_id" value="" class="@error('group_id') is-invalid @enderror">
                                                     <div class="position-relative">
-                                                        <input type="text" name="content"
-                                                            class="form-control chat-input task-comment"
-                                                            id="chat-input"
-                                                            placeholder="Type your message here..."
-                                                            class="@error('content') is-invalid @enderror">
-                                                            @error('content')
-                                                                {{ $message }}
-                                                            @enderror
-                                                        <div class="chat-input-links" id="tooltip-container">
-                                                            <ul class="list-inline mb-0">
-                                                                <li class="list-inline-item"><a
-                                                                        href="javascript: void(0);" title="Emoji">
-                                                                        <i class="mdi mdi-emoticon-happy-outline"></i></a>
-                                                                </li>
-                                                            </ul><!-- end ul -->
-                                                        </div>
+                                                        <div id="preview" class="mt-2 mb-2 preview-container"></div> <!-- Conteneur pour l'aperçu des fichiers -->
+                                                        <input type="text" name="content" class="form-control chat-input task-comment" id="chat-input" placeholder="Type your message here...">
                                                     </div>
                                                 </div><!-- end col -->
+                                                
                                                 <div class="col-auto">
                                                     <div class="d-flex gap-3">
-                                                        {{-- <i class="mdi mdi-microphone fs-3 text-muted align-middle"></i> --}}
-                                                        <button type="submit"
-                                                            class="btn btn-primary btn-rounded shadow-none chat-send">
+                                                        <button type="submit" class="btn btn-primary btn-rounded shadow-none chat-send">
                                                             <i class="mdi mdi-send send-task-comment"></i>
                                                         </button>
                                                     </div>
@@ -611,44 +622,71 @@
         });
 
     </script>
+<script>
+    // Référence au champ input unique
+    let fileInput = document.getElementById('fileInput');
+    let preview = document.getElementById('preview'); // Conteneur d'aperçu
+    
+    // Gestion des clics pour chaque bouton
+    document.getElementById('cameraBtn').addEventListener('click', function() {
+        fileInput.accept = "image/*"; // Autoriser uniquement les images capturées par la caméra
+        fileInput.capture = "camera"; // Activer la capture par la caméra
+        fileInput.click();
+    });
+    
+    document.getElementById('photosBtn').addEventListener('click', function() {
+        fileInput.accept = "image/*"; // Autoriser uniquement les images
+        fileInput.removeAttribute('capture');
+        fileInput.click();
+    });
+    
+    document.getElementById('audioBtn').addEventListener('click', function() {
+        fileInput.accept = "audio/*"; // Autoriser uniquement les fichiers audio
+        fileInput.removeAttribute('capture');
+        fileInput.click();
+    });
+    
+    document.getElementById('documentsBtn').addEventListener('click', function() {
+        fileInput.accept = ".zip,.pdf,.doc,.docx,.txt,.xls,.xlsx,.ppt,.pptx,.txt"; // Documents autorisés
+        fileInput.removeAttribute('capture');
+        fileInput.click();
+    });
+    
+    // Aperçu des fichiers sélectionnés
+    fileInput.addEventListener('change', function(event) {
+        preview.innerHTML = ''; // Effacer l'aperçu précédent
+        let files = event.target.files;
 
-    <script>
-        // Référence au champ input unique
-        let fileInput = document.getElementById('fileInput');
-        
-        // Gestion des clics pour chaque bouton
-        
-        // Activer la caméra directement
-        document.getElementById('cameraBtn').addEventListener('click', function() {
-            fileInput.accept = "image/*"; // Autoriser uniquement les images capturées par la caméra
-            fileInput.capture = "camera"; // Activer la capture par la caméra
-            fileInput.click();
-        });
-        
-        // Autoriser uniquement les photos/images
-        document.getElementById('photosBtn').addEventListener('click', function() {
-            fileInput.accept = "image/*"; // Autoriser uniquement les images
-            fileInput.removeAttribute('capture'); // Désactiver la capture directe (utilisation de la galerie)
-            fileInput.click();
-            console.log('Photo clique');
-            
-        });
-        
-        // Autoriser uniquement les fichiers audio
-        document.getElementById('audioBtn').addEventListener('click', function() {
-            fileInput.accept = "audio/*"; // Autoriser uniquement les fichiers audio
-            fileInput.removeAttribute('capture'); // Utiliser la galerie d'audio
-            fileInput.click();
-        });
-        
-        // Autoriser uniquement les documents
-        document.getElementById('documentsBtn').addEventListener('click', function() {
-            fileInput.accept = ".zip,.pdf,.doc,.docx,.txt,.xls,.xlsx,.ppt,.pptx,.txt"; // Documents autorisés
-            fileInput.removeAttribute('capture'); // Aucun besoin de capture
-            fileInput.click();
-        });
-        
-    </script>
+        for (let i = 0; i < files.length; i++) {
+            let file = files[i];
+            let fileType = file.type;
+
+            if (fileType.startsWith('image/')) {
+                let img = document.createElement('img');
+                img.src = URL.createObjectURL(file);
+                img.style.maxWidth = '150px'; // Ajustez la taille de l'aperçu
+                img.style.marginRight = '10px';
+                preview.appendChild(img);
+            } 
+            else if (fileType.startsWith('video/')) {
+                let video = document.createElement('video');
+                video.src = URL.createObjectURL(file);
+                video.controls = true;
+                video.style.maxWidth = '150px'; // Ajustez la taille de l'aperçu
+                video.style.marginRight = '10px';
+                preview.appendChild(video);
+            } 
+            else {
+                let docIcon = document.createElement('span');
+                docIcon.innerHTML = '📄'; // Icône pour les documents
+                docIcon.style.fontSize = '50px';
+                docIcon.style.marginRight = '10px';
+                preview.appendChild(docIcon);
+            }
+        }
+    });
+</script>
+
 
     <script>
         $(document).ready(function () {
@@ -1152,9 +1190,11 @@
                         getChatList(response.content, "chat-conversation-list", response.sender);
     
                         // console.log(response.files.file_path);
+                        // $(".chat-conversation-list").html(response); // Mettre à jour uniquement la liste des groupes
                         
                         // Efface le champ de message après envoi
                         $('#chat-input').val('');
+                        let preview = document.getElementById('preview').innerHTML = ''; // Conteneur d'aperçu
     
                         // Faire défiler jusqu'en bas après l'ajout du message
                         scrollToBottom("chat-conversation-list", "chat-conversation");
