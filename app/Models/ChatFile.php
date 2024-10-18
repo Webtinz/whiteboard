@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Message;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class File extends Model
+class ChatFile extends Model
 {
-    protected $fillable = ['name', 'path', 'project_id', 'uploaded_by', 'type', 'updated_at', 'created_at'];
+    use HasFactory;
+    protected $fillable = ['message_id', 'file_path', 'type','size'];
 
     public function project()
     {

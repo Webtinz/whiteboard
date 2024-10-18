@@ -62,9 +62,10 @@ Route::get('/conversations', [MessageController::class, 'getAllConversations'])-
 
 
 // Groupes
-Route::post('/groups/create', [GroupController::class, 'createGroup']);
-Route::post('/groups/{groupId}/add-member', [GroupController::class, 'addMember']);
-Route::delete('/groups/{groupId}/remove-member/{userId}', [GroupController::class, 'removeMember']);
+Route::post('/groups/create', [GroupController::class, 'createGroup'])->name('create.group');
+Route::get('/group-members/{groupId}', [GroupController::class, 'membersGroup'])->name('group.members');
+Route::post('/groups/{groupId}/add-member', [GroupController::class, 'addMember'])/*->name('add.group.members')*/;
+Route::post('/groups/{groupId}/remove-member', [GroupController::class, 'removeMember']);
 
 // Posts By Ak
 // Route::post('posts', [PostController::class, 'createPost']);
