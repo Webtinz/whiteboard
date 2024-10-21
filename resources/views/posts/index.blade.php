@@ -104,16 +104,16 @@
                                                         <button type="button" class="btn btn-link text-muted like-button" data-post-id="{{ $post->id }}">
                                                             @if($post->isLikedByUser($user->id))
                                                                 <i class="far fa-thumbs-up" style="color: blue"></i> <span class="like-count">Like ({{ $post->likes->count() }})</span>
-                                                            @else
-                                                                <i class="far fa-thumbs-up"></i> <span class="like-count">Like ({{ $post->likes->count() }})</span>
+                                                                @else
+                                                                    <i class="far fa-thumbs-up"></i> <span class="like-count">Like ({{ $post->likes->count() }})</span>
                                                             @endif
                                                         </button>                                                        
                                                     </form>
                         
                                                     <!-- Bouton Commenter -->
-                                                    <a href="#comment-section-{{ $post->id }}" class="btn btn-link text-muted" data-bs-toggle="collapse">
+                                                    <a href="#comment-section-{{ $post->id }}" class="btn btn-link text-muted comment-count-btn" data-bs-toggle="collapse" data-post-id="{{ $post->id }}">
                                                         <i class="far fa-comment"></i> Comment ({{ $post->comments->count() }})
-                                                    </a>
+                                                    </a>                                                    
                         
                                                     <!-- Bouton Partager -->
                                                     {{-- <a href="#" class="btn btn-link text-muted">
@@ -132,8 +132,8 @@
                                                             <button class="btn btn-primary ms-2 submit-comment" data-post-id="{{ $post->id }}" type="button">Post</button>
                                                         </form>
                                                         
-                                                        <!-- Affichage des commentaires existants -->
-                                                        <div class="comment-section">
+                                                        <!-- Affichage des commentaires existants avec un conteneur défilable -->
+                                                        <div class="comment-section" style="max-height: 200px; overflow-y: auto;">
                                                             @foreach ($post->comments as $comment)
                                                             <div class="d-flex align-items-center mb-2">
                                                                 <img src="{{ asset('assets/images/small/img-4.png') }}" alt="Comment Author Avatar" class="rounded-circle me-2" width="30" height="30">
@@ -145,7 +145,6 @@
                                                             </div>
                                                             @endforeach
                                                         </div>
-                                                        
                                                     </div>
                                                 </div>
                                             </div>
@@ -181,64 +180,87 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).on('click', '.like-button', function (e) {
-        e.preventDefault();
-        var postId = $(this).data('post-id');
-        var likeButton = $(this);
+    e.preventDefault();
+    var postId = $(this).data('post-id');
+    var likeButton = $(this);
+    
+    // Désactiver le bouton pour éviter les clics multiples
+    likeButton.prop('disabled', true);
 
-        $.ajax({
-            url: '/posts/' + postId + '/like',
-            type: 'POST',
-            data: {
-                _token: '{{ csrf_token() }}',
-            },
-            success: function (response) {
-                if (response.liked) {
-                    likeButton.find('i').css('color', 'blue');
-                } else {
-                    likeButton.find('i').css('color', '');
-                }
-                likeButton.find('.like-count').text('Like (' + response.likeCount + ')');
-            },
-            error: function (xhr) {
-                console.log(xhr.responseText);
+    $.ajax({
+        url: '/posts/' + postId + '/like',
+        type: 'POST',
+        data: {
+            _token: '{{ csrf_token() }}',
+        },
+        success: function (response) {
+            if (response.liked) {
+                likeButton.find('i').css('color', 'blue');
+            } else {
+                likeButton.find('i').css('color', '');
             }
-        });
+            likeButton.find('.like-count').text('Like (' + response.likeCount + ')');
+        },
+        error: function (xhr) {
+            console.log(xhr.responseText);
+        },
+        complete: function () {
+            // Réactiver le bouton après la requête
+            likeButton.prop('disabled', false);
+        }
     });
+});
+
 </script>
 <script>
-    $(document).on('click', '.submit-comment', function (e) {
-        e.preventDefault();
-        var postId = $(this).data('post-id');
-        var commentForm = $('#comment-form-' + postId);
-        var content = commentForm.find('.comment-content').val();
-        var commentSection = commentForm.next('.comment-section');
+    $(document).off('click', '.submit-comment').on('click', '.submit-comment', function (e) {
+    e.preventDefault();
+    var postId = $(this).data('post-id');
+    var commentForm = $('#comment-form-' + postId);
+    var content = commentForm.find('.comment-content').val();
+    var commentSection = commentForm.next('.comment-section');
+    var submitButton = $(this);
 
-        $.ajax({
-            url: '/posts/' + postId + '/comment',
-            type: 'POST',
-            data: {
-                _token: '{{ csrf_token() }}',
-                content: content
-            },
-            success: function (response) {
-                // Ajouter le nouveau commentaire à la section des commentaires
-                var newComment = `
-                    <div class="d-flex align-items-center mb-2">
-                        <img src="{{ asset('assets/images/small/img-4.png') }}" alt="Comment Author Avatar" class="rounded-circle me-2" width="30" height="30">
-                        <div class="bg-light rounded p-2 w-100">
-                            <strong>${response.comment.user.name}</strong>
-                            <p class="mb-1">${response.comment.content}</p>
-                            <small class="text-muted">Just now</small>
-                        </div>
+    // Désactiver le bouton pour éviter les clics multiples
+    submitButton.prop('disabled', true);
+
+    $.ajax({
+        url: '/posts/' + postId + '/comment',
+        type: 'POST',
+        data: {
+            _token: '{{ csrf_token() }}',
+            content: content
+        },
+        success: function (response) {
+            // Ajouter le nouveau commentaire à la section des commentaires
+            var newComment = `
+                <div class="d-flex align-items-center mb-2">
+                    <img src="{{ asset('assets/images/small/img-4.png') }}" alt="Comment Author Avatar" class="rounded-circle me-2" width="30" height="30">
+                    <div class="bg-light rounded p-2 w-100">
+                        <strong>${response.comment.user.name}</strong>
+                        <p class="mb-1">${response.comment.content}</p>
+                        <small class="text-muted">Just now</small>
                     </div>
-                `;
-                commentSection.append(newComment);
-                commentForm.find('.comment-content').val(''); // Effacer le champ de saisie
-            },
-            error: function (xhr) {
-                console.log(xhr.responseText);
-            }
-        });
+                </div>
+            `;
+            commentSection.append(newComment);
+            commentForm.find('.comment-content').val(''); // Effacer le champ de saisie
+
+            // Mettre à jour le nombre de commentaires dans le bouton
+            var commentCountBtn = $('.comment-count-btn[data-post-id="' + postId + '"]');
+            var currentCount = parseInt(commentCountBtn.text().match(/\d+/)); // Extraire le nombre actuel
+            var newCount = currentCount + 1;
+            commentCountBtn.html('<i class="far fa-comment"></i> Comment (' + newCount + ')');
+        },
+        error: function (xhr) {
+            console.log(xhr.responseText);
+        },
+        complete: function () {
+            // Réactiver le bouton après la requête
+            submitButton.prop('disabled', false);
+        }
     });
+});
+
 </script>
 @endsection

@@ -112,6 +112,7 @@ class PostController extends Controller
 
     public function like($post_id)
     {
+        $liked = false;
         $post = Post::findOrFail($post_id);
         $isLike = Like::where('user_id', auth()->id())
                         ->where('post_id', $post_id)->first();
