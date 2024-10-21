@@ -70,7 +70,7 @@
                                             <a class="dropdown-item" href="{{ route('projects.edit', $project->id) }}">Edit</a>
                                             {{-- <a class="dropdown-item" href="javascript: void(0);">Share</a> --}}
                                             <div class="dropdown-divider"></div>
-                                            <a class="dropdown-item delete-item" href="{{ route('projects.delete', $project->id) }}">Delete</a>
+                                            <a href="#" class="dropdown-item delete-item" data-id="{{ $project->id }}" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal">Delete</a>
                                         </div>
                                     </div>
                                 </div>
@@ -165,6 +165,26 @@
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
 
+    <!-- Modal de confirmation -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmDeleteModalLabel">Confirm deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete this project? This action cannot be undone.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <a href="#" id="confirmDeleteButton" class="btn btn-danger">Delete</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
     <footer class="footer">
         <div class="container-fluid">
             <div class="row">
@@ -198,4 +218,18 @@
         });
     });
 </script>
+<script>
+    // Écouter le clic sur le lien de suppression
+    document.querySelectorAll('.delete-item').forEach(function(item) {
+        item.addEventListener('click', function() {
+            // Récupérer l'ID du projet
+            var projectId = this.getAttribute('data-id');
+            // Construire l'URL de suppression
+            var deleteUrl = "{{ route('projects.delete', '') }}/" + projectId;
+            // Mettre à jour le bouton de confirmation
+            document.getElementById('confirmDeleteButton').setAttribute('href', deleteUrl);
+        });
+    });
+</script>
+
 @endsection

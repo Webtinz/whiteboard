@@ -131,8 +131,8 @@
                                                                         <a class="dropdown-item text-muted fw-medium" href="{{ route('files.download', $file->id)}}">
                                                                             <i class="mdi mdi-download me-2"></i>Download
                                                                         </a>
-                                                                        <a class="dropdown-item text-danger fw-medium delete-item" href="{{ route('files.delete', $file->id)}}" data-id="file-Drive">
-                                                                            <i class="mdi mdi-trash-can-outline me-2"></i>Delete
+                                                                        <a class="dropdown-item text-danger fw-medium delete-item" href="#" data-id="{{ $file->id }}" data-bs-toggle="modal" data-bs-target="#confirmDeleteFileModal">
+                                                                            <i class="mdi mdi-trash-can-outline me-2"></i> Delete
                                                                         </a>
                                                                     </div>
                                                                 </div>
@@ -279,6 +279,26 @@
     </div>
     <!-- End Page-content -->
 
+    <!-- Modal de confirmation -->
+<div class="modal fade" id="confirmDeleteFileModal" tabindex="-1" aria-labelledby="confirmDeleteFileModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmDeleteFileModalLabel">Confirm deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete this project? This action cannot be undone.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <a href="#" id="confirmDeleteFileButton" class="btn btn-danger">Delete</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
     <footer class="footer">
         <div class="container-fluid">
             <div class="row">
@@ -366,4 +386,18 @@
     });
     
     </script>
+    <script>
+        // Écouter le clic sur le lien de suppression des fichiers
+        document.querySelectorAll('.delete-item').forEach(function(item) {
+            item.addEventListener('click', function() {
+                // Récupérer l'ID du fichier
+                var fileId = this.getAttribute('data-id');
+                // Construire l'URL de suppression
+                var deleteUrl = "{{ route('files.delete', '') }}/" + fileId;
+                // Mettre à jour le bouton de confirmation
+                document.getElementById('confirmDeleteFileButton').setAttribute('href', deleteUrl);
+            });
+        });
+    </script>
+    
 @endsection

@@ -1,13 +1,15 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\ProjectController;
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FileController;
 use App\Http\Controllers\PostController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\TaskController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\PlatformUserController;
+// use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Whiteboard\GroupController;
 use App\Http\Controllers\Whiteboard\MessageController;
-use App\Http\Controllers\PlatformUserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,6 +23,11 @@ use App\Http\Controllers\PlatformUserController;
 */
 
 Route::get('/', function () {
+    return redirect()->route('welcome');
+});
+
+
+Route::get('/home', function () {
     return view('Front_include.index');
 })->name('welcome');
 
@@ -37,9 +44,7 @@ Route::get('kanbanboard', function () {
     return view('Front_include.kanbanboard');
 })->name('kanbanboard');
 
-Route::get('task', function () {
-    return view('Front_include.task');
-})->name('task');
+Route::get('task', [TaskController::class, 'taskslist'])->name('task');
 
 Route::get('activityzone', function () {
     return view('Front_include.activityzone');
@@ -48,6 +53,13 @@ Route::get('activityzone', function () {
 // Route::get('/signup', function () {
 //     return view('Front_include.signup');
 // })->name('signup');
+Route::get('/login1', function () {
+    return view('Front_include.login');
+})->name('login1');
+
+Route::get('/signup', function () {
+    return view('Front_include.signup');
+})->name('signup');
 
 
 // Messages
@@ -60,6 +72,9 @@ Route::get('/conversations', [MessageController::class, 'getAllConversations'])-
 // // Récupérer toutes les conversations (directes et groupes) pour l'utilisateur connecté
 // Route::get('user/conversations', [MessageController::class, 'getUserConversations']);
 
+// Route::get('/calendar', function(){
+//     return view('admin.calendar');
+// })->name('calendar');
 
 // Groupes
 Route::post('/groups/create', [GroupController::class, 'createGroup'])->name('create.group');
@@ -84,14 +99,13 @@ Route::middleware('auth')->group(function () {
 
     //Post routes
     Route::resource('/posts', PostController::class);
-    Route::post('posts/{post}/like', [PostController::class, 'like'])->name('posts.like');
+    Route::post('/posts/{post}/like', [PostController::class, 'like'])->name('posts.like');
     Route::post('posts/{post}/unlike', [PostController::class, 'unlike'])->name('posts.unlike');
     Route::post('posts/{post}/comment', [PostController::class, 'comment'])->name('posts.comment');
+    Route::get('/posts/filter/{teamId}', [PostController::class, 'filterByTeam'])->name('posts.filterByTeam');
 
     //Projects routes
     Route::resource('projects', ProjectController::class);
-    // Route::post('projects', [ProjectController::class, 'store'])->name('projects.store');
-    // Route::get('projects', [ProjectController::class, 'index'])->name('projects.index');
     Route::get('projects/delete/{project_id}', [ProjectController::class, 'delete'])->name('projects.delete');
     Route::post('projects/{project}/files', [FileController::class, 'store'])->name('files.store');
     Route::get('files/{file}/download', [FileController::class, 'download'])->name('files.download');
@@ -99,9 +113,16 @@ Route::middleware('auth')->group(function () {
     Route::get('files/{id}/view', [FileController::class, 'view'])->name('files.view');
 
 
+    Route::get('/calendar', [TaskController::class, 'calendar'])->name('calendar');
+    Route::get('/tasks', [TaskController::class, 'tasks'])->name('tasks');
+    Route::post('/tasks/add/', [TaskController::class, 'storeTask'])->name('add-task');
+    Route::put('/tasks/update', [TaskController::class, 'updateTask'])->name('update-task');
+    Route::get('/tasks/remove/{taskId}', [TaskController::class, 'deleteTask'])->name('remove-task');
+    Route::get('/tasks/get-details/{taskId}', [TaskController::class, 'getTask'])->name('get-task');
+
 });
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';
 
 Route::middleware(['auth', 'role:platform_master|platform_users_management'])->group(function () {
 });
