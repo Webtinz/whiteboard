@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Post;
 use App\Models\Comment;
 use App\Models\Group;
 use App\Models\Team;
 use App\Models\User;
 use App\Models\Like;
+use Illuminate\Http\Request;
 
 class PostController extends Controller
 {

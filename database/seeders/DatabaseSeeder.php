@@ -12,11 +12,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        $this->call(ProjectsTableSeeder::class);
         $this->call([
-            UserSeeder::class,
-            TeamSeeder::class,
-            PostSeeder::class, // Ajoutez le seeder des posts après avoir inséré les utilisateurs et les équipes
+            ProjectsTableSeeder::class,
+            RolesAndPermissionsSeeder::class
         ]);
     }
 
