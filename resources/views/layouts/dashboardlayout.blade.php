@@ -12,6 +12,9 @@
     <meta content="Pichforest" name="author" />
     <!-- App favicon -->
     <link rel="shortcut icon" href="{{ asset('assets/images/favicon.ico') }}">
+    <link rel="stylesheet" href="{{ asset('assets/libs/glightbox/css/glightbox.min.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css" rel="stylesheet">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
         
     <link href="{{ asset('assets/libs/prismjs/themes/prism.css' )}}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('assets/libs/prismjs/plugins/toolbar/prism-toolbar.css' )}}" rel="stylesheet" type="text/css" />
