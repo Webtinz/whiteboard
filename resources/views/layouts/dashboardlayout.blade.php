@@ -1,3 +1,7 @@
+<?php 
+use App\Models\Project;
+ $projects = Project::all();
+?>
 <!doctype html>
 <html lang="en">
 
@@ -186,10 +190,15 @@
                     <ul class="metismenu list-unstyled" id="side-menu">
 
                         <li>
-                            <a href="{{ route('kanbanboard') }}">
-                                <i class="icon nav-icon" data-feather="trello"></i>
-                                <span class="menu-item" data-key="t-kanban-board">Kanban Board</span>
+                            <a href="javascript: void(0);" class="has-arrow">
+                                <i class="icon nav-icon" data-feather="users"></i>
+                                <span class="menu-item" data-key="t-team-overview">Kanban Board</span>
                             </a>
+                            <ul class="sub-menu" aria-expanded="false">
+                                    @foreach ($projects as $project)
+                                    <li><a href="{{route('kanbanboard', $project->id )}}" data-key="t-employee">{{$project->name}}</a></li>
+                                    @endforeach
+                            </ul>
                         </li>
                         <li>
                             <a href="{{route('posts.index')}}">
@@ -422,10 +431,19 @@
                 <ul class="metismenu list-unstyled" id="side-menu">
 
                     <li>
-                        <a href="{{route('kanbanboard' )}}">
+                        {{-- <a href="{{route('kanbanboard' )}}">
                             <i class="icon nav-icon" data-feather="trello"></i>
                             <span class="menu-item" data-key="t-kanban-board">Kanban Board</span>
+                        </a> --}}
+                        <a href="javascript: void(0);" class="has-arrow">
+                            <i class="icon nav-icon" data-feather="users"></i>
+                            <span class="menu-item" data-key="t-team-overview">Kanban Board 2</span>
                         </a>
+                        @foreach ($projects as $project)
+                            <ul class="sub-menu" aria-expanded="false">
+                                <li><a href="{{route('kanbanboard', $project->id )}}" data-key="t-employee"></a></li>
+                            </ul>
+                        @endforeach
                     </li>
                     <li>
                         <a href="{{route('posts.index')}}">

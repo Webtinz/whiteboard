@@ -7,6 +7,8 @@ use App\Http\Controllers\TaskController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\PlatformUserController;
+use App\Http\Controllers\EtatController;
+use App\Http\Controllers\ProjectTaskController;
 // use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Whiteboard\GroupController;
 use App\Http\Controllers\Whiteboard\MessageController;
@@ -40,9 +42,7 @@ Route::get('allemployee', function () {
     return view('Front_include.allemployee');
 })->name('allemployee');
 
-Route::get('kanbanboard', function () {
-    return view('Front_include.kanbanboard');
-})->name('kanbanboard');
+Route::get('kanbanboard/{id}', [EtatController::class, 'index'])->name('kanbanboard');
 
 Route::get('task', [TaskController::class, 'taskslist'])->name('task');
 
@@ -112,6 +112,12 @@ Route::middleware('auth')->group(function () {
     Route::get('files/{file}', [FileController::class, 'delete'])->name('files.delete');
     Route::get('files/{id}/view', [FileController::class, 'view'])->name('files.view');
 
+    //Projects tasks routes
+    Route::resource('projecttasks', ProjectTaskController::class);
+    // Route::delete('projecttasks/{id}', [ProjectTaskController::class, 'delete'])->name('projecttasks.delete');
+    Route::post('projecttasks', [ProjectTaskController::class, 'store'])->name('projecttasks.store');
+    Route::put('tasks/{task}/etat', [TaskController::class, 'updateEtat'])->name('tasks.updateEtat');
+    Route::resource('etats', EtatController::class);
 
     Route::get('/calendar', [TaskController::class, 'calendar'])->name('calendar');
     Route::get('/tasks', [TaskController::class, 'tasks'])->name('tasks');
