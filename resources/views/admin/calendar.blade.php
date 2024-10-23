@@ -31,6 +31,20 @@
             margin: 0 auto;
         }
     </style> --}}
+
+    <style>
+        #selected_users_container {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.5em;
+            margin-bottom: 0.5em;
+        }
+    </style>
 @endsection
 
 @section('content')
@@ -173,6 +187,36 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="row gx-3">
+                                        <div class="col-sm-12">
+                                            <label class="form-label">Public or Private: </label> <br>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="public_or_private" id="public" value="public" checked>
+                                                <label class="form-check-label" for="public">Public</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="public_or_private" id="private" value="private">
+                                                <label class="form-check-label" for="private">Private</label>
+                                            </div>
+                                        </div>
+                                    </div>          
+                                    
+                                    <!-- Conteneur pour afficher les utilisateurs sélectionnés -->
+                                    <div id="selected_users_container" class="mb-3"></div>
+
+                                    <!-- Champ spécifique pour les utilisateurs privés -->
+                                    <div class="row gx-3" id="specific_users_field" style="display:none;">
+                                        <div class="col-sm-12">
+                                            <label class="form-label">Specific Users</label>
+                                            <select class="form-control" id="specific_users" name="specific_users[]" multiple>
+                                                <option value="1">User 1</option>
+                                                <option value="2">User 2</option>
+                                                <option value="3">User 3</option>
+                                                <!-- Ajoute d'autres utilisateurs ici -->
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
                                     {{-- <div class="row gx-3">
                                         <div class="col-sm-12">
                                             <div class="form-inline">
@@ -215,11 +259,11 @@
                                         </div>
                                     </div> --}}
                                 </form>
-                            </div>
-                            <div class="modal-footer align-items-center">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Discard</button>
-                                <button id="add_event" type="button" class="btn btn-primary fc-addEventButton-button"
-                                    data-bs-dismiss="modal">Add</button>
+                                <div class="modal-footer align-items-center">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Discard</button>
+                                    <button id="add_event" type="button" class="btn btn-primary fc-addEventButton-button"
+                                        data-bs-dismiss="modal">Add</button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -302,6 +346,37 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="row gx-3">
+                                        <div class="col-sm-12">
+                                            <label class="form-label">Public or Private: </label> <br>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="public_or_private" id="edit-public" value="public" checked>
+                                                <label class="form-check-label" for="public">Public</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="public_or_private" id="edit-private" value="private">
+                                                <label class="form-check-label" for="private">Private</label>
+                                            </div>
+                                        </div>
+                                    </div>          
+                                    
+                                    <!-- Conteneur pour afficher les utilisateurs sélectionnés -->
+                                    <div id="edit-selected_users_container" class="mb-3"></div>
+
+                                    <!-- Champ spécifique pour les utilisateurs privés -->
+                                    <div class="row gx-3" id="edit-specific_users_field" style="display:none;">
+                                        <div class="col-sm-12">
+                                            <label class="form-label">Specific Users</label>
+                                            <select class="form-control" id="edit-specific_users" name="specific_users[]" multiple>
+                                                <option value="1">User 1</option>
+                                                <option value="2">User 2</option>
+                                                <option value="3">User 3</option>
+                                                <!-- Ajoute d'autres utilisateurs ici -->
+                                            </select>
+                                        </div>
+                                    </div>
+
+
                                     {{-- <div class="row gx-3">
                                         <div class="col-sm-12">
                                             <div class="form-inline">
@@ -370,7 +445,7 @@
     <script src="{{ asset('asset/vendors/jquery/dist/jquery.min.js') }}"></script>
 
     <!-- Bootstrap Core JS -->
-    <script src="{{ asset('asset/vendors/bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script>
+    {{-- <script src="{{ asset('asset/vendors/bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script> --}}
 
     <!-- FeatherIcons JS -->
     <script src="{{ asset('asset/dist/js/feather.min.js') }}"></script>
@@ -398,6 +473,124 @@
 
     <!-- Init JS -->
     <script src="{{ asset('asset/dist/js/init.js') }}"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const publicRadio = document.getElementById('public');
+            const privateRadio = document.getElementById('private');
+            const specificUsersField = document.getElementById('specific_users_field');
+            const specificUsersSelect = document.getElementById('specific_users');
+            const selectedUsersContainer = document.getElementById('selected_users_container');
+
+            // Fonction pour afficher ou cacher le champ des utilisateurs spécifiques
+            function toggleSpecificUsersField() {
+                if (privateRadio.checked) {
+                    specificUsersField.style.display = 'block';
+                } else {
+                    specificUsersField.style.display = 'none';
+                    selectedUsersContainer.innerHTML = ''; // Réinitialiser les utilisateurs sélectionnés
+                    specificUsersSelect.selectedIndex = -1; // Désélectionner tous les utilisateurs
+                }
+            }
+
+            // Fonction pour mettre à jour la liste des utilisateurs sélectionnés
+            function updateSelectedUsers() {
+                // Vider le conteneur avant de le remplir
+                selectedUsersContainer.innerHTML = '';
+
+                // Parcourir les options sélectionnées et les afficher avec une croix
+                Array.from(specificUsersSelect.selectedOptions).forEach(option => {
+                    const userBadge = document.createElement('span');
+                    userBadge.className = 'badge bg-primary me-2'; // Style bootstrap pour le badge
+                    userBadge.textContent = option.text; // Afficher le nom de l'utilisateur
+
+                    // Ajout d'une croix pour supprimer
+                    const removeBtn = document.createElement('span');
+                    removeBtn.className = 'ms-2 text-white';
+                    removeBtn.style.cursor = 'pointer';
+                    removeBtn.innerHTML = '&times;'; // Symbole de la croix
+
+                    // Quand on clique sur la croix, on supprime l'utilisateur
+                    removeBtn.addEventListener('click', function() {
+                        option.selected = false; // Désélectionner l'utilisateur
+                        updateSelectedUsers(); // Mettre à jour l'affichage
+                    });
+
+                    userBadge.appendChild(removeBtn); // Ajouter la croix au badge
+                    selectedUsersContainer.appendChild(userBadge); // Ajouter le badge au conteneur
+                });
+            }
+
+            // Ajout d'événements pour changer l'état du champ spécifique
+            publicRadio.addEventListener('change', toggleSpecificUsersField);
+            privateRadio.addEventListener('change', toggleSpecificUsersField);
+
+            // Ajout d'un événement pour la sélection des utilisateurs
+            specificUsersSelect.addEventListener('change', updateSelectedUsers);
+
+            // Initialisation de l'état au chargement de la page
+            toggleSpecificUsersField();
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const publicRadio = document.getElementById('edit-public');
+            const privateRadio = document.getElementById('edit-private');
+            const specificUsersField = document.getElementById('edit-specific_users_field');
+            const specificUsersSelect = document.getElementById('edit-specific_users');
+            const selectedUsersContainer = document.getElementById('edit-selected_users_container');
+
+            // Fonction pour afficher ou cacher le champ des utilisateurs spécifiques
+            function toggleSpecificUsersField() {
+                if (privateRadio.checked) {
+                    specificUsersField.style.display = 'block';
+                } else {
+                    specificUsersField.style.display = 'none';
+                    selectedUsersContainer.innerHTML = ''; // Réinitialiser les utilisateurs sélectionnés
+                    specificUsersSelect.selectedIndex = -1; // Désélectionner tous les utilisateurs
+                }
+            }
+
+            // Fonction pour mettre à jour la liste des utilisateurs sélectionnés
+            function updateSelectedUsers() {
+                // Vider le conteneur avant de le remplir
+                selectedUsersContainer.innerHTML = '';
+
+                // Parcourir les options sélectionnées et les afficher avec une croix
+                Array.from(specificUsersSelect.selectedOptions).forEach(option => {
+                    const userBadge = document.createElement('span');
+                    userBadge.className = 'badge bg-primary me-2'; // Style bootstrap pour le badge
+                    userBadge.textContent = option.text; // Afficher le nom de l'utilisateur
+
+                    // Ajout d'une croix pour supprimer
+                    const removeBtn = document.createElement('span');
+                    removeBtn.className = 'ms-2 text-white';
+                    removeBtn.style.cursor = 'pointer';
+                    removeBtn.innerHTML = '&times;'; // Symbole de la croix
+
+                    // Quand on clique sur la croix, on supprime l'utilisateur
+                    removeBtn.addEventListener('click', function() {
+                        option.selected = false; // Désélectionner l'utilisateur
+                        updateSelectedUsers(); // Mettre à jour l'affichage
+                    });
+
+                    userBadge.appendChild(removeBtn); // Ajouter la croix au badge
+                    selectedUsersContainer.appendChild(userBadge); // Ajouter le badge au conteneur
+                });
+            }
+
+            // Ajout d'événements pour changer l'état du champ spécifique
+            publicRadio.addEventListener('change', toggleSpecificUsersField);
+            privateRadio.addEventListener('change', toggleSpecificUsersField);
+
+            // Ajout d'un événement pour la sélection des utilisateurs
+            specificUsersSelect.addEventListener('change', updateSelectedUsers);
+
+            // Initialisation de l'état au chargement de la page
+            toggleSpecificUsersField();
+        });
+    </script>
+
     <script>
         var curYear = moment().format('YYYY'),
             curMonth = moment().format('MM');
@@ -496,7 +689,11 @@
                                 end_date: $('#event_end_date_val').val(),
                                 end_time: $('#event_end_time_val').val(),
                                 color: $('#event_color_val').val(),
-                                priority: $('#event_priority_val').val()
+                                priority: $('#event_priority_val').val(),
+                                // event_specific_users_val-event_public_or_private_val
+                                specific_users: $('#event_specific_users_val').val()
+                                public_or_private: $('#event_public_or_private_val').val()
+
                             },
                             success: function(response) {
                                 $.notify({
@@ -579,8 +776,11 @@
                     url: `/tasks/update/`,
                     method: 'PUT',
                     data: {
+                        // user_id-specific_users-public_or_private
                         taskId: event.id,
                         title: event.title,
+                        specific_users: event.specific_users,
+                        public_or_private: event.public_or_private,
                         start_date: event.start.toISOString().slice(0, 10), // Start date (YYYY-MM-DD)
                         start_time: event.start.toISOString().slice(11, 19), // Start time (HH:MM:SS)
                         end_date: event.end ? event.end.toISOString().slice(0, 10) :
@@ -601,15 +801,20 @@
             // Add new event
             $('#add_event').click(function() {
                 var newEvent = {
+                    // user_id-specific_users-public_or_private
                     title: $('.cal-event-name').val(),
-                    description: $('#event_description').val(),
+                    description: $('#event_description_val').val(),
                     start_date: $('#start_date').val(),
                     start_time: $('#start_time').val(),
                     end_date: $('#end_date').val(),
                     end_time: $('#end_time').val(),
+                    specific_users: $('#specific_users').val(),
+                    public_or_private: $('input[name="public_or_private"]:checked').val(),
                     color: $('.cal-event-color').val(),
                     priority: $('input[name="priority"]:checked').val(),
                 };
+                console.log(newEvent);
+                
 
                 $.ajax({
                     url: `/tasks/add/`,
