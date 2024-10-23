@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ProjectTask;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Facade;
 
 class ProjectTaskController extends Controller
 {
@@ -36,15 +37,22 @@ class ProjectTaskController extends Controller
         return redirect()->back();
     }
 
-    public function delete($id)
+    public function destroy($id)
     {
-        $task = ProjectTask::findOrFail($id);
-
         try {
+            $task = ProjectTask::findOrFail($id);
             $task->delete();
-            return response()->json(['success' => true, 'message' => 'Task deleted successfully']);
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Tâche supprimée avec succès'
+            ]);
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => 'Error deleting task']);
+            \Log::error('Erreur de suppression de tâche: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de la suppression de la tâche'
+            ], 500);
         }
     }
 

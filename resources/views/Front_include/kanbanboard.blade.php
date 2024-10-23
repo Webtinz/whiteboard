@@ -165,7 +165,7 @@
                                                 @if ($task->etat->id == $etat->id)
                                                     
                                                 <div id="backlog-task" class="task d-flex flex-column">
-                                                    <div class="card task-box shadow-none" id="remove-item-{{ $task->id }}">
+                                                    <div class="card task-box shadow-none">
                                                         <div class="card-body">
                                                             <div class="d-flex mb-3">
                                                                 <div class="flex-grow-1 align-items-start">
@@ -831,6 +831,25 @@
 </div>
 <!-- /.modal -->
 
+<!-- Modal de confirmation -->
+<div class="modal fade" id="deleteTaskModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmer la suppression</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Êtes-vous sûr de vouloir supprimer cette tâche ?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteTask">Supprimer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
     <footer class="footer">
         <div class="container-fluid">
             <div class="row">
@@ -853,37 +872,96 @@
 <!-- kanbanboard Js -->
 <script src="assets/js/pages/kanbanboard.init.js"></script>
 <script>
-    $(document).on('click', '.delete-itemt', function (e) {
-    e.preventDefault(); // Empêche le comportement par défaut du lien
-
-    var taskId = $(this).data('id'); // Récupère l'ID de la tâche à partir du data-id
-    var deleteUrl = '/projecttasks/' + taskId; // L'URL pour supprimer la tâche
-
-    // if (confirm('Are you sure you want to delete this task?')) {
-    print("pass");
-        $.ajax({
-            url: deleteUrl,
-            type: 'DELETE',
-            data: {
-                _token: '{{ csrf_token() }}' // Inclut le token CSRF pour sécuriser la requête
-            },
-            success: function (response) {
-                if (response.success) {
-                    // Supprime la tâche du DOM après suppression
-                    // $('#remove-item-' + taskId).remove();
-                    alert(response.message);
-                } else {
-                    alert('Error: ' + response.message);
-                }
-            },
-            error: function (xhr) {
-                alert('Error deleting task');
+    document.addEventListener('DOMContentLoaded', function() {
+        let taskIdToDelete = null;
+        const deleteModal = new bootstrap.Modal(document.getElementById('deleteTaskModal'));
+        
+        // Supprimer les anciens écouteurs d'événements s'ils existent
+        const confirmButton = document.getElementById('confirmDeleteTask');
+        confirmButton.replaceWith(confirmButton.cloneNode(true));
+        
+        // Réattacher l'écouteur sur le nouveau bouton
+        document.getElementById('confirmDeleteTask').addEventListener('click', deleteTask);
+    
+        // Utiliser la délégation d'événements pour le bouton delete-itemt
+        document.addEventListener('click', function(e) {
+            if (e.target.matches('.delete-itemt')) {
+                e.preventDefault();
+                taskIdToDelete = e.target.getAttribute('data-id');
+                deleteModal.show();
             }
         });
-    // }
-});
-
+    
+        function deleteTask() {
+            if (!taskIdToDelete) return;
+    
+            const token = document.querySelector('meta[name="csrf-token"]').content;
+            
+            // Fermer d'abord la modal de confirmation
+            deleteModal.hide();
+            
+            fetch(`/projecttasks/${taskIdToDelete}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': token,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    _token: token
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erreur réseau');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // S'assurer que la modal Bootstrap est bien fermée
+                    const modalElement = document.getElementById('deleteTaskModal');
+                    const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                    if (modalInstance) {
+                        modalInstance.hide();
+                    }
+                    
+                    // Retirer le backdrop manuellement si nécessaire
+                    const backdrop = document.querySelector('.modal-backdrop');
+                    if (backdrop) {
+                        backdrop.remove();
+                    }
+                    
+                    // Retirer la classe modal-open du body
+                    document.body.classList.remove('modal-open');
+                    
+                    // Afficher le message de succès et recharger
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: 'The task was successfully deleted',
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An error occurred while deleting',
+                });
+            })
+            .finally(() => {
+                taskIdToDelete = null;
+            });
+        }
+    });
 </script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     // Cible le modal
 var taskModal = document.querySelector('.bs-task-details-edit');
