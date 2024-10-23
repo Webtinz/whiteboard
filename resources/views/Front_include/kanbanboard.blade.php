@@ -857,15 +857,15 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Confirmer la suppression</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title">Confirm deletion</h5>
+                <button type="button" class="btn-close" id="cancelDeleteTask" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                Êtes-vous sûr de vouloir supprimer cette tâche ?
+                Are you sure you want to delete this task?
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                <button type="button" class="btn btn-danger" id="confirmDeleteTask">Supprimer</button>
+                <button type="button" class="btn btn-secondary" id="cancelDeleteTask" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteTask">Delete</button>
             </div>
         </div>
     </div>
@@ -903,6 +903,7 @@
         
         // Réattacher l'écouteur sur le nouveau bouton
         document.getElementById('confirmDeleteTask').addEventListener('click', deleteTask);
+        document.getElementById('cancelDeleteTask').addEventListener('click', $('#deleteTaskModal').modal('hide'));
     
         // Utiliser la délégation d'événements pour le bouton delete-itemt
         document.addEventListener('click', function(e) {
