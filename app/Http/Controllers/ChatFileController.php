@@ -22,8 +22,12 @@ class ChatFileController extends Controller
         // Boucle à travers chaque fichier
         foreach ($validated['file'] as $file) {
             // Stocker le fichier et obtenir le chemin
-            $filePath = $file->store('uploads', 'public');
-    
+            // Récupérer le nom d'origine du fichier
+            $originalFileName = $file->getClientOriginalName();
+
+            // Enregistrer le fichier sous son nom d'origine dans le dossier 'uploads' dans le stockage public
+            $filePath = $file->storeAs('uploads', $originalFileName, 'public');
+            
             // Créer une entrée dans la base de données pour chaque fichier
             ChatFile::create([
                 'message_id' => $messageId,
