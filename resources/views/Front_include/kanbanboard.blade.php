@@ -47,83 +47,26 @@
                                     </div><!-- end col -->
 
                                     <div class="col-sm-6">
-                                        <div
+                                        {{-- <div
                                             class="d-flex flex-wrap justify-content-sm-end align-items-center mt-4 mt-md-0">
                                             <div class="me-3">
                                                 <h6 class="fw-medium text-muted mb-0">Members :-</h6>
                                             </div>
                                             <div class="avatar-group">
-                                                <div class="avatar-group-item">
-                                                    <a href="javascript: void(0);" class="d-inline-block"
+                                                @foreach ($projecttasks as $task)
+                                                    @foreach ($task->users->unique('id') as $member )
+                                                    <div class="avatar-group-item">
+                                                        <a href="javascript: void(0);" class="d-inline-block"
                                                         data-bs-toggle="tooltip" data-bs-placement="top"
-                                                        title="Mark Burke">
-                                                        <img src="assets/images/users/avatar-1.jpg" alt=""
-                                                            class="rounded-circle avatar-sm">
-                                                    </a>
-                                                </div>
-                                                <div class="avatar-group-item">
-                                                    <a href="javascript: void(0);" class="d-inline-block"
-                                                        data-bs-toggle="tooltip" data-bs-placement="top"
-                                                        title="Denny Silva">
-                                                        <img src="assets/images/users/avatar-2.jpg" alt=""
-                                                            class="rounded-circle avatar-sm">
-                                                    </a>
-                                                </div>
-                                                <div class="avatar-group-item">
-                                                    <a href="javascript: void(0);" class="d-inline-block"
-                                                        data-bs-toggle="tooltip" data-bs-placement="top"
-                                                        title="Julia Halsey">
-                                                        <img src="assets/images/users/avatar-3.jpg" alt=""
-                                                            class="rounded-circle avatar-sm">
-                                                    </a>
-                                                </div>
-                                                <div class="avatar-group-item">
-                                                    <a href="javascript: void(0);" class="d-inline-block"
-                                                        data-bs-toggle="tooltip" data-bs-placement="top"
-                                                        title="Abel Owen">
-                                                        <img src="assets/images/users/avatar-4.jpg" alt=""
-                                                            class="rounded-circle avatar-sm">
-                                                    </a>
-                                                </div>
-                                                <div class="avatar-group-item">
-                                                    <a href="javascript: void(0);" class="d-block"
-                                                        data-bs-toggle="tooltip" data-bs-placement="top"
-                                                        title="Julia Ott">
-                                                        <div class="avatar-sm">
-                                                            <div class="avatar-title rounded-circle bg-purple">
-                                                                J
-                                                            </div>
-                                                        </div>
-                                                    </a>
-                                                </div>
-                                                <div class="avatar-group-item">
-                                                    <a href="javascript: void(0);" class="d-inline-block"
-                                                        data-bs-toggle="tooltip" data-bs-placement="top"
-                                                        title="William Zawacki">
-                                                        <img src="assets/images/users/avatar-5.jpg" alt=""
-                                                            class="rounded-circle avatar-sm">
-                                                    </a>
-                                                </div>
-                                                <div class="avatar-group-item">
-                                                    <a href="javascript: void(0);" class="d-inline-block"
-                                                        data-bs-toggle="tooltip" data-bs-placement="top"
-                                                        title="Jansh Wells">
-                                                        <img src="assets/images/users/avatar-10.jpg" alt=""
-                                                            class="rounded-circle avatar-sm">
-                                                    </a>
-                                                </div>
-                                                <div class="avatar-group-item">
-                                                    <a href="javascript: void(0);">
-                                                        <div class="avatar-sm">
-                                                            <span
-                                                                class="avatar-title rounded-circle bg-primary text-white font-size-14">
-                                                                +7
-                                                            </span>
-                                                        </div>
-                                                    </a>
-                                                </div>
+                                                        title="{{$member->name}}">
+                                                        <img src="{{ asset('assets/images/users/avatar-1.jpg') }}" alt=""
+                                                        class="rounded-circle avatar-sm">
+                                                        </a>
+                                                    </div>
+                                                    @endforeach
+                                                @endforeach
                                             </div><!-- end avatar group -->
-                                        </div><!-- end -->
+                                        </div><!-- end --> --}}
                                         <div class="d-flex align-items-center justify-content-sm-end mt-4">
                                             <div class="search-box ">
                                                 <div class="position-relative">
@@ -178,10 +121,24 @@
                                                                         <i class="mdi mdi-dots-horizontal"></i>
                                                                     </a>
                                                                     <div class="dropdown-menu dropdown-menu-end">
-                                                                        <a class="dropdown-item" data-bs-toggle="modal" data-bs-target=".bs-task-details-edit" href="#">Edit</a>
+                                                                        <a class="dropdown-item edit-task-btn" data-bs-toggle="modal" href="#" data-id="{{ $task->id }}" data-name="{{ $task->name }}" data-description="{{ $task->description }}" data-progress="{{ $task->progress }}" data-end-date="{{ $task->end_date }}">Edit</a>
                                                                         <a class="dropdown-item delete-itemt" href="#" data-id="{{ $task->id }}">Remove</a>
+                                                                        
+                                                                        <!-- Menu pour déplacer la tâche -->
+                                                                        <div class="dropdown dropdown-move">
+                                                                            <a class="dropdown-item dropdown-toggle arrow-none" href="#">Move</a>
+                                                                            <div class="dropdown-menu">
+                                                                                @foreach ($etats as $etatOption)
+                                                                                    @if ($task->etat_id != $etatOption->id)
+                                                                                        <a class="dropdown-item move-task" href="#" data-id="{{ $task->id }}" data-etat-id="{{ $etatOption->id }}">
+                                                                                            Move to {{ $etatOption->name }}
+                                                                                        </a>
+                                                                                    @endif
+                                                                                @endforeach
+                                                                            </div>
+                                                                        </div>
                                                                     </div>
-                                                                </div>
+                                                                </div>                                                                
                                                             </div>
 
                                                             <a href="#" class="font-size-15 fw-medium text-dark task-name" data-bs-toggle="modal" onclick="editTaskDetails('remove-item-{{ $task->id }}', 1)">
@@ -193,7 +150,7 @@
                                                             <div class="progress progress-sm animated-progess mb-3"
                                                                 style="height: 4px;">
                                                                 <div class="progress-bar" role="progressbar"
-                                                                    style="width: 0%" aria-valuenow="0" value="0"
+                                                                    style="width: {{$task->progress}}%" aria-valuenow="0" value="0"
                                                                     aria-valuemin="0" aria-valuemax="100"></div>
                                                             </div>
                                                             <div class="d-flex">
@@ -207,6 +164,25 @@
                                                                     <p class="text-muted font-size-13 fw-medium mb-2">
                                                                         <i class="mdi mdi-check-all me-1 align-middle"></i>{{ $task->progress == 100 ? 'Completed' : 'Not Completed' }}
                                                                     </p>
+                                                                </div>
+                                                            </div>
+                                                            <div class="d-flex">
+                                                                <div id="all-member-lists-2" class="flex-grow-1">
+                                                                    @foreach ($task->users as $member )
+                                                                    <div class="avatar-group float-start task-assigne">
+                                                                        <div class="avatar-group-item">
+                                                                            <a href="javascript: void(0);"
+                                                                            class="d-inline-block"
+                                                                            data-bs-toggle="tooltip"
+                                                                            data-bs-placement="top"
+                                                                            value="member-1" title="{{$member->name}}">
+                                                                            <img src="{{ asset('assets/images/users/avatar-1.jpg')}}"
+                                                                            alt=""
+                                                                            class="rounded-circle avatar-sm">
+                                                                            </a>
+                                                                        </div>
+                                                                    </div><!-- end avatar group -->
+                                                                @endforeach
                                                                 </div>
                                                             </div>
                                                         </div><!-- end card body -->
@@ -517,6 +493,51 @@
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
+
+    <!-- Modal de modification de tâche -->
+    <div class="modal fade" id="editTaskModal" tabindex="-1" aria-labelledby="editTaskModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editTaskModalLabel">Edit Task</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editTaskForm" method="POST" action="">
+                        @csrf
+                        @method('PUT') <!-- Utilise la méthode PATCH pour la mise à jour -->
+                        
+                        <div class="mb-3">
+                            <label for="editTaskName" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="editTaskName" name="name" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="editTaskDescription" class="form-label">Description</label>
+                            <textarea class="form-control" id="editTaskDescription" name="description" rows="3" required></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="editTaskProgress" class="form-label">Progress</label>
+                            <input type="number" class="form-control" id="editTaskProgress" name="progress" max="100" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="editTaskEndDate" class="form-label">End Date</label>
+                            <input type="date" class="form-control" id="editTaskEndDate" name="end_date" required>
+                        </div>
+
+                        <input type="hidden" id="editTaskId" name="task_id">
+                        
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <!-- KanbanBoard Card Edit Modal -->
     <div class="modal fade bs-task-details-edit" tabindex="-1" role="dialog" id="modalForm" aria-hidden="true">
@@ -1033,4 +1054,88 @@ taskModal.addEventListener('show.bs.modal', function (event) {
         });
     });
 </script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Gestionnaire pour les liens de déplacement de tâche
+        document.addEventListener('click', function(e) {
+            if (e.target.matches('.move-task')) {
+                e.preventDefault();
+                const taskId = e.target.getAttribute('data-id');
+                const newEtatId = e.target.getAttribute('data-etat-id');
+                moveTask(taskId, newEtatId);
+            }
+        });
+    
+        function moveTask(taskId, newEtatId) {
+            const token = document.querySelector('meta[name="csrf-token"]').content;
+    
+            fetch(`/projecttasks/${taskId}/move`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': token,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    etat_id: newEtatId,
+                    _token: token
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erreur réseau');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // Afficher une notification de succès
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Succès',
+                        text: 'The task was moved successfully',
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(() => {
+                        // Recharger la page pour afficher la tâche dans son nouvel état
+                        window.location.reload();
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An error occurred while moving the task',
+                });
+            });
+        }
+    });
+</script>
+<script>
+$(document).on('click', '.edit-task-btn', function () {
+    var taskId = $(this).data('id');
+    var taskName = $(this).data('name');
+    var taskDescription = $(this).data('description');
+    var taskProgress = $(this).data('progress');
+    var taskEndDate = $(this).data('end-date');
+    
+    // Remplir les champs du formulaire avec les données de la tâche
+    $('#editTaskName').val(taskName);
+    $('#editTaskDescription').val(taskDescription);
+    $('#editTaskProgress').val(taskProgress);
+    $('#editTaskEndDate').val(taskEndDate);
+    $('#editTaskId').val(taskId);
+    
+    // Définir l'action du formulaire avec l'URL de la tâche
+    $('#editTaskForm').attr('action', '/projecttasks/' + taskId);
+    
+    // Ouvrir le modal
+    $('#editTaskModal').modal('show');
+});
+
+</script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 @endsection

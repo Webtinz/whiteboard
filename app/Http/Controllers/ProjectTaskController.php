@@ -37,6 +37,20 @@ class ProjectTaskController extends Controller
         return redirect()->back();
     }
 
+    public function update(Request $request, $id)
+    {
+        $task = ProjectTask::findOrFail($id);
+
+        $task->update([
+            'name' => $request->name,
+            'description' => $request->description,
+            'progress' => $request->progress,
+            'end_date' => $request->end_date,
+        ]);
+
+        return redirect()->back()->with('success', 'Task updated successfully');
+    }
+
     public function destroy($id)
     {
         try {
@@ -56,5 +70,23 @@ class ProjectTaskController extends Controller
         }
     }
 
+    public function move(Request $request, $id)
+    {
+        try {
+            $task = ProjectTask::findOrFail($id);
+            $task->etat_id = $request->etat_id;
+            $task->save();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Tâche déplacée avec succès'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors du déplacement de la tâche'
+            ], 500);
+        }
+    }
 
 }

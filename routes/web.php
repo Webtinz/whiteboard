@@ -116,6 +116,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('projecttasks', ProjectTaskController::class);
     // Route::delete('projecttasks/{id}', [ProjectTaskController::class, 'delete'])->name('projecttasks.delete');
     Route::post('projecttasks', [ProjectTaskController::class, 'store'])->name('projecttasks.store');
+    Route::post('/projecttasks/{id}/move', [ProjectTaskController::class, 'move'])->name('projecttasks.move');
     Route::put('tasks/{task}/etat', [TaskController::class, 'updateEtat'])->name('tasks.updateEtat');
     Route::resource('etats', EtatController::class);
 
