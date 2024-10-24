@@ -47,6 +47,9 @@ class ProjectTaskController extends Controller
             'progress' => $request->progress,
             'end_date' => $request->end_date,
         ]);
+        if (!empty($request->assigned_members)) {
+            $task->users()->attach($request->assigned_members);
+        }
 
         return redirect()->back()->with('success', 'Task updated successfully');
     }

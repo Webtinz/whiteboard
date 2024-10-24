@@ -39,11 +39,11 @@
                                                     transition into a new project management method.</p>
                                             </div>
                                         </div>
-                                        <div class="text-cente mt-4">
+                                        {{-- <div class="text-cente mt-4">
                                             <a href="javascript: void(0);" class="btn btn-primary"
                                                 data-bs-toggle="modal" data-bs-target=".bs-add-new-board"><i
                                                     class="mdi mdi-plus me-1"></i> Add New Board</a>
-                                        </div>
+                                        </div> --}}
                                     </div><!-- end col -->
 
                                     <div class="col-sm-6">
@@ -121,7 +121,7 @@
                                                                         <i class="mdi mdi-dots-horizontal"></i>
                                                                     </a>
                                                                     <div class="dropdown-menu dropdown-menu-end">
-                                                                        <a class="dropdown-item edit-task-btn" data-bs-toggle="modal" href="#" data-id="{{ $task->id }}" data-name="{{ $task->name }}" data-description="{{ $task->description }}" data-progress="{{ $task->progress }}" data-end-date="{{ $task->end_date }}">Edit</a>
+                                                                        <a class="dropdown-item edit-task-btn" data-bs-toggle="modal" href="#" data-id="{{ $task->id }}" data-name="{{ $task->name }}" data-description="{{ $task->description }}" data-progress="{{ $task->progress }}" data-end-date="{{ $task->end_date }}" data-assigned-members="{{ json_encode($task->users->pluck('id')->toArray()) }}">Edit</a>
                                                                         <a class="dropdown-item delete-itemt" href="#" data-id="{{ $task->id }}">Remove</a>
                                                                         
                                                                         <!-- Menu pour déplacer la tâche -->
@@ -525,6 +525,20 @@
                         <div class="mb-3">
                             <label for="editTaskEndDate" class="form-label">End Date</label>
                             <input type="date" class="form-control" id="editTaskEndDate" name="end_date" required>
+                        </div>
+                        <div class="pt-2">
+                            <p class="fw-medium mb-3">Assign Team Members</p>
+                            <ul class="list-unstyled user-list validate mt-2" id="taskassignee" data-simplebar style="max-height: 160px;">
+                                @foreach ($users as $user)
+                                    <li>
+                                        <div class="form-check form-check-primary mb-2 font-size-16 d-flex align-items-center">
+                                            <input class="form-check-input me-3" type="checkbox" id="member-{{ $user->id }}" name="assigned_members[]" value="{{ $user->id }}">
+                                            <img src="{{ asset('assets/images/users/avatar-' . $user->id . '.jpg') }}" class="rounded-circle avatar-sm" alt="">
+                                            <label class="form-check-label font-size-14 mb-0 ms-3" for="member-{{ $user->id }}">{{ $user->name }}</label>
+                                        </div>
+                                    </li>
+                                @endforeach
+                            </ul>
                         </div>
 
                         <input type="hidden" id="editTaskId" name="task_id">
@@ -1115,24 +1129,35 @@ taskModal.addEventListener('show.bs.modal', function (event) {
     });
 </script>
 <script>
-$(document).on('click', '.edit-task-btn', function () {
+$(document).on('click', '.edit-task-btn', function (e) {
+    e.preventDefault();
+
+    // Récupère les informations de la tâche à partir des attributs data-*
     var taskId = $(this).data('id');
     var taskName = $(this).data('name');
     var taskDescription = $(this).data('description');
     var taskProgress = $(this).data('progress');
     var taskEndDate = $(this).data('end-date');
-    
-    // Remplir les champs du formulaire avec les données de la tâche
+    var assignedMembers = $(this).data('assigned-members'); // Tableau des membres assignés
+
+    // Remplir les champs du formulaire
+    $('#editTaskId').val(taskId);
     $('#editTaskName').val(taskName);
     $('#editTaskDescription').val(taskDescription);
     $('#editTaskProgress').val(taskProgress);
     $('#editTaskEndDate').val(taskEndDate);
-    $('#editTaskId').val(taskId);
-    
-    // Définir l'action du formulaire avec l'URL de la tâche
-    $('#editTaskForm').attr('action', '/projecttasks/' + taskId);
-    
-    // Ouvrir le modal
+
+    // Réinitialiser toutes les cases à cocher
+    $('#taskassignee input[type="checkbox"]').prop('checked', false);
+
+    // Coche les cases des membres déjà assignés
+    if (assignedMembers && Array.isArray(assignedMembers)) {
+        assignedMembers.forEach(function (memberId) {
+            $('#member-' + memberId).prop('checked', true); // Coche la case correspondant au membre
+        });
+    }
+
+    // Affiche le modal d'édition
     $('#editTaskModal').modal('show');
 });
 
