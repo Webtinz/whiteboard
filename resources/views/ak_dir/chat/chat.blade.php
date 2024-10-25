@@ -361,9 +361,9 @@
                                             <div class="row align-items-center">
                                                 <div class="col-auto">
                                                     <div class="dropdown">
-                                                        <a class="dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                        {{-- <a class="dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                             <i class="bx bx-plus fs-3"></i>
-                                                        </a>
+                                                        </a> --}}
                                                         <div class="dropdown-menu">
                                                             <a class="dropdown-item fw-medium text-muted" href="javascript: void(0);" id="cameraBtn">
                                                                 <i class="mdi mdi-camera-outline me-2"></i>Camera</a>
