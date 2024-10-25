@@ -67,7 +67,7 @@
                                                 @endforeach
                                             </div><!-- end avatar group -->
                                         </div><!-- end --> --}}
-                                        <div class="d-flex align-items-center justify-content-sm-end mt-4">
+                                        {{-- <div class="d-flex align-items-center justify-content-sm-end mt-4">
                                             <div class="search-box ">
                                                 <div class="position-relative">
                                                     <input type="text" class="form-control rounded"
@@ -76,7 +76,7 @@
                                                     <i class="uil uil-search search-icon"></i>
                                                 </div>
                                             </div><!-- end seacrh-box -->
-                                        </div>
+                                        </div> --}}
                                     </div><!-- end col -->
                                 </div><!-- end row -->
                             </div>

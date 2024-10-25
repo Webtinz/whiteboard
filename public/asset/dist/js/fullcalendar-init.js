@@ -1,13 +1,6 @@
 /*Full Calendar Init*/
 //Small Calendar
-$('input[name="calendar"]').daterangepicker({
-	singleDatePicker: true,
-	showDropdowns: false,
-	minYear: 1901,
-	"cancelClass": "btn-secondary",
-	autoApply :true,
-	parentEl: "#inline_calendar",
-});
+
 /* Single Date*/
 $('input[name="single-date-pick"]').daterangepicker({
 	singleDatePicker: true,

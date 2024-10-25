@@ -3,8 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\Task;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Events\MeetingScheduled;
+use App\Notifications\ReunionReminder;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Notification;
+use App\Mail\ReunionNotification;
+use Illuminate\Support\Facades\Mail;
 
 class TaskController extends Controller
 {
@@ -13,17 +20,45 @@ class TaskController extends Controller
      */
 
     public function taskslist(){
-        $tasks = Task::orderByDesc('created_at')->get();
+        $userId = Auth::id();
+        $tasks = Task::where(function ($query) use ($userId) {
+            $query->where('public_or_private', 'public') // Tâches publiques
+                ->orWhere(function ($q) use ($userId) {
+                    $q->where('public_or_private', 'private') // Tâches privées
+                        ->whereJsonContains('specific_users', $userId); // Vérifier si l'utilisateur est dans le champ specific_users
+                });
+        })
+        ->orderByDesc('created_at')
+        ->get();
         return view('Front_include.task', compact('tasks'));
     }
     public function calendar(){
-        $tasks = Task::orderByDesc('created_at')->get();
-        return view('admin.calendar', compact('tasks'));
+        $userId = Auth::id();
+        // Récupérer les tâches
+        $tasks = Task::where(function ($query) use ($userId) {
+            $query->where('public_or_private', 'public') // Tâches publiques
+                  ->orWhere(function ($q) use ($userId) {
+                      $q->where('public_or_private', 'private') // Tâches privées
+                        ->whereJsonContains('specific_users', $userId); // Vérifier si l'utilisateur est dans specific_users (JSON)
+                  });
+        })
+        ->orderByDesc('created_at')
+        ->get(); 
+        $users = User::all();
+        return view('admin.calendar', compact('tasks','users'));
     }
     public function tasks()
     {
+        $userId = Auth::id();
         // user_id-specific_users-public_or_private
-        $tasks = Task::all()->map(function ($task) {
+        $tasks = Task::where(function ($query) use ($userId) {
+            $query->where('public_or_private', 'public') // Tâches publiques
+                  ->orWhere(function ($q) use ($userId) {
+                      $q->where('public_or_private', 'private') // Tâches privées
+                        ->whereJsonContains('specific_users', $userId); // Vérifier si l'utilisateur est dans specific_users (JSON)
+                  });
+        })
+        ->orderByDesc('created_at')->get()->map(function ($task) {
             return [
                 'id' => $task->id,
                 'backgroundColor' => $task->color,
@@ -35,6 +70,22 @@ class TaskController extends Controller
         });
 
         return response()->json($tasks);
+    }
+
+    // Fonction qui planifie la notification email
+    public function planifierNotification($reunion)
+    {
+        $participants = json_decode($reunion->specific_users); // Utilisateurs impliqués dans la réunion
+        $participants[] = $reunion->user_id;
+        $participants = array_unique($participants);
+        $tempsAvantReunion = Carbon::parse($reunion->start_time)->subHour()->subMinutes(20);
+
+        foreach ($participants as $participant) {
+            $user_to_send = User::findOrFail($participant);
+            Mail::to($user_to_send->email)
+                ->later($tempsAvantReunion, new ReunionNotification($reunion));
+                \Log::info("Planification de l'email pour {$user_to_send->email} à {$tempsAvantReunion}");
+        }
     }
 
     public function storeTask(Request $request)
@@ -61,10 +112,14 @@ class TaskController extends Controller
         
             // Ajoutez l'ID de l'utilisateur authentifié
             $validated['user_id'] = Auth::user()->id;
-            $validated['specific_users'] = json_encode($validated['specific_users']);
+            if($validated['public_or_private'] == 'private'){
+                $validated['specific_users'] = array_map('intval', $validated['specific_users']);
+                $validated['specific_users'] = json_encode($validated['specific_users']);
+            }
         
             // Sauvegarde de la tâche
             $task = Task::create($validated);
+            $this->planifierNotification($task);
         
             // Retourne la tâche nouvellement créée en JSON
             return response()->json([
