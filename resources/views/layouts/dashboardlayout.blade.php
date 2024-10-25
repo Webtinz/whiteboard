@@ -662,7 +662,6 @@ use App\Models\Project;
 
 <!-- JAVASCRIPT -->
 @yield('js')
-@if (request()->url() != route('conversations'))
     <script src="{{ asset('assets/libs/bootstrap/js/bootstrap.bundle.min.js' )}}"></script>
 
     <!-- Metismenu Js -->
@@ -671,6 +670,7 @@ use App\Models\Project;
     <!-- Simplebar Js -->
     <script src="{{ asset('assets/libs/simplebar/simplebar.min.js' )}}"></script>
 
+    @if (request()->url() != route('conversations'))
     <!-- Feather Js -->
     <script src="{{ asset('assets/libs/feather-icons/feather.min.js' )}}"></script>
 
