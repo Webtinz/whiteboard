@@ -75,16 +75,27 @@ class TaskController extends Controller
     // Fonction qui planifie la notification email
     public function planifierNotification($reunion)
     {
-        $participants = json_decode($reunion->specific_users); // Utilisateurs impliqués dans la réunion
-        $participants[] = $reunion->user_id;
-        $participants = array_unique($participants);
-        $tempsAvantReunion = Carbon::parse($reunion->start_time)->subHour()->subMinutes(20);
+        if($reunion->public_or_private == "private"){
+            $participants = json_decode($reunion->specific_users); // Utilisateurs impliqués dans la réunion
+            $participants[] = $reunion->user_id;
+            $participants = array_unique($participants);
+            $tempsAvantReunion = Carbon::parse($reunion->start_time)->subHour()->subMinutes(20);
 
-        foreach ($participants as $participant) {
-            $user_to_send = User::findOrFail($participant);
-            Mail::to($user_to_send->email)
-                ->later($tempsAvantReunion, new ReunionNotification($reunion));
-                \Log::info("Planification de l'email pour {$user_to_send->email} à {$tempsAvantReunion}");
+            foreach ($participants as $participant) {
+                $user_to_send = User::findOrFail($participant);
+                Mail::to($user_to_send->email)
+                    ->later($tempsAvantReunion, new ReunionNotification($reunion));
+                    \Log::info("Planification de l'email pour {$user_to_send->email} à {$tempsAvantReunion}");
+            }
+        }else{
+            $participants = User::all();
+            $tempsAvantReunion = Carbon::parse($reunion->start_time)->subHour()->subMinutes(20);
+
+            foreach ($participants as $participant) {
+                Mail::to($participant->email)
+                    ->later($tempsAvantReunion, new ReunionNotification($reunion));
+                    \Log::info("Planification de l'email pour {$participant->email} à {$tempsAvantReunion}");
+            }
         }
     }
 

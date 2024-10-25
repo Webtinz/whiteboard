@@ -176,7 +176,7 @@
                                                                             data-bs-toggle="tooltip"
                                                                             data-bs-placement="top"
                                                                             value="member-1" title="{{$member->name}}">
-                                                                            <img src="{{ asset('assets/images/users/avatar-1.jpg')}}"
+                                                                            <img src="{{ asset('assets/images/users/avatar-' . $member->id . '.jpg')}}"
                                                                             alt=""
                                                                             class="rounded-circle avatar-sm">
                                                                             </a>
