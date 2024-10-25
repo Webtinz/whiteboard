@@ -1157,6 +1157,9 @@ $(document).on('click', '.edit-task-btn', function (e) {
         });
     }
 
+    // Définir l'action du formulaire avec l'URL de la tâche
+    $('#editTaskForm').attr('action', '/projecttasks/' + taskId);
+
     // Affiche le modal d'édition
     $('#editTaskModal').modal('show');
 });
