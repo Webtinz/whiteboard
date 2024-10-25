@@ -6,7 +6,9 @@
     <link href="{{ asset('assets/css/bootstrap.min.css') }}" id="bootstrap-style" rel="stylesheet" type="text/css" />
     <!-- Icons Css -->
     {{-- <link href="{{ asset('assets/css/icons.min.css') }}" rel="stylesheet" type="text/css" /> --}}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- App Css-->
+    
     <link href="{{ asset('assets/css/app.min.css') }}" id="app-style" rel="stylesheet" type="text/css" />
     <style>
         .default-display-none {
@@ -23,50 +25,123 @@
         }
 
         .preview-container {
-    display: flex;
-    flex-wrap: wrap; /* Pour que les éléments se regroupent sur plusieurs lignes */
-    gap: 15px; /* Espacement entre les fichiers */
-    padding: 10px; /* Espacement interne pour un peu d'air */
-    border: 2px solid #ddd; /* Bordure douce */
-    border-radius: 10px; /* Coins arrondis */
-    background-color: #f9f9f9; /* Légère couleur d'arrière-plan */
-    max-height: 200px; /* Hauteur maximale */
-    overflow-y: auto; /* Ajout d'une barre de défilement si le contenu dépasse */
-}
+            display: flex;
+            flex-wrap: wrap; /* Pour que les éléments se regroupent sur plusieurs lignes */
+            gap: 15px; /* Espacement entre les fichiers */
+            padding: 10px; /* Espacement interne pour un peu d'air */
+            border: 2px solid #ddd; /* Bordure douce */
+            border-radius: 10px; /* Coins arrondis */
+            background-color: #f9f9f9; /* Légère couleur d'arrière-plan */
+            max-height: 200px; /* Hauteur maximale */
+            overflow-y: auto; /* Ajout d'une barre de défilement si le contenu dépasse */
+        }
 
-.preview-container img, 
-.preview-container video {
-    max-width: 100px; /* Taille maximale des aperçus */
-    max-height: 100px;
-    border-radius: 8px; /* Coins arrondis pour les images et vidéos */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Effet d'ombre douce */
-}
+        .preview-container img, 
+        .preview-container video {
+            max-width: 100px; /* Taille maximale des aperçus */
+            max-height: 100px;
+            border-radius: 8px; /* Coins arrondis pour les images et vidéos */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Effet d'ombre douce */
+        }
 
-.preview-container span {
-    font-size: 50px; /* Taille des icônes pour les fichiers */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100px;
-    height: 100px;
-    background-color: #e2e2e2; /* Fond pour les fichiers non visuels */
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
+        .preview-container span {
+            font-size: 50px; /* Taille des icônes pour les fichiers */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100px;
+            height: 100px;
+            background-color: #e2e2e2; /* Fond pour les fichiers non visuels */
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
 
-.preview-container::-webkit-scrollbar {
-    width: 8px; /* Largeur de la scrollbar */
-}
+        .preview-container::-webkit-scrollbar {
+            width: 8px; /* Largeur de la scrollbar */
+        }
 
-.preview-container::-webkit-scrollbar-thumb {
-    background-color: #888; /* Couleur de la barre de défilement */
-    border-radius: 4px;
-}
+        .preview-container::-webkit-scrollbar-thumb {
+            background-color: #888; /* Couleur de la barre de défilement */
+            border-radius: 4px;
+        }
 
-.preview-container::-webkit-scrollbar-thumb:hover {
-    background-color: #555; /* Changement de couleur au survol */
-}
+        .preview-container::-webkit-scrollbar-thumb:hover {
+            background-color: #555; /* Changement de couleur au survol */
+        }
+        
+        .input-group {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
 
+        .input-group .btn {
+            border: none;
+            background: transparent;
+            padding: 8px 12px;
+            color: #666;
+            cursor: pointer;
+        }
+
+        .emoji-popup {
+            position: absolute;
+            bottom: 100%;
+            right: 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 10px;
+            width: 100%;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .emoji-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 5px;
+        }
+
+        .emoji-item {
+            font-size: 20px;
+            padding: 5px;
+            cursor: pointer;
+            text-align: center;
+            transition: background 0.2s;
+            border-radius: 4px;
+        }
+
+        .emoji-item:hover {
+            background: #f0f0f0;
+        }
+
+        /* Style moderne et minimal */
+        .emoji-popup {
+            /* Styles existants */
+            scrollbar-width: thin; /* Pour Firefox */
+            scrollbar-color: #888 #f0f0f0; /* Pour Firefox */
+        }
+
+        /* Pour Chrome, Safari et autres navigateurs Webkit */
+        .emoji-popup::-webkit-scrollbar {
+            width: 6px; /* Largeur de la barre */
+        }
+
+        .emoji-popup::-webkit-scrollbar-track {
+            background: #f0f0f0; /* Couleur de fond */
+            border-radius: 50px;
+        }
+
+        .emoji-popup::-webkit-scrollbar-thumb {
+            background: #888; /* Couleur de la barre */
+            border-radius: 10px;
+        }
+
+        .emoji-popup::-webkit-scrollbar-thumb:hover {
+            background: #555; /* Couleur au survol */
+        }
     </style>
     <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
 
@@ -301,16 +376,29 @@
                                                         </div>
                                                     </div>
                                                 </div><!-- end col -->
-                                                
                                                 <div class="col">
                                                     <input type="file" id="fileInput" style="display: none;" name="file[]" multiple>
                                                     <input type="hidden" name="receiver_id" id="receiver_id" value="{{ Auth::user()->id }}" class="@error('receiver_id') is-invalid @enderror">
                                                     <input type="hidden" name="group_id" id="group_id" value="" class="@error('group_id') is-invalid @enderror">
                                                     <div class="position-relative">
-                                                        <div id="preview" class="mt-2 mb-2 preview-container"></div> <!-- Conteneur pour l'aperçu des fichiers -->
-                                                        <input type="text" name="content" class="form-control chat-input task-comment" id="chat-input" placeholder="Type your message here...">
+                                                        <div id="preview" class="mt-2 mb-2 preview-container"></div>
+                                                        <div class="input-group">
+                                                            <button type="button" class="btn" onclick="document.getElementById('fileInput').click()">
+                                                                <i class="fas fa-paperclip"></i>
+                                                            </button>
+                                                            <input type="text" name="content" class="form-control chat-input task-comment" id="chat-input" placeholder="Type your message here...">
+                                                            <button type="button" class="btn" id="emoji-button">
+                                                                <i class="fas fa-smile"></i>
+                                                            </button>
+                                                            <!-- Popup des emojis -->
+                                                            <div id="emoji-popup" class="card emoji-popup" style="display: none;">
+                                                                <div class="emoji-grid">
+                                                                    <!-- Les emojis seront insérés ici par JavaScript -->
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                </div><!-- end col -->
+                                                </div>
                                                 
                                                 <div class="col-auto">
                                                     <div class="d-flex gap-3">
@@ -554,6 +642,89 @@
 <!-- end main content-->
 @endsection
 @section('js')
+
+<script>
+    const emojis = [
+    // Visages souriants et émotions de base
+    '😀', '😃', '😄', '😁', '😅', '😂', '🤣', '😊',
+    '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘',
+    '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪',
+    '🤨', '🧐', '🤓', '😎', '🤩', '🥳', '😏', '😒',
+
+    // Cœurs et amour
+    '❤️', '💖', '💗', '💓', '💞', '💕', '💟', '❣️',
+    '💝', '💘', '💌', '💋', '💑', '👩‍❤️‍👨', '💏', '😻',
+
+    // Gestes et mains
+    '👍', '👋', '🙌', '👏', '🎉', '✨', '⭐', '🌟',
+    '👊', '✊', '🤝', '🤲', '🤚', '🖐️', '✋', '👌',
+
+    // Émotions négatives
+    '😢', '😭', '😤', '😠', '😡', '🤬', '😱', '😨',
+    '😰', '😥', '😓', '😪', '😴', '😷', '🤒', '🤕',
+
+    // Animaux populaires
+    '🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼',
+    '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐙', '🦋',
+
+    // Nourriture et boissons
+    '🍎', '🍕', '🍔', '🍟', '🌮', '🍣', '🍜', '🍙',
+    '🍦', '🍪', '🍰', '🎂', '☕', '🍷', '🍺', '🥤',
+
+    // Nature et météo
+    '🌸', '🌺', '🌹', '🌈', '☀️', '⛅', '🌤️', '🌙',
+    '⭐', '🌟', '✨', '⚡', '🌍', '🌊', '🍀', '🌿',
+
+    // Sports et activités
+    '⚽', '🏀', '🏈', '⚾', '🎾', '🏐', '🎱', '🎮',
+    '🎨', '🎭', '🎪', '🎢', '🎡', '🎯', '🎲', '🎷',
+
+    // Objets du quotidien
+    '📱', '💻', '⌚', '📷', '🔋', '💡', '🔑', '🎵',
+    '🎤', '🎧', '📚', '✏️', '📝', '💼', '🎁', '🏠'
+];
+    
+    // Initialisation du popup d'emojis
+    document.addEventListener('DOMContentLoaded', function() {
+        const emojiButton = document.getElementById('emoji-button');
+        const emojiPopup = document.getElementById('emoji-popup');
+        const chatInput = document.getElementById('chat-input');
+        const emojiGrid = document.querySelector('.emoji-grid');
+    
+        // Créer les éléments emoji
+        emojis.forEach(emoji => {
+            const emojiElement = document.createElement('div');
+            emojiElement.className = 'emoji-item';
+            emojiElement.textContent = emoji;
+            emojiElement.onclick = () => {
+                // Insérer l'emoji à la position du curseur
+                const cursorPos = chatInput.selectionStart;
+                const textBefore = chatInput.value.substring(0, cursorPos);
+                const textAfter = chatInput.value.substring(cursorPos);
+                chatInput.value = textBefore + emoji + textAfter;
+                
+                // Placer le curseur après l'emoji
+                const newCursorPos = cursorPos + emoji.length;
+                chatInput.setSelectionRange(newCursorPos, newCursorPos);
+                chatInput.focus();
+            };
+            emojiGrid.appendChild(emojiElement);
+        });
+    
+        // Gérer l'affichage/masquage du popup
+        emojiButton.onclick = (e) => {
+            e.stopPropagation();
+            emojiPopup.style.display = emojiPopup.style.display === 'none' ? 'block' : 'none';
+        };
+    
+        // Fermer le popup quand on clique en dehors
+        document.addEventListener('click', (e) => {
+            if (!emojiPopup.contains(e.target) && e.target !== emojiButton) {
+                emojiPopup.style.display = 'none';
+            }
+        });
+    });
+    </script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     
     {{-- data-dowload-file-id --}}
