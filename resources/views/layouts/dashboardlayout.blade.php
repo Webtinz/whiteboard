@@ -252,7 +252,7 @@ use App\Models\Project;
                                 <span class="menu-item" data-key="t-team-overview">Team Overview</span>
                             </a>
                             <ul class="sub-menu" aria-expanded="false">
-                                <li><a href="{{ route('allemployee') }}" data-key="t-employee">Employee</a></li>
+                                <li><a href="{{ route('allemployee.index') }}" data-key="t-employee">Employee</a></li>
                             </ul>
                         </li>
                     </ul>
@@ -497,7 +497,7 @@ use App\Models\Project;
                             <span class="menu-item" data-key="t-team-overview">Team Overview</span>
                         </a>
                         <ul class="sub-menu" aria-expanded="false">
-                            <li><a href="{{route('allemployee' )}}" data-key="t-employee">Employee</a></li>
+                            <li><a href="{{route('allemployee.index' )}}" data-key="t-employee">Employee</a></li>
                         </ul>
                     </li>
                 </ul>

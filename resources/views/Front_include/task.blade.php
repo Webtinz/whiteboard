@@ -30,33 +30,35 @@
                         <div class="d-md-flex">
                             <div class="card filemanager-sidebar me-md-3">
                                 <div class="card-body">
-                                    <div>
+                                    {{-- <div>
                                         <a href="#" class="btn btn-soft-primary w-100 shadow-none"
                                             data-bs-toggle="modal" data-bs-target="add_task"><i
                                                 class="mdi mdi-plus me-1"></i>Add
                                             New Task</a>
-                                    </div>
+                                    </div> --}}
 
                                     <div class="tasks-list mt-4">
-                                        <a href="#" class="active"><i
-                                                class="mdi mdi-folder-outline font-size-16 align-middle me-2"></i>
-                                            All Tasks</a>
-                                        <a href="#"><i
-                                                class="mdi mdi-text-box-check-outline align-middl font-size-16 me-2"></i>
-                                            My Task</a>
-                                    </div>
+                                        <a href="#" onclick="filterTasksByProject('')" id="all-tasks"><i
+                                            class="mdi mdi-text-box-check-outline align-middl font-size-16 me-2"></i>All Tasks</a>
+                                        @foreach ($projects as $project)
+                                            <a href="#" onclick="filterTasksByProject({{ $project->id }})" id="project-{{ $project->id }}"><i
+                                                class="mdi mdi-folder-outline font-size-16 align-middle me-2"></i>{{ $project->name }}</a>
+                                        @endforeach
+                                    </div>                                    
 
                                     <h6 class="mt-4 font-size-13 text-muted tex-decoration-underline">Status</h6>
                                     <div class="tasks-list mt-1">
-                                        <a href="#"><span class="mdi mdi-autorenew text-muted me-1"></span>Pending
-                                            Tasks
-                                            <span class="ms-1 float-end">23</span></a>
-                                        <a href="#"><span
-                                                class="mdi mdi-check-circle-outline text-muted me-1"></span>Completed
-                                            <span class="ms-1 float-end">30</span></a>
-                                    </div>
+                                        <a href="#" onclick="filterTasksByProgress('pending')">
+                                            <span class="mdi mdi-autorenew text-muted me-1"></span>Pending Tasks
+                                            <span class="ms-1 float-end">{{$projecttasks->where('progress', '<', 100)->count()}}</span>
+                                        </a>
+                                        <a href="#" onclick="filterTasksByProgress('completed')">
+                                            <span class="mdi mdi-check-circle-outline text-muted me-1"></span>Completed
+                                            <span class="ms-1 float-end">{{$projecttasks->where('progress', '=', 100)->count()}}</span>
+                                        </a>
+                                    </div>                                    
 
-                                    <h6 class="mt-4 font-size-13 text-muted tex-decoration-underline">Tags</h6>
+                                    {{-- <h6 class="mt-4 font-size-13 text-muted tex-decoration-underline">Tags</h6>
                                     <div class="tasks-list mt-1">
                                         <a href="#"><span
                                                 class="mdi mdi-circle text-primary font-size-12 me-2 float-end"></span>Fronted</a>
@@ -68,7 +70,7 @@
                                                 class="mdi mdi-circle text-info font-size-12 me-2 fs float-end"></span>Design</a>
                                         <a href="#"><span
                                                 class="mdi mdi-circle text-danger font-size-12 me-2 fs float-end"></span>Social</a>
-                                    </div>
+                                    </div> --}}
                                 </div><!-- end cardbody-->
                             </div><!-- end card -->
                             <!-- filemanager-leftsidebar -->
@@ -94,9 +96,9 @@
                                             </div><!-- end dropdown -->
                                         </div>
                                         <div class="search-box mb-2">
-                                            <div class="position-relative">
-                                                <input type="text" class="form-control rounded" id="search-task"
-                                                    onkeyup="searchTask()" placeholder="Search...">
+                                            <div class="position-relative search-bar">
+                                                <input type="text" class="form-control rounded" onkeyup="searchTasks()" id="taskSearch"
+                                                 placeholder="Search...">
                                                 <i class="bx bx-search-alt search-icon"></i>
                                             </div>
                                         </div><!-- end search box -->
@@ -120,8 +122,8 @@
                                 </div>
 
                                 <div id="all-task">
-                                    @foreach ($tasks as $task)
-                                        <div class="task-list-box" id="landing-task">
+                                    @foreach ($projecttasks as $task)
+                                        <div class="task-list-box" data-project-id="{{ $task->project_id }}" data-progress="{{ $task->progress }}" id="landing-task">
                                             <div id="task-item-1">
                                                 <div class="card list-group-item rounded-3">
                                                     <div class="card-body">
@@ -131,7 +133,7 @@
                                                                     <input type="checkbox" class="form-check-input"
                                                                         id="customCheck1">
                                                                     <label class="form-check-label ms-1 task-title"
-                                                                        for="customCheck1">{{$task->title}}</label>
+                                                                        for="customCheck1">{{$task->name}}</label>
                                                                 </div>
                                                             </div><!-- end col -->
                                                             <div class="col-xl-6 col-sm-7">
@@ -145,37 +147,10 @@
                                                                                     data-bs-toggle="tooltip"
                                                                                     value="member-2"
                                                                                     data-bs-placement="top"
-                                                                                    title="Mark Powell">
+                                                                                    title="{{$user->name}}">
                                                                                     <img src="assets/images/users/avatar-2.jpg"
                                                                                         alt=""
                                                                                         class="rounded-circle avatar-sm">
-                                                                                </a>
-                                                                            </div>
-                                                                            <div class="avatar-group-item">
-                                                                                <a href="javascript: void(0);"
-                                                                                    class="d-inline-block"
-                                                                                    data-bs-toggle="tooltip"
-                                                                                    value="member-4"
-                                                                                    data-bs-placement="top"
-                                                                                    title="Craig Hall">
-                                                                                    <img src="assets/images/users/avatar-4.jpg"
-                                                                                        alt=""
-                                                                                        class="rounded-circle avatar-sm">
-                                                                                </a>
-                                                                            </div>
-                                                                            <div class="avatar-group-item">
-                                                                                <a href="javascript: void(0);"
-                                                                                    class="d-block"
-                                                                                    data-bs-toggle="tooltip"
-                                                                                    value="member-11"
-                                                                                    data-bs-placement="top"
-                                                                                    title="Sarah Kerns">
-                                                                                    <div class="avatar-sm">
-                                                                                        <div
-                                                                                            class="avatar-title rounded-circle bg-info">
-                                                                                            S
-                                                                                        </div>
-                                                                                    </div>
                                                                                 </a>
                                                                             </div>
                                                                         </div><!-- end avatar group -->
@@ -525,4 +500,68 @@
     </div>
 @endsection
 @section('js')
+<script>
+    function filterTasksByProgress(status) {
+        // Récupérer toutes les tâches
+        var tasks = document.querySelectorAll('.task-list-box');
+        
+        // Afficher/masquer les tâches en fonction du statut sélectionné
+        tasks.forEach(function (task) {
+            var progress = task.getAttribute('data-progress'); // Supposons que tu aies défini data-progress dans chaque tâche
+
+            if (status === 'pending' && progress < 100) {
+                task.style.display = 'block'; // Afficher les tâches en attente
+            } else if (status === 'completed' && progress == 100) {
+                task.style.display = 'block'; // Afficher les tâches complètes
+            } else {
+                task.style.display = 'none'; // Masquer les autres tâches
+            }
+        });
+    }
+
+    function filterTasksByProject(projectId) {
+        // Récupérer toutes les tâches
+        var tasks = document.querySelectorAll('.task-list-box');
+        
+        // Afficher/masquer les tâches en fonction du projet sélectionné
+        tasks.forEach(function (task) {
+            if (projectId === "" || task.getAttribute('data-project-id') == projectId) {
+                task.style.display = 'block';
+            } else {
+                task.style.display = 'none';
+            }
+        });
+
+        // Gérer l'activation du lien sélectionné
+        document.querySelectorAll('.tasks-list a').forEach(function(link) {
+            link.classList.remove('active'); // Retirer la classe "active" de tous les liens
+        });
+        if (projectId === "") {
+            document.getElementById('all-tasks').classList.add('active'); // Activer "All Tasks"
+        } else {
+            document.getElementById('project-' + projectId).classList.add('active'); // Activer le lien du projet sélectionné
+        }
+    }
+</script>
+<script>
+    function searchTasks() {
+        // Récupérer la valeur de la barre de recherche
+        var input = document.getElementById('taskSearch').value.toLowerCase();
+        
+        // Récupérer toutes les tâches
+        var tasks = document.querySelectorAll('.task-list-box');
+        
+        // Afficher/masquer les tâches en fonction de la recherche
+        tasks.forEach(function (task) {
+            var taskName = task.querySelector('.task-title').innerText.toLowerCase(); // Récupérer le nom de la tâche
+            
+            if (taskName.includes(input)) {
+                task.style.display = 'block'; // Afficher la tâche si le nom contient le texte de recherche
+            } else {
+                task.style.display = 'none'; // Masquer la tâche sinon
+            }
+        });
+    }
+</script>
+
 @endsection

@@ -48,6 +48,7 @@ class ProjectTaskController extends Controller
             'end_date' => $request->end_date,
         ]);
         if (!empty($request->assigned_members)) {
+            $task->users()->detach();
             $task->users()->syncWithoutDetaching($request->assigned_members);
         }
 

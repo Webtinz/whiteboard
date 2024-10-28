@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Task;
 use App\Models\User;
+use App\Models\Project;
+use App\Models\ProjectTask;
+use App\Models\Etat;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Events\MeetingScheduled;
@@ -20,17 +23,11 @@ class TaskController extends Controller
      */
 
     public function taskslist(){
-        $userId = Auth::id();
-        $tasks = Task::where(function ($query) use ($userId) {
-            $query->where('public_or_private', 'public') // Tâches publiques
-                ->orWhere(function ($q) use ($userId) {
-                    $q->where('public_or_private', 'private') // Tâches privées
-                        ->whereJsonContains('specific_users', $userId); // Vérifier si l'utilisateur est dans le champ specific_users
-                });
-        })
-        ->orderByDesc('created_at')
-        ->get();
-        return view('Front_include.task', compact('tasks'));
+        $projects = Project::all();
+        $etats = Etat::all();
+        $user = Auth::user(); // Obtenir l'utilisateur connecté
+        $projecttasks = $user->projectTasks;
+        return view('Front_include.task', compact('projects', 'etats','user', 'projecttasks'));
     }
     public function calendar(){
         $userId = Auth::id();

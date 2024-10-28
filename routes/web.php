@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\EmployeeController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FileController;
 use App\Http\Controllers\PostController;
@@ -38,9 +39,7 @@ Route::get('dashboarduser', function () {
 })->name('dashboarduser');
 
 // vue temporaire
-Route::get('allemployee', function () {
-    return view('Front_include.allemployee');
-})->name('allemployee');
+Route::resource('allemployee', EmployeeController::class);
 
 Route::get('kanbanboard/{id}', [EtatController::class, 'index'])->name('kanbanboard');
 
