@@ -58,7 +58,7 @@ use App\Models\Project;
                 <div class="d-flex">
                     <!-- LOGO -->
                     <div class="navbar-brand-box">
-                        <a href="index-2.html" class="logo logo-dark">
+                        <a href="{{route('dashboarduser.index')}}" class="logo logo-dark">
                             <span class="logo-sm">
                                 <img src="assets/images/logo-light-sm.png" alt="" height="22">
                             </span>
@@ -67,7 +67,7 @@ use App\Models\Project;
                             </span>
                         </a>
 
-                        <a href="index-2.html" class="logo logo-light">
+                        <a href="{{route('dashboarduser.index')}}" class="logo logo-light">
                             <span class="logo-sm">
                                 <img src="assets/images/logo-light-sm.png" alt="" height="22">
                             </span>
@@ -157,7 +157,7 @@ use App\Models\Project;
             <!-- LOGO -->
             <div class="navbar-brand-box"
                 style="background-image: linear-gradient(45deg, #009EC5 0%, #2e7eed 20%, #02225B 50%)">
-                <a href="index-2.html" class="logo logo-dark">
+                <a href="{{route('dashboarduser.index')}}" class="logo logo-dark">
                     <span class="logo-sm">
                         <img src="assets/images/logo-sm.png" alt="" height="22">
                     </span>
@@ -166,7 +166,7 @@ use App\Models\Project;
                     </span>
                 </a>
 
-                <a href="index-2.html" class="logo logo-light">
+                <a href="{{route('dashboarduser.index')}}" class="logo logo-light">
                     <span class="logo-sm">
                         <img src="assets/images/logo-light-sm.png" alt="" height="22">
                     </span>
@@ -398,7 +398,7 @@ use App\Models\Project;
 
         <!-- LOGO -->
         <div class="navbar-brand-box" style="background-image: linear-gradient(45deg, #009EC5 0%, #2e7eed 20%, #02225B 50%)">
-            <a href="index-2.html" class="logo logo-dark">
+            <a href="{{route('dashboarduser.index')}}" class="logo logo-dark">
                 <span class="logo-sm">
                     <img src="assets/images/logo-sm.png" alt="" height="22">
                 </span>
@@ -407,7 +407,7 @@ use App\Models\Project;
                 </span>
             </a>
 
-            <a href="index-2.html" class="logo logo-light">
+            <a href="{{route('dashboarduser.index')}}" class="logo logo-light">
                 <span class="logo-sm">
                     <img src="assets/images/logo-light-sm.png" alt="" height="22">
                 </span>

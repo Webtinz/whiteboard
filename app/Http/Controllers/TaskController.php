@@ -24,10 +24,9 @@ class TaskController extends Controller
 
     public function taskslist(){
         $projects = Project::all();
-        $etats = Etat::all();
         $user = Auth::user(); // Obtenir l'utilisateur connecté
         $projecttasks = $user->projectTasks;
-        return view('Front_include.task', compact('projects', 'etats','user', 'projecttasks'));
+        return view('Front_include.task', compact('projects','user', 'projecttasks'));
     }
     public function calendar(){
         $userId = Auth::id();

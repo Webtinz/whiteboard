@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmployeeController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FileController;
@@ -34,9 +35,7 @@ Route::get('/home', function () {
     return view('Front_include.index');
 })->name('welcome');
 
-Route::get('dashboarduser', function () {
-    return view('layouts.dashboardlayout');
-})->name('dashboarduser');
+Route::resource('dashboarduser', DashboardController::class);
 
 // vue temporaire
 Route::resource('allemployee', EmployeeController::class);
