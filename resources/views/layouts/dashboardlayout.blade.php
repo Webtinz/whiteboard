@@ -226,12 +226,12 @@ use App\Models\Project;
                                 <span class="menu-item" data-key="t-chat">Calendar</span>
                             </a>
                         </li>
-                        <li>
+                        {{-- <li>
                             <a href="apps-chat.html">
                                 <i class="icon nav-icon" data-feather="message-square"></i>
                                 <span class="menu-item" data-key="t-chat">Files</span>
                             </a>
-                        </li>
+                        </li> --}}
 
                         
                         <li>
@@ -466,12 +466,12 @@ use App\Models\Project;
                         </a>
                     </li>
 
-                    <li>
+                    {{-- <li>
                         <a href="apps-chat.html">
                             <i class="icon nav-icon" data-feather="message-square"></i>
                             <span class="menu-item" data-key="t-chat">Files</span>
                         </a>
-                    </li>
+                    </li> --}}
 
                     <li>
                         <a href="apps-chat.html">
