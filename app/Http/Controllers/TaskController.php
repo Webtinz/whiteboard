@@ -155,7 +155,7 @@ class TaskController extends Controller
             $task->end_time = $request->input('end_time');
             $task->color = $request->input('color');
             $task->user_id = Auth::user()->id;
-            $task->specific_users = json_encode($request->input('specific_users')) ?? null;
+            $task->specific_users = json_encode(array_map('intval',$request->input('specific_users'))) ?? null;
             $task->public_or_private = $request->input('public_or_private');
             $task->save();
 

@@ -268,7 +268,7 @@
                                     <div class="row gx-3">
                                         <div class="col-sm-12 form-group">
                                             <label class="form-label">Name</label>
-                                            <input class="form-control  cal-event-name"
+                                            <input class="form-control  cal-event-named"
                                                 type="text" />
                                         </div>
                                     </div>
@@ -284,7 +284,7 @@
                                         <div class="col-sm-6">
                                             <div class="form-group">
                                                 <label class="form-label">Start Date</label>
-                                                <input class="form-control cal-event-date-start"
+                                                <input class="form-control cal-event-date-startd"
                                                     name="single-date-pick" type="text" />
                                             </div>
                                         </div>
@@ -300,7 +300,7 @@
                                         <div class="col-sm-6">
                                             <div class="form-group">
                                                 <label class="form-label">End Date</label>
-                                                <input class="form-control cal-event-date-end"
+                                                <input class="form-control cal-event-date-endd"
                                                     name="single-date-pick" type="text" />
                                             </div>
                                         </div>
@@ -335,11 +335,11 @@
                                         <div class="col-sm-12">
                                             <label class="form-label">Public or Private: </label> <br>
                                             <div class="form-check form-check-inline">
-                                                <input class="form-check-input" type="radio" name="public_or_private" value="public" checked>
+                                                <input class="form-check-input" type="radio" name="public_or_privated" id="edit-publicd" value="public" checked>
                                                 <label class="form-check-label" for="public">Public</label>
                                             </div>
                                             <div class="form-check form-check-inline">
-                                                <input class="form-check-input" type="radio" name="public_or_private" value="private">
+                                                <input class="form-check-input" type="radio" name="public_or_privated" id="edit-privated" value="private">
                                                 <label class="form-check-label" for="private">Private</label>
                                             </div>
                                         </div>
@@ -352,7 +352,7 @@
                                     <div class="row gx-3" id="edit-specific_users_fieldd" style="display:none;">
                                         <div class="col-sm-12">
                                             <label class="form-label">Specific Users</label>
-                                            <select class="form-control" name="specific_users[]" multiple>
+                                            <select class="form-control" name="specific_usersd[]" multiple>
                                                 @foreach($users as $user)
                                                     <option value="{{ $user->id }}">{{ $user->name }}</option>
                                                 @endforeach
@@ -522,23 +522,21 @@
                         },
                         success: function(event) {
                         // Remplir les champs du modal avec les données de l'événement
-                        $('.cal-event-name').val(event.title);
+                        $('.cal-event-named').val(event.title);
                         $('.cal-event-description').val(event.description);
-                        $('.cal-event-date-start').val(event.start_date);
+                        $('.cal-event-date-startd').val(event.start_date);
                         $('.time').eq(0).val(event.start_time);
-                        $('.cal-event-date-end').val(event.end_date);
+                        $('.cal-event-date-endd').val(event.end_date);
                         $('.time').eq(1).val(event.end_time);
                         $('select[name="location_type"]').val(event.status);
-                        $('input[name="public_or_private"][value="' + event.public_or_private + '"]').prop('checked', true);
+                        $('input[name="public_or_privated"][value="' + event.public_or_private + '"]').prop('checked', true);
                         
                         // Si l'événement est privé, afficher les utilisateurs spécifiques
                         if (event.public_or_private === 'private') {
                             $('#edit-specific_users_fieldd').show();
                             
                             // Vérifiez si specific_users est un tableau et assurez-vous qu'il est non vide
-                            if (Array.isArray(event.specific_users)) {
-                                $('select[name="specific_users[]"]').val(event.specific_users);
-                            }
+                            $('select[name="specific_usersd[]"]').val(JSON.parse(event.specific_users));
                         } else {
                             $('#edit-specific_users_fieldd').hide();
                         }
@@ -554,51 +552,56 @@
                     })
 
                     // Update event
-                    $('#update_event').click(function() {
-                        console.log('ok');
+                    $('#update_event').on('click', function() {
+                    // Récupérer les valeurs des champs
+                    const taskId = $('#edit_event_modal').data('task-id'); // Assurez-vous que cet ID est défini lors de l'ouverture du modal
+                    const title = $('.cal-event-named').val();
+                    const description = $('.cal-event-description').val();
+                    const startDate = $('.cal-event-date-startd').val();
+                    const startTime = $('.input-single-timepicker.time[name="input-timepicker"]').val();
+                    const endDate = $('.cal-event-date-endd').val();
+                    const endTime = $('.input-single-timepicker.time[name="input-timepicker"]').val();
+                    const locationType = $('select[name="location_type"]').val();
+                    const publicOrPrivate = $('input[name="public_or_privated"]:checked').val();
+                    const specificUsers = $('select[name="specific_usersd[]"]').val();
 
-                        $.ajax({
-                            url: `/tasks/update`,
-                            method: 'PUT',
-                            data: {
-                                taskId: info.event.id,
-                                title: $('#event_title_val').val(),
-                                description: $('#event_description_vald').val(),
-                                start_date: $('#event_start_date_val').val(),
-                                start_time: $('#event_start_time_val').val(),
-                                end_date: $('#event_end_date_val').val(),
-                                end_time: $('#event_end_time_val').val(),
-                                color: $('#event_color_val').val(),
-                                priority: $('#event_priority_val').val(),
-                                // event_specific_users_val-event_public_or_private_val
-                                // specific_users: $('#event_specific_users_val').val()
-                                public_or_private: $('#event_public_or_private_val').val()
+                    // Vérification des valeurs (facultatif)
+                    if (!title || !startDate || !endDate) {
+                        alert('Please fill in all required fields.');
+                        return;
+                    }
 
-                            },
-                            success: function(response) {
-                                $.notify({
-                                    icon: 'ri-checkbox-line mr-5',
-                                    message: `Event has been updated`,
-                                }, {
-                                    type: "dismissible alert alert-inv alert-inv-primary",
-                                    placement: {
-                                        from: "bottom",
-                                        align: "center"
-                                    },
-                                    animate: {
-                                        enter: 'animated fadeInUp',
-                                        exit: 'animated fadeOutUp'
-                                    },
-                                    delay: 1000,
-                                });
-                                location.reload(true);
-                            },
-                            error: function(xhr, status, error) {
-                                console.error('Error deleting task:', error);
-                                // Show error notification
-                            }
-                        });
+                    // Créer l'objet des données à envoyer
+                    const data = {
+                        taskId: info.event.id, // ID de la tâche à mettre à jour
+                        title: title,
+                        description: description,
+                        start_date: startDate,
+                        start_time: startTime,
+                        end_date: endDate,
+                        end_time: endTime,
+                        location_type: locationType,
+                        public_or_private: publicOrPrivate,
+                        specific_users: specificUsers
+                    };
+
+                    // Envoyer les données via AJAX
+                    $.ajax({
+                        url: '/tasks/update', // URL de votre route de mise à jour
+                        type: 'PUT', // Méthode HTTP
+                        data: data,
+                        success: function(response) {
+                            // Gérer la réponse de succès
+                            alert('Task updated successfully!');
+                            // Optionnel : mettre à jour l'interface utilisateur ou recharger la liste des tâches
+                            location.reload(); // Recharge la page ou met à jour la liste
+                        },
+                        error: function(xhr) {
+                            // Gérer les erreurs
+                            alert('Error updating task: ' + xhr.responseText);
+                        }
                     });
+                });
                     // Delete event
                     $('#delete_event').click(function() {
                         Swal.fire({
