@@ -13,7 +13,7 @@
     <link href="{{ asset('assets/css/app.min.css') }}" id="app-style" rel="stylesheet" type="text/css" />
     <style>
         .default-display-none {
-            display: none; /* Cache par défaut les éléments avec cette classe */
+            display: none !important;/* Cache par défaut les éléments avec cette classe */
         }
         .card.rounded-0.shadow-none.mb-0 {
             min-height: 100% !important;
@@ -151,7 +151,6 @@
 @section('content')
 
         <div class="main-content">
-
             <div class="page-content">
                 <div class="container-fluid">
 
@@ -160,6 +159,7 @@
                         <div class="col-12">
                             <div class="page-title-box d-flex align-items-center justify-content-between">
                                 <h4 class="mb-0">Chat</h4>
+                                {{-- <button onclick="showBlocHidened()">Show Hidden Div</button> --}}
 
                                 <div class="page-title-right">
                                     <ol class="breadcrumb m-0">
@@ -167,6 +167,9 @@
                                         <li class="breadcrumb-item active">Chat</li>
                                     </ol>
                                 </div>
+                                {{-- <div class="default-display-none" style="border: 2px solid;">
+                                    My div for Hide
+                                </div> --}}
 
                             </div>
                         </div>
@@ -213,7 +216,7 @@
                                         <h6 class="text-uppercase font-size-13 mt-4 pt-2 mb-3">Groups</h6>
                                         <ul class="list-unstyled chat-list group-chat" id="groupList">
                                             @forelse ($groupConversations as $groupId => $groupData)
-                                                <li>
+                                                <li  onclick="showBlocHidened()">
                                                     <a href="javascript: void(0);" class="fw-medium d-block chat-group-link" data-group-id="{{ $groupData['group']->id }}" data-group-name="{{ $groupData['group']->name }}" data-group-member-number="{{ $groupData['number_of_members'] }}" onclick="updateFormAction({{ $groupData['group']->id }})">
                                                         <div class="d-flex align-items-center">
                                                             <div class="avatar-sm">
@@ -270,7 +273,7 @@
                                                 $authUserId = Auth::user()->id; 
                                                 $otherUser = $firstMessage->sender_id === $authUserId ? $firstMessage->receiver : $firstMessage->sender;
                                             @endphp
-                                            <li>
+                                            <li  onclick="showBlocHidened()">
                                                 <a href="javascript: void(0);" class="fw-medium d-block chat-user-link" data-user-id="{{ $userId }}" data-user-name="{{ $otherUser->name  == Auth::user()->name ? "Yourself" : $otherUser->name }}">
                                                     <div class="d-flex align-items-center">
                                                         <div class="chat-user-img online flex-shrink-0">
@@ -308,8 +311,8 @@
                         </div><!-- end card -->
 
                         <!-- Group Chat -->
-                        <div id="group-chat-conversation" class="w-100 user-chat mt-4 mt-lg-0">
-                            <div class="card rounded-0 shadow-none mb-0">
+                        <div id="group-chat-conversation" class="w-100 user-chat mt-4 mt-lg-0 default-display-none" style="width: 100% !important">
+                            <div class="card rounded-0 shadow-none mb-0" style="min-width: 100% !important">
                                 <div class="p-3 border-bottom">
                                     <div class="row">
                                         <div class="col-md-5">
@@ -416,10 +419,10 @@
                             </div>
                         </div><!-- end user chat -->
 
-                        <!-- Direct Massage -->
-                        <div id="user-chat-conversation" class="w-100 user-chat mt-4 mt-lg-0 d-none">
+                        {{-- <!-- Direct Massage -->
+                        <div id="user-chat-conversation" class="w-100 user-chat mt-4 mt-lg-0 default-display-none"  style="width: 100% !important">
 
-                        </div>
+                        </div> --}}
                     </div><!-- end row -->
                 </div><!-- container-fluid -->
             </div>
@@ -721,6 +724,20 @@
                 }
             });
         });
+    </script>
+    <script>
+            function showBlocHidened() {
+                // console.log('Click for display');
+                
+                // Récupère tous les éléments avec la classe 'default-display-none'
+                var elements = document.getElementsByClassName('default-display-none');
+                
+                // Parcours chaque élément et change son style pour le rendre visible
+                for (var i = 0; i < elements.length; i++) {
+                    elements[i].classList.remove('default-display-none'); // Affiche l'élément
+                }
+            }
+
     </script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     
