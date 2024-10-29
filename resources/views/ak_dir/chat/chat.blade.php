@@ -308,7 +308,7 @@
                         </div><!-- end card -->
 
                         <!-- Group Chat -->
-                        <div id="group-chat-conversation" class="w-100 user-chat mt-4 mt-lg-0 default-display-none">
+                        <div id="group-chat-conversation" class="w-100 user-chat mt-4 mt-lg-0">
                             <div class="card rounded-0 shadow-none mb-0">
                                 <div class="p-3 border-bottom">
                                     <div class="row">
@@ -417,7 +417,7 @@
                         </div><!-- end user chat -->
 
                         <!-- Direct Massage -->
-                        <div id="user-chat-conversation" class="w-100 user-chat mt-4 mt-lg-0 d-none default-display-none">
+                        <div id="user-chat-conversation" class="w-100 user-chat mt-4 mt-lg-0 d-none">
 
                         </div>
                     </div><!-- end row -->
@@ -446,10 +446,10 @@
                                 <label for="Groupdetails" class="form-label">Description</label>
                                 <textarea type="text" class="form-control" rows="3" id="Groupdetails" placeholder="Enter Description"></textarea>
                             </div> --}}
-                                <div class="form-check form-switch form-switch-md ps-0">
+                                {{-- <div class="form-check form-switch form-switch-md ps-0">
                                     <input class="form-check-input" type="checkbox" id="flexSwitchCheckDefault">
                                     <label class="form-check-label" for="flexSwitchCheckDefault">Make Private</label>
-                                </div>
+                                </div> --}}
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
@@ -604,11 +604,6 @@
                                                                     {{-- id="span-group-member-number" --}}
                                                                     <input type="text" hidden name="user_id" value="{{ $eachUser->id }}">
                                                                     <button type="submit" style="border: 0px !important; padding: 0px !important;background-color: #fff;"><i class="mdi mdi-plus"></i> Add</button>
-                                                                </form>
-                                                                <form action="/groups/1/add-member" method="post" class="delete-user-from-group">
-                                                                    @csrf
-                                                                    <input type="text" hidden name="user_id" value="{{ $eachUser->id }}">
-                                                                    <button type="submit"  style="border: 0px !important; padding: 0px !important;background-color: #fff;"><i class="mdi mdi-delete"></i> Remove</button>
                                                                 </form>
                                                             </span>
                                                         </div>

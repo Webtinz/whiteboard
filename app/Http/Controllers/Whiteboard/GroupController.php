@@ -87,18 +87,44 @@ class GroupController extends Controller
             'user_id' => $validated['user_id'],
         ]);
 
-        return response()->json(['message' => 'Member added successfully']);
+        $group = Group::find($groupId);
+        $members = $group->members;
+
+        // Filtrer les doublons basés sur l'email
+        $uniqueUsers = $members->unique('id');
+        
+        // Convertir à nouveau en tableau si nécessaire
+        $uniqueUsersArray = $uniqueUsers->values()->all(); // Cela réindexe les clés
+        return response()->json([
+            'members' => $uniqueUsersArray,
+            'groupId' => $groupId
+        ]);
+        // return response()->json(['message' => 'Member added successfully']);
     }
 
     public function removeMember(Request $request, $groupId)
     {
         $users = GroupMember::where('group_id', $groupId)->where('user_id', $request->user_id)->get();
-
+        // dd($users);
         if ($users) {
             foreach ($users as $user) {
                 $user->delete();
             }
-            return response()->json(['message' => 'Member removed successfully']);
+
+            $group = Group::find($groupId);
+            $members = $group->members;
+    
+            // Filtrer les doublons basés sur l'email
+            $uniqueUsers = $members->unique('id');
+            
+            // Convertir à nouveau en tableau si nécessaire
+            $uniqueUsersArray = $uniqueUsers->values()->all(); // Cela réindexe les clés
+            // dd($uniqueUsersArray);
+            return response()->json([
+                'members' => $uniqueUsersArray,
+                'groupId' => $groupId
+            ]);
+            // return response()->json(['message' => 'Member removed successfully']);
         }else {
             return response()->json(['message' => 'Member not found']);
         }

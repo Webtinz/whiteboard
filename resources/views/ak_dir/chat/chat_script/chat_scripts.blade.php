@@ -19,10 +19,10 @@
 </script>
 
 {{-- Add/Remove Group Members --}}
-<script>
+{{-- <script>
     $(document).ready(function() {
         // Gérer la soumission du formulaire "add-user-to-group" sans rechargement
-        $(".add-user-to-group").on("submit", function(e) {
+        $(".add-user-to-group").off("submit").on("submit", function(e) {
             e.preventDefault(); // Empêche le rechargement de la page
             var form = $(this);
             $.ajax({
@@ -42,7 +42,7 @@
         });
 
         // Gérer la soumission du formulaire "delete-user-from-group" sans rechargement
-        $(".delete-user-from-group").on("submit", function(e) {
+        $(".delete-user-from-group").off("submit").on("submit", function(e) {
             e.preventDefault(); // Empêche le rechargement de la page
             var form = $(this);
             $.ajax({
@@ -61,7 +61,53 @@
             });
         });
     });
+</script> --}}
+<script>
+    $(document).ready(function() {
+        // Gérer la soumission du formulaire "add-user-to-group" sans rechargement
+        $(".add-user-to-group").off("submit").on("submit", function(e) {
+            e.preventDefault(); // Empêche le rechargement de la page
+            var form = $(this);
+            $.ajax({
+                url: form.attr("action"),
+                type: form.attr("method"),
+                data: form.serialize(),
+                success: function(response) {
+                    // Mettre à jour la liste des membres
+                    updateMemberList(response.members, response.groupId); // Assurez-vous que votre réponse contient ces données
+                    alert("User added");
+                },
+                error: function(error) {
+                    console.error("Error adding user:", error);
+                    alert("An error occurred. Please try again.");
+                }
+            });
+        });
+
+        // Utiliser la délégation d'événements pour le formulaire de suppression
+        $('#u-member-list').off("submit", ".delete-user-from-group").on("submit", ".delete-user-from-group", function(e) {
+            e.preventDefault(); // Empêche le rechargement de la page
+            var form = $(this);
+            $.ajax({
+                url: form.attr("action"),
+                type: form.attr("method"),
+                data: form.serialize(),
+                success: function(response) {
+                    // Mettre à jour la liste des membres
+                    console.log(response);
+                    
+                    updateMemberList(response.members, response.groupId); // Assurez-vous que votre réponse contient ces données
+                    alert("User removed");
+                },
+                error: function(error) {
+                    console.error("Error removing user:", error);
+                    alert("An error occurred. Please try again.");
+                }
+            });
+        });
+    });
 </script>
+
 
 {{-- File Input "Accept" attribute management --}}
 <script>
@@ -179,7 +225,7 @@
             success: function(response) {
                 if (response.length > 0) {
                     // Remplacer le contenu de la liste avec les membres récupérés
-                    updateMemberList(response);
+                    updateMemberList(response,groupId);
                     // console.log(response);
                 }
             },
@@ -189,11 +235,10 @@
         });
     }
 
-    function updateMemberList(members) {
+    function updateMemberList(members,groupId) {
         var memberList = $('#u-member-list');
         memberList.empty(); // Vider la liste existante
-
-        // Ajouter les membres récupérés
+        // /groups/${groupId}/remove-member
         members.forEach(function(member) {
             memberList.append(`
                 <li class="chat-list">
@@ -207,7 +252,13 @@
                                 <p class="text-muted font-size-13 mb-0">${member.role}</p>
                             </div>
                             <div>
-                                <p class="text-muted font-size-13 mb-0">Remove</p>
+                                <form action="/groups/${groupId}/remove-member" method="post" class="delete-user-from-group">
+                                    @csrf
+                                    <input type="hidden" name="user_id" value="${member.id}">
+                                    <button type="submit" style="border: 0px !important; padding: 0px !important;background-color: #fff;">
+                                        <i class="mdi mdi-delete"></i> Remove
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </a>
@@ -218,6 +269,7 @@
         // Mettre à jour le nombre de membres affiché
         $('#span-group-member-number').text(members.length);
     }
+
 </script>
 
 {{-- Hide Group member number span --}}

@@ -72,7 +72,7 @@ Route::get('/signup', function () {
 Route::post('/groups/create', [GroupController::class, 'createGroup'])->name('create.group');
 Route::get('/group-members/{groupId}', [GroupController::class, 'membersGroup'])->name('group.members');
 Route::post('/groups/{groupId}/add-member', [GroupController::class, 'addMember'])/*->name('add.group.members')*/;
-Route::post('/groups/{groupId}/remove-member', [GroupController::class, 'removeMember']);
+Route::post('/groups/{groupId}/remove-member', [GroupController::class, 'removeMember'])->name('remove.group.members');
 
 // Posts By Ak
 // Route::post('posts', [PostController::class, 'createPost']);
