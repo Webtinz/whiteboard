@@ -240,12 +240,12 @@ use App\Models\Project;
                                 <span class="menu-item" data-key="t-chat">Chat</span>
                             </a>
                         </li>
-                        <li>
+                        {{-- <li>
                             <a href="{{ route('activityzone') }}">
                                 <i class="icon nav-icon" data-feather="message-square"></i>
                                 <span class="menu-item" data-key="t-chat">Activity Zone</span>
                             </a>
-                        </li>
+                        </li> --}}
                         <li>
                             <a href="javascript: void(0);" class="has-arrow">
                                 <i class="icon nav-icon" data-feather="users"></i>
@@ -485,12 +485,12 @@ use App\Models\Project;
                             <span class="menu-item" data-key="t-chat">Chat</span>
                         </a>
                     </li>
-                    <li>
+                    {{-- <li>
                         <a href="{{route('activityzone' )}}">
                             <i class="icon nav-icon" data-feather="message-square"></i>
                             <span class="menu-item" data-key="t-chat">Activity Zone</span>
                         </a>
-                    </li>
+                    </li> --}}
                     <li>
                         <a href="javascript: void(0);" class="has-arrow">
                             <i class="icon nav-icon" data-feather="users"></i>

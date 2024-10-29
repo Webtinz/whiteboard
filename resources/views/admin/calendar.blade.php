@@ -268,7 +268,7 @@
                                     <div class="row gx-3">
                                         <div class="col-sm-12 form-group">
                                             <label class="form-label">Name</label>
-                                            <input id="event_title_val" class="form-control  cal-event-name"
+                                            <input class="form-control  cal-event-name"
                                                 type="text" />
                                         </div>
                                     </div>
@@ -277,22 +277,22 @@
                                             <div class="form-label-group">
                                                 <label>Note/Description</label>
                                             </div>
-                                            <textarea id="event_description_val" class="form-control" rows="3"></textarea>
+                                            <textarea class="form-control cal-event-description" rows="3"></textarea>
                                         </div>
                                     </div>
                                     <div class="row gx-3">
                                         <div class="col-sm-6">
                                             <div class="form-group">
                                                 <label class="form-label">Start Date</label>
-                                                <input class="form-control cal-event-date-start" id="event_start_date_val"
+                                                <input class="form-control cal-event-date-start"
                                                     name="single-date-pick" type="text" />
                                             </div>
                                         </div>
                                         <div class="col-sm-6">
                                             <div class="form-group">
                                                 <label class="form-label">Start Time</label>
-                                                <input class="form-control input-single-timepicker"
-                                                    id="event_start_time_val" name="input-timepicker" type="text" />
+                                                <input class="form-control input-single-timepicker time"
+                                                 name="input-timepicker" type="text" />
                                             </div>
                                         </div>
                                     </div>
@@ -300,15 +300,15 @@
                                         <div class="col-sm-6">
                                             <div class="form-group">
                                                 <label class="form-label">End Date</label>
-                                                <input class="form-control cal-event-date-end" id="event_end_date_val"
+                                                <input class="form-control cal-event-date-end"
                                                     name="single-date-pick" type="text" />
                                             </div>
                                         </div>
                                         <div class="col-sm-6">
                                             <div class="form-group">
                                                 <label class="form-label">End Time</label>
-                                                <input class="form-control input-single-timepicker"
-                                                    id="event_end_time_val" type="text" />
+                                                <input class="form-control input-single-timepicker time"
+                                                 type="text" />
                                             </div>
                                         </div>
                                     </div>
@@ -316,7 +316,7 @@
                                         <label class="form-label">Status</label>
                                         <div class="form-group">
                                             <div class="d-flex align-item-end mr-2">
-                                                <select class="form-control" name="location_type" id="location_type">
+                                                <select class="form-control" name="location_type">
                                                     <option value="scheduled">Schedule</option>
                                                     <option value="started">Started</option>
                                                     <option value="done">Done</option>
@@ -335,11 +335,11 @@
                                         <div class="col-sm-12">
                                             <label class="form-label">Public or Private: </label> <br>
                                             <div class="form-check form-check-inline">
-                                                <input class="form-check-input" type="radio" name="public_or_private" id="edit-public" value="public" checked>
+                                                <input class="form-check-input" type="radio" name="public_or_private" value="public" checked>
                                                 <label class="form-check-label" for="public">Public</label>
                                             </div>
                                             <div class="form-check form-check-inline">
-                                                <input class="form-check-input" type="radio" name="public_or_private" id="edit-private" value="private">
+                                                <input class="form-check-input" type="radio" name="public_or_private" value="private">
                                                 <label class="form-check-label" for="private">Private</label>
                                             </div>
                                         </div>
@@ -349,17 +349,17 @@
                                     <div id="edit-selected_users_container" class="mb-3"></div>
                                     
                                     <!-- Champ spécifique pour les utilisateurs privés -->
-                                    <div class="row gx-3" id="edit-specific_users_field" style="display:none;">
+                                    <div class="row gx-3" id="edit-specific_users_fieldd" style="display:none;">
                                         <div class="col-sm-12">
                                             <label class="form-label">Specific Users</label>
-                                            <select class="form-control" id="edit-specific_users" name="specific_users[]" multiple>
+                                            <select class="form-control" name="specific_users[]" multiple>
                                                 @foreach($users as $user)
                                                     <option value="{{ $user->id }}">{{ $user->name }}</option>
                                                 @endforeach
                                             </select>
                                         </div>
-                                    </div>                                                                     
-
+                                    </div>
+                                    
 
                                     {{-- <div class="row gx-3">
                                         <div class="col-sm-12">
@@ -520,27 +520,33 @@
                         data: {
                             taskId: info.event.id
                         },
-                        success: function(response) {
-                            console.log(response);
-                            var title = response.title
-                            var description = response.description
-                            var start_date = response.start_date
-                            var start_time = response.start_time
-                            var end_date = response.end_date
-                            var end_time = response.end_time
-                            var color = response.color
-                            var priority = response.priority
+                        success: function(event) {
+                        // Remplir les champs du modal avec les données de l'événement
+                        $('.cal-event-name').val(event.title);
+                        $('.cal-event-description').val(event.description);
+                        $('.cal-event-date-start').val(event.start_date);
+                        $('.time').eq(0).val(event.start_time);
+                        $('.cal-event-date-end').val(event.end_date);
+                        $('.time').eq(1).val(event.end_time);
+                        $('select[name="location_type"]').val(event.status);
+                        $('input[name="public_or_private"][value="' + event.public_or_private + '"]').prop('checked', true);
+                        
+                        // Si l'événement est privé, afficher les utilisateurs spécifiques
+                        if (event.public_or_private === 'private') {
+                            $('#edit-specific_users_fieldd').show();
+                            
+                            // Vérifiez si specific_users est un tableau et assurez-vous qu'il est non vide
+                            if (Array.isArray(event.specific_users)) {
+                                $('select[name="specific_users[]"]').val(event.specific_users);
+                            }
+                        } else {
+                            $('#edit-specific_users_fieldd').hide();
+                        }
 
-                            $('#event_title_val').val(title)
-                            $('#event_description_val').val(description)
-                            $('#event_start_date_val').val(start_date)
-                            $('#event_start_time_val').val(start_time)
-                            $('#event_end_date_val').val(end_date)
-                            $('#event_end_time_val').val(end_time)
-                            $('#event_color_val').val(color)
-                            $('input[name="priority":checked]').val(priority)
 
-                        },
+                        // Afficher le modal
+                        $('#edit_event_modal').modal('show');
+                    },
                         error: function(xhr, status, error) {
                             console.error('Error deleting task:', error);
                             // Show error notification
@@ -557,7 +563,7 @@
                             data: {
                                 taskId: info.event.id,
                                 title: $('#event_title_val').val(),
-                                description: $('#event_description_val').val(),
+                                description: $('#event_description_vald').val(),
                                 start_date: $('#event_start_date_val').val(),
                                 start_time: $('#event_start_time_val').val(),
                                 end_date: $('#event_end_date_val').val(),
@@ -730,6 +736,29 @@
         const publicRadio = document.getElementById('edit-public');
         const privateRadio = document.getElementById('edit-private');
         const specificUsersField = document.getElementById('edit-specific_users_field');
+
+        // Fonction pour afficher ou masquer le champ des utilisateurs privés
+        function toggleSpecificUsers() {
+            if (privateRadio.checked) {
+                specificUsersField.style.display = 'block';
+            } else {
+                specificUsersField.style.display = 'none';
+            }
+        }
+
+        // Écouter les changements sur les radios
+        publicRadio.addEventListener('change', toggleSpecificUsers);
+        privateRadio.addEventListener('change', toggleSpecificUsers);
+
+        // Appeler la fonction une fois pour initialiser l'affichage correct
+        toggleSpecificUsers();
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const publicRadio = document.getElementById('edit-publicd');
+        const privateRadio = document.getElementById('edit-privated');
+        const specificUsersField = document.getElementById('edit-specific_users_fieldd');
 
         // Fonction pour afficher ou masquer le champ des utilisateurs privés
         function toggleSpecificUsers() {
