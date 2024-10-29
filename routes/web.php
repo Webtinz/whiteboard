@@ -61,14 +61,6 @@ Route::get('/signup', function () {
     return view('Front_include.signup');
 })->name('signup');
 
-
-// Messages
-Route::post('/messages/send', [MessageController::class, 'sendMessage'])->name('message.inbox.send');
-Route::get('/messages/{receiverId}', [MessageController::class, 'getConversationWithUser']);
-Route::get('/groupmessages/{groupId}', [MessageController::class, 'getGroupConversation']);
-
-// Récupérer toutes les conversations (directes et de groupe)
-Route::get('/conversations', [MessageController::class, 'getAllConversations'])->name('conversations');
 // // Récupérer toutes les conversations (directes et groupes) pour l'utilisateur connecté
 // Route::get('user/conversations', [MessageController::class, 'getUserConversations']);
 
@@ -93,6 +85,13 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
+    // Messages
+    Route::post('/messages/send', [MessageController::class, 'sendMessage'])->name('message.inbox.send');
+    Route::get('/messages/{receiverId}', [MessageController::class, 'getConversationWithUser']);
+    Route::get('/groupmessages/{groupId}', [MessageController::class, 'getGroupConversation']);
+    // Récupérer toutes les conversations (directes et de groupe)
+    Route::get('/conversations', [MessageController::class, 'getAllConversations'])->name('conversations');
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

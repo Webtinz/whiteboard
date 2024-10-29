@@ -1,4 +1,5 @@
 @extends('layouts.dashboardlayout')
+
 @section('links')
     <!-- lightbox css -->
 
@@ -146,6 +147,7 @@
     <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
 
 @endsection
+
 @section('content')
 
         <div class="main-content">
@@ -640,90 +642,90 @@
         </div>
 
 <!-- end main content-->
-@endsection
-@section('js')
+    @endsection
+    @section('js')
 
-<script>
-    const emojis = [
-    // Visages souriants et émotions de base
-    '😀', '😃', '😄', '😁', '😅', '😂', '🤣', '😊',
-    '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘',
-    '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪',
-    '🤨', '🧐', '🤓', '😎', '🤩', '🥳', '😏', '😒',
+    <script>
+        const emojis = [
+            // Visages souriants et émotions de base
+            '😀', '😃', '😄', '😁', '😅', '😂', '🤣', '😊',
+            '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘',
+            '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪',
+            '🤨', '🧐', '🤓', '😎', '🤩', '🥳', '😏', '😒',
 
-    // Cœurs et amour
-    '❤️', '💖', '💗', '💓', '💞', '💕', '💟', '❣️',
-    '💝', '💘', '💌', '💋', '💑', '👩‍❤️‍👨', '💏', '😻',
+            // Cœurs et amour
+            '❤️', '💖', '💗', '💓', '💞', '💕', '💟', '❣️',
+            '💝', '💘', '💌', '💋', '💑', '👩‍❤️‍👨', '💏', '😻',
 
-    // Gestes et mains
-    '👍', '👋', '🙌', '👏', '🎉', '✨', '⭐', '🌟',
-    '👊', '✊', '🤝', '🤲', '🤚', '🖐️', '✋', '👌',
+            // Gestes et mains
+            '👍', '👋', '🙌', '👏', '🎉', '✨', '⭐', '🌟',
+            '👊', '✊', '🤝', '🤲', '🤚', '🖐️', '✋', '👌',
 
-    // Émotions négatives
-    '😢', '😭', '😤', '😠', '😡', '🤬', '😱', '😨',
-    '😰', '😥', '😓', '😪', '😴', '😷', '🤒', '🤕',
+            // Émotions négatives
+            '😢', '😭', '😤', '😠', '😡', '🤬', '😱', '😨',
+            '😰', '😥', '😓', '😪', '😴', '😷', '🤒', '🤕',
 
-    // Animaux populaires
-    '🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼',
-    '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐙', '🦋',
+            // Animaux populaires
+            '🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼',
+            '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐙', '🦋',
 
-    // Nourriture et boissons
-    '🍎', '🍕', '🍔', '🍟', '🌮', '🍣', '🍜', '🍙',
-    '🍦', '🍪', '🍰', '🎂', '☕', '🍷', '🍺', '🥤',
+            // Nourriture et boissons
+            '🍎', '🍕', '🍔', '🍟', '🌮', '🍣', '🍜', '🍙',
+            '🍦', '🍪', '🍰', '🎂', '☕', '🍷', '🍺', '🥤',
 
-    // Nature et météo
-    '🌸', '🌺', '🌹', '🌈', '☀️', '⛅', '🌤️', '🌙',
-    '⭐', '🌟', '✨', '⚡', '🌍', '🌊', '🍀', '🌿',
+            // Nature et météo
+            '🌸', '🌺', '🌹', '🌈', '☀️', '⛅', '🌤️', '🌙',
+            '⭐', '🌟', '✨', '⚡', '🌍', '🌊', '🍀', '🌿',
 
-    // Sports et activités
-    '⚽', '🏀', '🏈', '⚾', '🎾', '🏐', '🎱', '🎮',
-    '🎨', '🎭', '🎪', '🎢', '🎡', '🎯', '🎲', '🎷',
+            // Sports et activités
+            '⚽', '🏀', '🏈', '⚾', '🎾', '🏐', '🎱', '🎮',
+            '🎨', '🎭', '🎪', '🎢', '🎡', '🎯', '🎲', '🎷',
 
-    // Objets du quotidien
-    '📱', '💻', '⌚', '📷', '🔋', '💡', '🔑', '🎵',
-    '🎤', '🎧', '📚', '✏️', '📝', '💼', '🎁', '🏠'
-];
-    
-    // Initialisation du popup d'emojis
-    document.addEventListener('DOMContentLoaded', function() {
-        const emojiButton = document.getElementById('emoji-button');
-        const emojiPopup = document.getElementById('emoji-popup');
-        const chatInput = document.getElementById('chat-input');
-        const emojiGrid = document.querySelector('.emoji-grid');
-    
-        // Créer les éléments emoji
-        emojis.forEach(emoji => {
-            const emojiElement = document.createElement('div');
-            emojiElement.className = 'emoji-item';
-            emojiElement.textContent = emoji;
-            emojiElement.onclick = () => {
-                // Insérer l'emoji à la position du curseur
-                const cursorPos = chatInput.selectionStart;
-                const textBefore = chatInput.value.substring(0, cursorPos);
-                const textAfter = chatInput.value.substring(cursorPos);
-                chatInput.value = textBefore + emoji + textAfter;
-                
-                // Placer le curseur après l'emoji
-                const newCursorPos = cursorPos + emoji.length;
-                chatInput.setSelectionRange(newCursorPos, newCursorPos);
-                chatInput.focus();
+            // Objets du quotidien
+            '📱', '💻', '⌚', '📷', '🔋', '💡', '🔑', '🎵',
+            '🎤', '🎧', '📚', '✏️', '📝', '💼', '🎁', '🏠'
+        ];
+        
+        // Initialisation du popup d'emojis
+        document.addEventListener('DOMContentLoaded', function() {
+            const emojiButton = document.getElementById('emoji-button');
+            const emojiPopup = document.getElementById('emoji-popup');
+            const chatInput = document.getElementById('chat-input');
+            const emojiGrid = document.querySelector('.emoji-grid');
+        
+            // Créer les éléments emoji
+            emojis.forEach(emoji => {
+                const emojiElement = document.createElement('div');
+                emojiElement.className = 'emoji-item';
+                emojiElement.textContent = emoji;
+                emojiElement.onclick = () => {
+                    // Insérer l'emoji à la position du curseur
+                    const cursorPos = chatInput.selectionStart;
+                    const textBefore = chatInput.value.substring(0, cursorPos);
+                    const textAfter = chatInput.value.substring(cursorPos);
+                    chatInput.value = textBefore + emoji + textAfter;
+                    
+                    // Placer le curseur après l'emoji
+                    const newCursorPos = cursorPos + emoji.length;
+                    chatInput.setSelectionRange(newCursorPos, newCursorPos);
+                    chatInput.focus();
+                };
+                emojiGrid.appendChild(emojiElement);
+            });
+        
+            // Gérer l'affichage/masquage du popup
+            emojiButton.onclick = (e) => {
+                e.stopPropagation();
+                emojiPopup.style.display = emojiPopup.style.display === 'none' ? 'block' : 'none';
             };
-            emojiGrid.appendChild(emojiElement);
+        
+            // Fermer le popup quand on clique en dehors
+            document.addEventListener('click', (e) => {
+                if (!emojiPopup.contains(e.target) && e.target !== emojiButton) {
+                    emojiPopup.style.display = 'none';
+                }
+            });
         });
-    
-        // Gérer l'affichage/masquage du popup
-        emojiButton.onclick = (e) => {
-            e.stopPropagation();
-            emojiPopup.style.display = emojiPopup.style.display === 'none' ? 'block' : 'none';
-        };
-    
-        // Fermer le popup quand on clique en dehors
-        document.addEventListener('click', (e) => {
-            if (!emojiPopup.contains(e.target) && e.target !== emojiButton) {
-                emojiPopup.style.display = 'none';
-            }
-        });
-    });
     </script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     
