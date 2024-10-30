@@ -119,7 +119,7 @@
                                             <div class="form-label-group">
                                                 <label>Note/Description</label>
                                             </div>
-                                            <textarea id="description" class="form-control" rows="3"></textarea>
+                                            <textarea id="event_description_val" class="form-control" rows="3"></textarea>
                                         </div>
                                     </div>
                                     <div class="row gx-3">
@@ -173,6 +173,35 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="row gx-3">
+                                        <div class="col-sm-12">
+                                            <label class="form-label">Public or Private: </label> <br>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="public_or_private" id="edit-public" value="public" checked>
+                                                <label class="form-check-label" for="public">Public</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="public_or_private" id="edit-private" value="private">
+                                                <label class="form-check-label" for="private">Private</label>
+                                            </div>
+                                        </div>
+                                    </div>          
+                                    
+                                    <!-- Conteneur pour afficher les utilisateurs sélectionnés -->
+                                    <div id="edit-selected_users_container" class="mb-3"></div>
+                                    
+                                    <!-- Champ spécifique pour les utilisateurs privés -->
+                                    <div class="row gx-3" id="edit-specific_users_field" style="display:none;">
+                                        <div class="col-sm-12">
+                                            <label class="form-label">Specific Users</label>
+                                            <select class="form-control" id="edit-specific_users" name="specific_users[]" multiple>
+                                                @foreach($users as $user)
+                                                    <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>    
+                                    
                                     {{-- <div class="row gx-3">
                                         <div class="col-sm-12">
                                             <div class="form-inline">
@@ -215,11 +244,11 @@
                                         </div>
                                     </div> --}}
                                 </form>
-                            </div>
-                            <div class="modal-footer align-items-center">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Discard</button>
-                                <button id="add_event" type="button" class="btn btn-primary fc-addEventButton-button"
-                                    data-bs-dismiss="modal">Add</button>
+                                <div class="modal-footer align-items-center">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Discard</button>
+                                    <button id="add_event" type="button" class="btn btn-primary fc-addEventButton-button"
+                                        data-bs-dismiss="modal">Add</button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -239,7 +268,7 @@
                                     <div class="row gx-3">
                                         <div class="col-sm-12 form-group">
                                             <label class="form-label">Name</label>
-                                            <input id="event_title_val" class="form-control  cal-event-name"
+                                            <input class="form-control  cal-event-named"
                                                 type="text" />
                                         </div>
                                     </div>
@@ -248,22 +277,22 @@
                                             <div class="form-label-group">
                                                 <label>Note/Description</label>
                                             </div>
-                                            <textarea id="event_description_val" class="form-control" rows="3"></textarea>
+                                            <textarea class="form-control cal-event-description" rows="3"></textarea>
                                         </div>
                                     </div>
                                     <div class="row gx-3">
                                         <div class="col-sm-6">
                                             <div class="form-group">
                                                 <label class="form-label">Start Date</label>
-                                                <input class="form-control cal-event-date-start" id="event_start_date_val"
+                                                <input class="form-control cal-event-date-startd"
                                                     name="single-date-pick" type="text" />
                                             </div>
                                         </div>
                                         <div class="col-sm-6">
                                             <div class="form-group">
                                                 <label class="form-label">Start Time</label>
-                                                <input class="form-control input-single-timepicker"
-                                                    id="event_start_time_val" name="input-timepicker" type="text" />
+                                                <input class="form-control input-single-timepicker time"
+                                                 name="input-timepicker" type="text" />
                                             </div>
                                         </div>
                                     </div>
@@ -271,15 +300,15 @@
                                         <div class="col-sm-6">
                                             <div class="form-group">
                                                 <label class="form-label">End Date</label>
-                                                <input class="form-control cal-event-date-end" id="event_end_date_val"
+                                                <input class="form-control cal-event-date-endd"
                                                     name="single-date-pick" type="text" />
                                             </div>
                                         </div>
                                         <div class="col-sm-6">
                                             <div class="form-group">
                                                 <label class="form-label">End Time</label>
-                                                <input class="form-control input-single-timepicker"
-                                                    id="event_end_time_val" type="text" />
+                                                <input class="form-control input-single-timepicker time"
+                                                 type="text" />
                                             </div>
                                         </div>
                                     </div>
@@ -287,7 +316,7 @@
                                         <label class="form-label">Status</label>
                                         <div class="form-group">
                                             <div class="d-flex align-item-end mr-2">
-                                                <select class="form-control" name="location_type" id="location_type">
+                                                <select class="form-control" name="location_type">
                                                     <option value="scheduled">Schedule</option>
                                                     <option value="started">Started</option>
                                                     <option value="done">Done</option>
@@ -302,6 +331,36 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="row gx-3">
+                                        <div class="col-sm-12">
+                                            <label class="form-label">Public or Private: </label> <br>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="public_or_privated" id="edit-publicd" value="public" checked>
+                                                <label class="form-check-label" for="public">Public</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="public_or_privated" id="edit-privated" value="private">
+                                                <label class="form-check-label" for="private">Private</label>
+                                            </div>
+                                        </div>
+                                    </div>          
+                                    
+                                    <!-- Conteneur pour afficher les utilisateurs sélectionnés -->
+                                    <div id="edit-selected_users_container" class="mb-3"></div>
+                                    
+                                    <!-- Champ spécifique pour les utilisateurs privés -->
+                                    <div class="row gx-3" id="edit-specific_users_fieldd" style="display:none;">
+                                        <div class="col-sm-12">
+                                            <label class="form-label">Specific Users</label>
+                                            <select class="form-control" name="specific_usersd[]" multiple>
+                                                @foreach($users as $user)
+                                                    <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+
                                     {{-- <div class="row gx-3">
                                         <div class="col-sm-12">
                                             <div class="form-inline">
@@ -399,6 +458,14 @@
     <!-- Init JS -->
     <script src="{{ asset('asset/dist/js/init.js') }}"></script>
     <script>
+        $('input[name="calendar"]').daterangepicker({
+            singleDatePicker: true,
+            showDropdowns: false,
+            minYear: 1901,
+            "cancelClass": "btn-secondary",
+            autoApply :true,
+            parentEl: "#inline_calendar",
+        });
         var curYear = moment().format('YYYY'),
             curMonth = moment().format('MM');
         $.ajaxSetup({
@@ -453,27 +520,31 @@
                         data: {
                             taskId: info.event.id
                         },
-                        success: function(response) {
-                            console.log(response);
-                            var title = response.title
-                            var description = response.description
-                            var start_date = response.start_date
-                            var start_time = response.start_time
-                            var end_date = response.end_date
-                            var end_time = response.end_time
-                            var color = response.color
-                            var priority = response.priority
+                        success: function(event) {
+                        // Remplir les champs du modal avec les données de l'événement
+                        $('.cal-event-named').val(event.title);
+                        $('.cal-event-description').val(event.description);
+                        $('.cal-event-date-startd').val(event.start_date);
+                        $('.time').eq(0).val(event.start_time);
+                        $('.cal-event-date-endd').val(event.end_date);
+                        $('.time').eq(1).val(event.end_time);
+                        $('select[name="location_type"]').val(event.status);
+                        $('input[name="public_or_privated"][value="' + event.public_or_private + '"]').prop('checked', true);
+                        
+                        // Si l'événement est privé, afficher les utilisateurs spécifiques
+                        if (event.public_or_private === 'private') {
+                            $('#edit-specific_users_fieldd').show();
+                            
+                            // Vérifiez si specific_users est un tableau et assurez-vous qu'il est non vide
+                            $('select[name="specific_usersd[]"]').val(JSON.parse(event.specific_users));
+                        } else {
+                            $('#edit-specific_users_fieldd').hide();
+                        }
 
-                            $('#event_title_val').val(title)
-                            $('#event_description_val').val(description)
-                            $('#event_start_date_val').val(start_date)
-                            $('#event_start_time_val').val(start_time)
-                            $('#event_end_date_val').val(end_date)
-                            $('#event_end_time_val').val(end_time)
-                            $('#event_color_val').val(color)
-                            $('input[name="priority":checked]').val(priority)
 
-                        },
+                        // Afficher le modal
+                        $('#edit_event_modal').modal('show');
+                    },
                         error: function(xhr, status, error) {
                             console.error('Error deleting task:', error);
                             // Show error notification
@@ -481,47 +552,56 @@
                     })
 
                     // Update event
-                    $('#update_event').click(function() {
-                        console.log('ok');
+                    $('#update_event').on('click', function() {
+                    // Récupérer les valeurs des champs
+                    const taskId = $('#edit_event_modal').data('task-id'); // Assurez-vous que cet ID est défini lors de l'ouverture du modal
+                    const title = $('.cal-event-named').val();
+                    const description = $('.cal-event-description').val();
+                    const startDate = $('.cal-event-date-startd').val();
+                    const startTime = $('.input-single-timepicker.time[name="input-timepicker"]').val();
+                    const endDate = $('.cal-event-date-endd').val();
+                    const endTime = $('.input-single-timepicker.time[name="input-timepicker"]').val();
+                    const locationType = $('select[name="location_type"]').val();
+                    const publicOrPrivate = $('input[name="public_or_privated"]:checked').val();
+                    const specificUsers = $('select[name="specific_usersd[]"]').val();
 
-                        $.ajax({
-                            url: `/tasks/update`,
-                            method: 'PUT',
-                            data: {
-                                taskId: info.event.id,
-                                title: $('#event_title_val').val(),
-                                description: $('#event_description_val').val(),
-                                start_date: $('#event_start_date_val').val(),
-                                start_time: $('#event_start_time_val').val(),
-                                end_date: $('#event_end_date_val').val(),
-                                end_time: $('#event_end_time_val').val(),
-                                color: $('#event_color_val').val(),
-                                priority: $('#event_priority_val').val()
-                            },
-                            success: function(response) {
-                                $.notify({
-                                    icon: 'ri-checkbox-line mr-5',
-                                    message: `Event has been updated`,
-                                }, {
-                                    type: "dismissible alert alert-inv alert-inv-primary",
-                                    placement: {
-                                        from: "bottom",
-                                        align: "center"
-                                    },
-                                    animate: {
-                                        enter: 'animated fadeInUp',
-                                        exit: 'animated fadeOutUp'
-                                    },
-                                    delay: 1000,
-                                });
-                                location.reload(true);
-                            },
-                            error: function(xhr, status, error) {
-                                console.error('Error deleting task:', error);
-                                // Show error notification
-                            }
-                        });
+                    // Vérification des valeurs (facultatif)
+                    if (!title || !startDate || !endDate) {
+                        alert('Please fill in all required fields.');
+                        return;
+                    }
+
+                    // Créer l'objet des données à envoyer
+                    const data = {
+                        taskId: info.event.id, // ID de la tâche à mettre à jour
+                        title: title,
+                        description: description,
+                        start_date: startDate,
+                        start_time: startTime,
+                        end_date: endDate,
+                        end_time: endTime,
+                        location_type: locationType,
+                        public_or_private: publicOrPrivate,
+                        specific_users: specificUsers
+                    };
+
+                    // Envoyer les données via AJAX
+                    $.ajax({
+                        url: '/tasks/update', // URL de votre route de mise à jour
+                        type: 'PUT', // Méthode HTTP
+                        data: data,
+                        success: function(response) {
+                            // Gérer la réponse de succès
+                            alert('Task updated successfully!');
+                            // Optionnel : mettre à jour l'interface utilisateur ou recharger la liste des tâches
+                            location.reload(); // Recharge la page ou met à jour la liste
+                        },
+                        error: function(xhr) {
+                            // Gérer les erreurs
+                            alert('Error updating task: ' + xhr.responseText);
+                        }
                     });
+                });
                     // Delete event
                     $('#delete_event').click(function() {
                         Swal.fire({
@@ -579,8 +659,11 @@
                     url: `/tasks/update/`,
                     method: 'PUT',
                     data: {
+                        // user_id-specific_users-public_or_private
                         taskId: event.id,
                         title: event.title,
+                        specific_users: event.specific_users,
+                        public_or_private: event.public_or_private,
                         start_date: event.start.toISOString().slice(0, 10), // Start date (YYYY-MM-DD)
                         start_time: event.start.toISOString().slice(11, 19), // Start time (HH:MM:SS)
                         end_date: event.end ? event.end.toISOString().slice(0, 10) :
@@ -600,16 +683,22 @@
 
             // Add new event
             $('#add_event').click(function() {
+                var selectedUsers = $('#edit-specific_users').val();
                 var newEvent = {
+                    // user_id-specific_users-public_or_private
                     title: $('.cal-event-name').val(),
-                    description: $('#event_description').val(),
+                    description: $('#event_description_val').val(),
                     start_date: $('#start_date').val(),
                     start_time: $('#start_time').val(),
                     end_date: $('#end_date').val(),
                     end_time: $('#end_time').val(),
+                    specific_users: selectedUsers,
+                    public_or_private: $('input[name="public_or_private"]:checked').val(),
                     color: $('.cal-event-color').val(),
                     priority: $('input[name="priority"]:checked').val(),
                 };
+                console.log(newEvent);
+                
 
                 $.ajax({
                     url: `/tasks/add/`,
@@ -644,4 +733,51 @@
             });
         });
     </script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const publicRadio = document.getElementById('edit-public');
+        const privateRadio = document.getElementById('edit-private');
+        const specificUsersField = document.getElementById('edit-specific_users_field');
+
+        // Fonction pour afficher ou masquer le champ des utilisateurs privés
+        function toggleSpecificUsers() {
+            if (privateRadio.checked) {
+                specificUsersField.style.display = 'block';
+            } else {
+                specificUsersField.style.display = 'none';
+            }
+        }
+
+        // Écouter les changements sur les radios
+        publicRadio.addEventListener('change', toggleSpecificUsers);
+        privateRadio.addEventListener('change', toggleSpecificUsers);
+
+        // Appeler la fonction une fois pour initialiser l'affichage correct
+        toggleSpecificUsers();
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const publicRadio = document.getElementById('edit-publicd');
+        const privateRadio = document.getElementById('edit-privated');
+        const specificUsersField = document.getElementById('edit-specific_users_fieldd');
+
+        // Fonction pour afficher ou masquer le champ des utilisateurs privés
+        function toggleSpecificUsers() {
+            if (privateRadio.checked) {
+                specificUsersField.style.display = 'block';
+            } else {
+                specificUsersField.style.display = 'none';
+            }
+        }
+
+        // Écouter les changements sur les radios
+        publicRadio.addEventListener('change', toggleSpecificUsers);
+        privateRadio.addEventListener('change', toggleSpecificUsers);
+
+        // Appeler la fonction une fois pour initialiser l'affichage correct
+        toggleSpecificUsers();
+    });
+</script>
 @endsection

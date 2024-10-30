@@ -27,6 +27,10 @@ class User extends Authenticatable
         return $this->belongsToMany(Group::class, 'group_members', 'user_id', 'group_id');
     }
 
+    public function projectTasks()
+    {
+        return $this->belongsToMany(ProjectTask::class, 'project_task_user');
+    }
 
     /**
      * The attributes that are mass assignable.

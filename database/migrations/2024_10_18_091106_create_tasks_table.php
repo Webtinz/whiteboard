@@ -21,13 +21,21 @@ return new class extends Migration
             $table->time('start_time')->nullable();
 
             $table->date('end_date')->nullable();
-            $table->time('end_time')->nullable()    ;
-
+            $table->time('end_time')->nullable();
 
             $table->enum('status', ['scheduled', 'started', 'done'])->default('scheduled');  
             $table->enum('priority', ['urgent', 'high', 'medium', 'low'])->default('urgent');
+        
+            // user_id-specific_users-public_or_private
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->text('specific_users')->nullable(); // Stocker les IDs des utilisateurs spécifiques
+            $table->string('public_or_private')->default('public'); // public, privé
+            
             $table->timestamps();
-        });
+        
+            // Créer un index unique sur start_date, start_time, end_date, et end_time
+            $table->unique(['user_id','start_date', 'start_time', 'end_date', 'end_time'], 'unique_task_dates');
+        });        
     }
 
     /**

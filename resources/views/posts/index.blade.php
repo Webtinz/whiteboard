@@ -214,53 +214,53 @@
 </script>
 <script>
     $(document).off('click', '.submit-comment').on('click', '.submit-comment', function (e) {
-    e.preventDefault();
-    var postId = $(this).data('post-id');
-    var commentForm = $('#comment-form-' + postId);
-    var content = commentForm.find('.comment-content').val();
-    var commentSection = commentForm.next('.comment-section');
-    var submitButton = $(this);
+        e.preventDefault();
+        var postId = $(this).data('post-id');
+        var commentForm = $('#comment-form-' + postId);
+        var content = commentForm.find('.comment-content').val();
+        var commentSection = commentForm.next('.comment-section');
+        var submitButton = $(this);
 
-    // Désactiver le bouton pour éviter les clics multiples
-    submitButton.prop('disabled', true);
+        // Désactiver le bouton pour éviter les clics multiples
+        submitButton.prop('disabled', true);
 
-    $.ajax({
-        url: '/posts/' + postId + '/comment',
-        type: 'POST',
-        data: {
-            _token: '{{ csrf_token() }}',
-            content: content
-        },
-        success: function (response) {
-            // Ajouter le nouveau commentaire à la section des commentaires
-            var newComment = `
-                <div class="d-flex align-items-center mb-2">
-                    <img src="{{ asset('assets/images/small/img-4.png') }}" alt="Comment Author Avatar" class="rounded-circle me-2" width="30" height="30">
-                    <div class="bg-light rounded p-2 w-100">
-                        <strong>${response.comment.user.name}</strong>
-                        <p class="mb-1">${response.comment.content}</p>
-                        <small class="text-muted">Just now</small>
+        $.ajax({
+            url: '/posts/' + postId + '/comment',
+            type: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                content: content
+            },
+            success: function (response) {
+                // Ajouter le nouveau commentaire à la section des commentaires
+                var newComment = `
+                    <div class="d-flex align-items-center mb-2">
+                        <img src="{{ asset('assets/images/small/img-4.png') }}" alt="Comment Author Avatar" class="rounded-circle me-2" width="30" height="30">
+                        <div class="bg-light rounded p-2 w-100">
+                            <strong>${response.comment.user.name}</strong>
+                            <p class="mb-1">${response.comment.content}</p>
+                            <small class="text-muted">Just now</small>
+                        </div>
                     </div>
-                </div>
-            `;
-            commentSection.append(newComment);
-            commentForm.find('.comment-content').val(''); // Effacer le champ de saisie
+                `;
+                commentSection.append(newComment);
+                commentForm.find('.comment-content').val(''); // Effacer le champ de saisie
 
-            // Mettre à jour le nombre de commentaires dans le bouton
-            var commentCountBtn = $('.comment-count-btn[data-post-id="' + postId + '"]');
-            var currentCount = parseInt(commentCountBtn.text().match(/\d+/)); // Extraire le nombre actuel
-            var newCount = currentCount + 1;
-            commentCountBtn.html('<i class="far fa-comment"></i> Comment (' + newCount + ')');
-        },
-        error: function (xhr) {
-            console.log(xhr.responseText);
-        },
-        complete: function () {
-            // Réactiver le bouton après la requête
-            submitButton.prop('disabled', false);
-        }
+                // Mettre à jour le nombre de commentaires dans le bouton
+                var commentCountBtn = $('.comment-count-btn[data-post-id="' + postId + '"]');
+                var currentCount = parseInt(commentCountBtn.text().match(/\d+/)); // Extraire le nombre actuel
+                var newCount = currentCount + 1;
+                commentCountBtn.html('<i class="far fa-comment"></i> Comment (' + newCount + ')');
+            },
+            error: function (xhr) {
+                console.log(xhr.responseText);
+            },
+            complete: function () {
+                // Réactiver le bouton après la requête
+                submitButton.prop('disabled', false);
+            }
+        });
     });
-});
 
 </script>
 @endsection

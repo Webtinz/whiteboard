@@ -1,3 +1,7 @@
+<?php 
+use App\Models\Project;
+ $projects = Project::all();
+?>
 <!doctype html>
 <html lang="en">
 
@@ -11,6 +15,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
     <meta content="Pichforest" name="author" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <!-- App favicon -->
     <link rel="shortcut icon" href="{{ asset('assets/images/favicon.ico') }}">
     <link rel="stylesheet" href="{{ asset('assets/libs/glightbox/css/glightbox.min.css') }}">
@@ -53,7 +58,7 @@
                 <div class="d-flex">
                     <!-- LOGO -->
                     <div class="navbar-brand-box">
-                        <a href="index-2.html" class="logo logo-dark">
+                        <a href="{{route('dashboarduser.index')}}" class="logo logo-dark">
                             <span class="logo-sm">
                                 <img src="assets/images/logo-light-sm.png" alt="" height="22">
                             </span>
@@ -62,7 +67,7 @@
                             </span>
                         </a>
 
-                        <a href="index-2.html" class="logo logo-light">
+                        <a href="{{route('dashboarduser.index')}}" class="logo logo-light">
                             <span class="logo-sm">
                                 <img src="assets/images/logo-light-sm.png" alt="" height="22">
                             </span>
@@ -152,7 +157,7 @@
             <!-- LOGO -->
             <div class="navbar-brand-box"
                 style="background-image: linear-gradient(45deg, #009EC5 0%, #2e7eed 20%, #02225B 50%)">
-                <a href="index-2.html" class="logo logo-dark">
+                <a href="{{route('dashboarduser.index')}}" class="logo logo-dark">
                     <span class="logo-sm">
                         <img src="assets/images/logo-sm.png" alt="" height="22">
                     </span>
@@ -161,7 +166,7 @@
                     </span>
                 </a>
 
-                <a href="index-2.html" class="logo logo-light">
+                <a href="{{route('dashboarduser.index')}}" class="logo logo-light">
                     <span class="logo-sm">
                         <img src="assets/images/logo-light-sm.png" alt="" height="22">
                     </span>
@@ -186,10 +191,15 @@
                     <ul class="metismenu list-unstyled" id="side-menu">
 
                         <li>
-                            <a href="{{ route('kanbanboard') }}">
-                                <i class="icon nav-icon" data-feather="trello"></i>
-                                <span class="menu-item" data-key="t-kanban-board">Kanban Board</span>
+                            <a href="javascript: void(0);" class="has-arrow">
+                                <i class="icon nav-icon" data-feather="users"></i>
+                                <span class="menu-item" data-key="t-team-overview">Kanban Board</span>
                             </a>
+                            <ul class="sub-menu" aria-expanded="false">
+                                    @foreach ($projects as $project)
+                                    <li><a href="{{route('kanbanboard', $project->id )}}" data-key="t-employee">{{$project->name}}</a></li>
+                                    @endforeach
+                            </ul>
                         </li>
                         <li>
                             <a href="{{route('posts.index')}}">
@@ -216,12 +226,12 @@
                                 <span class="menu-item" data-key="t-chat">Calendar</span>
                             </a>
                         </li>
-                        <li>
+                        {{-- <li>
                             <a href="apps-chat.html">
                                 <i class="icon nav-icon" data-feather="message-square"></i>
                                 <span class="menu-item" data-key="t-chat">Files</span>
                             </a>
-                        </li>
+                        </li> --}}
 
                         
                         <li>
@@ -230,19 +240,19 @@
                                 <span class="menu-item" data-key="t-chat">Chat</span>
                             </a>
                         </li>
-                        <li>
+                        {{-- <li>
                             <a href="{{ route('activityzone') }}">
                                 <i class="icon nav-icon" data-feather="message-square"></i>
                                 <span class="menu-item" data-key="t-chat">Activity Zone</span>
                             </a>
-                        </li>
+                        </li> --}}
                         <li>
                             <a href="javascript: void(0);" class="has-arrow">
                                 <i class="icon nav-icon" data-feather="users"></i>
                                 <span class="menu-item" data-key="t-team-overview">Team Overview</span>
                             </a>
                             <ul class="sub-menu" aria-expanded="false">
-                                <li><a href="{{ route('allemployee') }}" data-key="t-employee">Employee</a></li>
+                                <li><a href="{{ route('allemployee.index') }}" data-key="t-employee">Employee</a></li>
                             </ul>
                         </li>
                     </ul>
@@ -388,7 +398,7 @@
 
         <!-- LOGO -->
         <div class="navbar-brand-box" style="background-image: linear-gradient(45deg, #009EC5 0%, #2e7eed 20%, #02225B 50%)">
-            <a href="index-2.html" class="logo logo-dark">
+            <a href="{{route('dashboarduser.index')}}" class="logo logo-dark">
                 <span class="logo-sm">
                     <img src="assets/images/logo-sm.png" alt="" height="22">
                 </span>
@@ -397,7 +407,7 @@
                 </span>
             </a>
 
-            <a href="index-2.html" class="logo logo-light">
+            <a href="{{route('dashboarduser.index')}}" class="logo logo-light">
                 <span class="logo-sm">
                     <img src="assets/images/logo-light-sm.png" alt="" height="22">
                 </span>
@@ -422,10 +432,19 @@
                 <ul class="metismenu list-unstyled" id="side-menu">
 
                     <li>
-                        <a href="{{route('kanbanboard' )}}">
+                        {{-- <a href="{{route('kanbanboard' )}}">
                             <i class="icon nav-icon" data-feather="trello"></i>
                             <span class="menu-item" data-key="t-kanban-board">Kanban Board</span>
+                        </a> --}}
+                        <a href="javascript: void(0);" class="has-arrow">
+                            <i class="icon nav-icon" data-feather="users"></i>
+                            <span class="menu-item" data-key="t-team-overview">Kanban Board 2</span>
                         </a>
+                        @foreach ($projects as $project)
+                            <ul class="sub-menu" aria-expanded="false">
+                                <li><a href="{{route('kanbanboard', $project->id )}}" data-key="t-employee"></a></li>
+                            </ul>
+                        @endforeach
                     </li>
                     <li>
                         <a href="{{route('posts.index')}}">
@@ -447,12 +466,12 @@
                         </a>
                     </li>
 
-                    <li>
+                    {{-- <li>
                         <a href="apps-chat.html">
                             <i class="icon nav-icon" data-feather="message-square"></i>
                             <span class="menu-item" data-key="t-chat">Files</span>
                         </a>
-                    </li>
+                    </li> --}}
 
                     <li>
                         <a href="apps-chat.html">
@@ -466,19 +485,19 @@
                             <span class="menu-item" data-key="t-chat">Chat</span>
                         </a>
                     </li>
-                    <li>
+                    {{-- <li>
                         <a href="{{route('activityzone' )}}">
                             <i class="icon nav-icon" data-feather="message-square"></i>
                             <span class="menu-item" data-key="t-chat">Activity Zone</span>
                         </a>
-                    </li>
+                    </li> --}}
                     <li>
                         <a href="javascript: void(0);" class="has-arrow">
                             <i class="icon nav-icon" data-feather="users"></i>
                             <span class="menu-item" data-key="t-team-overview">Team Overview</span>
                         </a>
                         <ul class="sub-menu" aria-expanded="false">
-                            <li><a href="{{route('allemployee' )}}" data-key="t-employee">Employee</a></li>
+                            <li><a href="{{route('allemployee.index' )}}" data-key="t-employee">Employee</a></li>
                         </ul>
                     </li>
                 </ul>
