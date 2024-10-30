@@ -487,7 +487,7 @@
                                     <div class="card shadow-none rounded-3">
                                         <div class="card-body">
                                             @forelse ($allUsers as $eachUser)
-                                                <div class="d-flex chat-user-link" data-user-id="{{ $eachUser->id }}" data-user-name="{{ $eachUser->id == Auth::user()->id ? "Yourself" : $eachUser->name }}"  data-bs-dismiss="modal">
+                                                <div  onclick="showBlocHidened()" class="d-flex chat-user-link" data-user-id="{{ $eachUser->id }}" data-user-name="{{ $eachUser->id == Auth::user()->id ? "Yourself" : $eachUser->name }}"  data-bs-dismiss="modal">
                                                     <div>
                                                         <img src="{{ asset('assets/images/users/avatar-10.jpg') }}"
                                                             class="img-fluid avatar-sm rounded" alt="">
