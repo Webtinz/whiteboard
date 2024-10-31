@@ -189,7 +189,6 @@ use App\Models\Project;
                 <div id="sidebar-menu">
                     <!-- Left Menu Start -->
                     <ul class="metismenu list-unstyled" id="side-menu">
-
                         <li>
                             <a href="javascript: void(0);" class="has-arrow">
                                 <i class="icon nav-icon" data-feather="users"></i>
@@ -200,6 +199,12 @@ use App\Models\Project;
                                     <li><a href="{{route('kanbanboard', $project->id )}}" data-key="t-employee">{{$project->name}}</a></li>
                                     @endforeach
                             </ul>
+                        </li>
+                        <li>
+                            <a href="{{ route('admin_users.index') }}">
+                                <i class="icon nav-icon" data-feather="briefcase"></i>
+                                <span class="menu-item" data-key="t-contacts">Users Management</span>
+                            </a>
                         </li>
                         <li>
                             <a href="{{route('posts.index')}}">
@@ -274,7 +279,7 @@ use App\Models\Project;
     <!-- END layout-wrapper -->
 
     <!-- Right Sidebar -->
-    <div class="right-bar">
+    {{-- <div class="right-bar">
         <div data-simplebar class="h-100">
             <div class="rightbar-title d-flex align-items-center bg-dark p-3">
 
@@ -432,10 +437,6 @@ use App\Models\Project;
                 <ul class="metismenu list-unstyled" id="side-menu">
 
                     <li>
-                        {{-- <a href="{{route('kanbanboard' )}}">
-                            <i class="icon nav-icon" data-feather="trello"></i>
-                            <span class="menu-item" data-key="t-kanban-board">Kanban Board</span>
-                        </a> --}}
                         <a href="javascript: void(0);" class="has-arrow">
                             <i class="icon nav-icon" data-feather="users"></i>
                             <span class="menu-item" data-key="t-team-overview">Kanban Board 2</span>
@@ -466,13 +467,6 @@ use App\Models\Project;
                         </a>
                     </li>
 
-                    {{-- <li>
-                        <a href="apps-chat.html">
-                            <i class="icon nav-icon" data-feather="message-square"></i>
-                            <span class="menu-item" data-key="t-chat">Files</span>
-                        </a>
-                    </li> --}}
-
                     <li>
                         <a href="apps-chat.html">
                             <i class="icon nav-icon" data-feather="message-square"></i>
@@ -485,12 +479,6 @@ use App\Models\Project;
                             <span class="menu-item" data-key="t-chat">Chat</span>
                         </a>
                     </li>
-                    {{-- <li>
-                        <a href="{{route('activityzone' )}}">
-                            <i class="icon nav-icon" data-feather="message-square"></i>
-                            <span class="menu-item" data-key="t-chat">Activity Zone</span>
-                        </a>
-                    </li> --}}
                     <li>
                         <a href="javascript: void(0);" class="has-arrow">
                             <i class="icon nav-icon" data-feather="users"></i>
@@ -504,7 +492,7 @@ use App\Models\Project;
             </div>
             <!-- Sidebar -->
         </div>
-    </div>
+    </div> --}}
     <!-- /Right-bar -->
 
     <!-- Right bar overlay-->
@@ -512,6 +500,13 @@ use App\Models\Project;
 
     <!-- JAVASCRIPT -->
     @yield('js')
+    {{-- Script Go back --}}
+    <script>
+      function goBack() {
+          window.history.back();
+      }
+    </script>
+    {{-- End Script Go back --}}
     <script src="{  { asset('assets/libs/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
 
     <!-- Metismenu Js -->
@@ -532,7 +527,7 @@ use App\Models\Project;
     <script src="{{ asset('assets/libs/prismjs/plugins/copy-to-clipboard/prism-copy-to-clipboard.min.js') }}"></script>
 
 <!-- Right Sidebar -->
-<div class="right-bar">
+{{-- <div class="right-bar">
     <div data-simplebar class="h-100">
         <div class="rightbar-title d-flex align-items-center bg-dark p-3">
 
@@ -654,7 +649,7 @@ use App\Models\Project;
         </div>
 
     </div> <!-- end slimscroll-menu-->
-</div>
+</div> --}}
 <!-- /Right-bar -->
 
 <!-- Right bar overlay-->

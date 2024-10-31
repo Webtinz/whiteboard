@@ -18,7 +18,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->integer('created_by')->nullable();
-            $table->enum('user_type', ['platform user', 'platform master', 'user'])->nullable();
+            $table->enum('user_type', ['platform user', 'platform master', 'user','internal','external'])->nullable();
             $table->string('status')->default('inactive');
             $table->rememberToken();
             $table->timestamps();

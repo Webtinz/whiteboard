@@ -16,5 +16,6 @@
     </div>
     <div class="btn btn-info">
         <a href="{{ route('conversations') }}">conversations list</a>
+        {{-- <a href="{{ route('admin_users.list') }}">Users list</a> --}}
     </div>
 </x-app-layout>

@@ -133,57 +133,59 @@
                                         </div>
     
                                         <div class="row" id="all-projects">
-                                            @foreach ($projects as $project )
-                        
-                                            <div class="col-md-6 team-box" id="project-items-1">
-                                                <div class="card">
-                                                    <div class="card-body">
-                                                        <div class="d-flex mb-3">
-                                                            <div class="flex-grow-1 align-items-start">
-                                                                <div>
-                                                                    <h6 class="mb-0 text-muted">
-                                                                        <i class="mdi mdi-circle-medium text-danger fs-3 align-middle"></i>
-                                                                        <span class="team-date">{{$project->deadline}}</span>
-                                                                    </h6>
+                                            @forelse ($projects as $project )    
+                                                <div class="col-md-6 team-box" id="project-items-1">
+                                                    <div class="card">
+                                                        <div class="card-body">
+                                                            <div class="d-flex mb-3">
+                                                                <div class="flex-grow-1 align-items-start">
+                                                                    <div>
+                                                                        <h6 class="mb-0 text-muted">
+                                                                            <i class="mdi mdi-circle-medium text-danger fs-3 align-middle"></i>
+                                                                            <span class="team-date">{{$project->deadline}}</span>
+                                                                        </h6>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="dropdown ms-2">
+                                                                    <a href="#" class="dropdown-toggle font-size-16 text-muted"
+                                                                        data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                                        <i class="mdi mdi-dots-horizontal"></i>
+                                                                    </a>
+                                                                    <div class="dropdown-menu dropdown-menu-end">
+                                                                        <a class="dropdown-item" href="{{ route('projects.show', $project->id) }}">Details</a>
+                                                                        <a class="dropdown-item" href="{{ route('projects.edit', $project->id) }}">Edit</a>
+                                                                        {{-- <a class="dropdown-item" href="javascript: void(0);">Share</a> --}}
+                                                                        {{-- <div class="dropdown-divider"></div> --}}
+                                                                        {{-- <a href="#" class="dropdown-item delete-item" data-id="{{ $project->id }}" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal">Delete</a> --}}
+                                                                    </div>
                                                                 </div>
                                                             </div>
-                                                            <div class="dropdown ms-2">
-                                                                <a href="#" class="dropdown-toggle font-size-16 text-muted"
-                                                                    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                                    <i class="mdi mdi-dots-horizontal"></i>
-                                                                </a>
-                                                                <div class="dropdown-menu dropdown-menu-end">
-                                                                    <a class="dropdown-item" href="{{ route('projects.show', $project->id) }}">Details</a>
-                                                                    <a class="dropdown-item" href="{{ route('projects.edit', $project->id) }}">Edit</a>
-                                                                    {{-- <a class="dropdown-item" href="javascript: void(0);">Share</a> --}}
-                                                                    {{-- <div class="dropdown-divider"></div> --}}
-                                                                    {{-- <a href="#" class="dropdown-item delete-item" data-id="{{ $project->id }}" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal">Delete</a> --}}
-                                                                </div>
-                                                            </div>
-                                                        </div>
 
-                                                        <div class="mb-4">
-                                                            <h5 class="mb-1 font-size-17 team-title">{{$project->name}}</h5>
-                                                            <p class="text-muted mb-0 team-description">{{$project->description}}</p>
-                                                        </div>
-                                                        <div class="d-flex">
-                                                            <div class="align-self-end">
-                                                                @if ($project->status == "Progress")
-                                                                    <span class="badge badge-soft-danger p-2 team-status">{{$project->status}}</span>
-                                                                @endif
-                                                                @if ($project->status == "Pending")
-                                                                    <span class="badge badge-soft-warning p-2 team-status">{{$project->status}}</span>
-                                                                @endif
-                                                                @if ($project->status == "Completed")
-                                                                    <span class="badge badge-soft-success p-2 team-status">{{$project->status}}</span>
-                                                                @endif
+                                                            <div class="mb-4">
+                                                                <h5 class="mb-1 font-size-17 team-title">{{$project->name}}</h5>
+                                                                <p class="text-muted mb-0 team-description">{{$project->description}}</p>
                                                             </div>
-                                                        </div>
-                                                    </div><!-- end card body-->
-                                                </div><!-- end card -->
-                                            </div><!-- end col -->
-                                            @endforeach
-    
+                                                            <div class="d-flex">
+                                                                <div class="align-self-end">
+                                                                    @if ($project->status == "Progress")
+                                                                        <span class="badge badge-soft-danger p-2 team-status">{{$project->status}}</span>
+                                                                    @endif
+                                                                    @if ($project->status == "Pending")
+                                                                        <span class="badge badge-soft-warning p-2 team-status">{{$project->status}}</span>
+                                                                    @endif
+                                                                    @if ($project->status == "Completed")
+                                                                        <span class="badge badge-soft-success p-2 team-status">{{$project->status}}</span>
+                                                                    @endif
+                                                                </div>
+                                                            </div>
+                                                        </div><!-- end card body-->
+                                                    </div><!-- end card -->
+                                                </div><!-- end col -->
+                                            @empty
+                                                <div class="alert alert-warning">
+                                                    Empty
+                                                </div>
+                                            @endforelse    
                                         </div><!-- end row -->
                                     </div><!-- end tab pane -->
     
@@ -192,134 +194,143 @@
     
                                         <div class="row">
                                             <div class="col-xl-12">
-                                                @foreach ($projecttasks as $task )
-                                                    
-                                                <div class="task-list-box" data-project-id="{{ $task->project_id }}" data-progress="{{ $task->progress }}" id="landing-task">
-                                                    <div id="task-item-1">
-                                                        <div class="card list-group-item rounded-3">
-                                                            <div class="card-body">
-                                                                <div class="row align-items-center">
-                                                                    <div class="col-xl-6 col-sm-5">
-                                                                        <div class="checklist form-check font-size-15">
-                                                                            <input type="checkbox" class="form-check-input"
-                                                                                id="customCheck1">
-                                                                            <label class="form-check-label ms-1 task-title"
-                                                                                for="customCheck1">{{$task->name}}</label>
-                                                                        </div>
-                                                                    </div><!-- end col -->
-                                                                    <div class="col-xl-6 col-sm-7">
-                                                                        <div class="row align-items-center">
-                                                                            <div class="col-xl-5 col-md-6 col-sm-5">
-                                                                                <div
-                                                                                    class="avatar-group mt-3 mt-xl-0 task-assigne">
-                                                                                    <div class="avatar-group-item">
-                                                                                        <a href="javascript: void(0);"
-                                                                                            class="d-inline-block"
-                                                                                            data-bs-toggle="tooltip"
-                                                                                            value="member-2"
-                                                                                            data-bs-placement="top"
-                                                                                            title="{{$user->name}}">
-                                                                                            <img src="assets/images/users/avatar-2.jpg"
-                                                                                                alt=""
-                                                                                                class="rounded-circle avatar-sm">
-                                                                                        </a>
+                                                @forelse ($projecttasks as $task )    
+                                                    <div class="task-list-box" data-project-id="{{ $task->project_id }}" data-progress="{{ $task->progress }}" id="landing-task">
+                                                        <div id="task-item-1">
+                                                            <div class="card list-group-item rounded-3">
+                                                                <div class="card-body">
+                                                                    <div class="row align-items-center">
+                                                                        <div class="col-xl-6 col-sm-5">
+                                                                            <div class="checklist form-check font-size-15">
+                                                                                <input type="checkbox" class="form-check-input"
+                                                                                    id="customCheck1">
+                                                                                <label class="form-check-label ms-1 task-title"
+                                                                                    for="customCheck1">{{$task->name}}</label>
+                                                                            </div>
+                                                                        </div><!-- end col -->
+                                                                        <div class="col-xl-6 col-sm-7">
+                                                                            <div class="row align-items-center">
+                                                                                <div class="col-xl-5 col-md-6 col-sm-5">
+                                                                                    <div
+                                                                                        class="avatar-group mt-3 mt-xl-0 task-assigne">
+                                                                                        <div class="avatar-group-item">
+                                                                                            <a href="javascript: void(0);"
+                                                                                                class="d-inline-block"
+                                                                                                data-bs-toggle="tooltip"
+                                                                                                value="member-2"
+                                                                                                data-bs-placement="top"
+                                                                                                title="{{$user->name}}">
+                                                                                                <img src="assets/images/users/avatar-2.jpg"
+                                                                                                    alt=""
+                                                                                                    class="rounded-circle avatar-sm">
+                                                                                            </a>
+                                                                                        </div>
+                                                                                    </div><!-- end avatar group -->
+                                                                                </div><!-- end col -->
+                                                                                <div class="col-xl-7 col-md-6 col-sm-7">
+                                                                                    <div
+                                                                                        class="d-flex flex-wrap gap-3 mt-3 mt-xl-0 justify-content-md-end">
+                                                                                        <div>
+                                                                                            <span
+                                                                                                class="badge rounded-pill badge-soft-warning font-size-11 task-status">{{$task->status}}</span>
+                                                                                        </div>
+                                                                                        <div>
+                                                                                            <a href="#"
+                                                                                                class="mb-0 text-muted fw-medium"><i
+                                                                                                    class="mdi mdi-checkbox-marked-circle-outline me-1"></i>4/8
+                                                                                            </a>
+                                                                                        </div>
+                                                                                        <div>
+                                                                                            <a href="#"
+                                                                                                class="mb-0 text-muted fw-medium"
+                                                                                                data-bs-toggle="modal"
+                                                                                                data-bs-target=".bs-example-new-task"><i
+                                                                                                    class="mdi mdi-square-edit-outline font-size-16 align-middle"
+                                                                                                    onclick="editTask('task-item-1')"></i></a>
+                                                                                        </div>
+                                                                                        <div>
+                                                                                            <a href="#" class="delete-item"
+                                                                                                onclick="deleteProjects('task-item-1')">
+                                                                                                <i
+                                                                                                    class="mdi mdi-trash-can-outline align-middle font-size-16 text-danger"></i>
+                                                                                            </a>
+                                                                                        </div>
                                                                                     </div>
-                                                                                </div><!-- end avatar group -->
-                                                                            </div><!-- end col -->
-                                                                            <div class="col-xl-7 col-md-6 col-sm-7">
-                                                                                <div
-                                                                                    class="d-flex flex-wrap gap-3 mt-3 mt-xl-0 justify-content-md-end">
-                                                                                    <div>
-                                                                                        <span
-                                                                                            class="badge rounded-pill badge-soft-warning font-size-11 task-status">{{$task->status}}</span>
-                                                                                    </div>
-                                                                                    <div>
-                                                                                        <a href="#"
-                                                                                            class="mb-0 text-muted fw-medium"><i
-                                                                                                class="mdi mdi-checkbox-marked-circle-outline me-1"></i>4/8
-                                                                                        </a>
-                                                                                    </div>
-                                                                                    <div>
-                                                                                        <a href="#"
-                                                                                            class="mb-0 text-muted fw-medium"
-                                                                                            data-bs-toggle="modal"
-                                                                                            data-bs-target=".bs-example-new-task"><i
-                                                                                                class="mdi mdi-square-edit-outline font-size-16 align-middle"
-                                                                                                onclick="editTask('task-item-1')"></i></a>
-                                                                                    </div>
-                                                                                    <div>
-                                                                                        <a href="#" class="delete-item"
-                                                                                            onclick="deleteProjects('task-item-1')">
-                                                                                            <i
-                                                                                                class="mdi mdi-trash-can-outline align-middle font-size-16 text-danger"></i>
-                                                                                        </a>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div><!-- end col -->
-                                                                        </div><!-- end row -->
-                                                                    </div><!-- end col -->
-                                                                </div><!-- end row -->
-                                                            </div><!-- end cardbody -->
-                                                        </div><!-- end card -->
+                                                                                </div><!-- end col -->
+                                                                            </div><!-- end row -->
+                                                                        </div><!-- end col -->
+                                                                    </div><!-- end row -->
+                                                                </div><!-- end cardbody -->
+                                                            </div><!-- end card -->
+                                                        </div>
+                                                    </div><!-- end -->
+                                                @empty
+                                                    <div class="alert alert-warning">
+                                                        Empty
                                                     </div>
-                                                </div><!-- end -->
-                                                @endforeach
+                                                @endforelse
 
                                             </div><!-- end col -->
                                         </div><!-- end row -->
                                     </div><!-- end tab pane -->
-    
                                     <div class="tab-pane" id="team-tab" role="tabpanel">
                                         <h4 class="card-title mb-4">Team</h4>
                                         <div class="row">
-                                            @foreach ($groupMessages as $groupMessage)
-                                                
-                                            <div class="col-xl-4 col-md-6" id="team-1">
-                                                <div class="card">
-                                                    <div class="card-body">
-                                                        <div class="d-flex mb-4">
-                                                            <div class="flex-grow-1 align-items-start">
-                                                                <div class="avatar-group float-start flex-grow-1">
-                                                                    @foreach ($groupMessage->members->unique('id') as $member)
-                                                                        <div class="avatar-group-item">
-                                                                            <a href="javascript: void(0);"
-                                                                            class="d-inline-block" data-bs-toggle="tooltip"
-                                                                            data-bs-placement="top" title=""
-                                                                            data-bs-original-title="{{ $member->name }}">
-                                                                                <img src="assets/images/users/avatar-6.jpg"
-                                                                                    alt="" class="rounded-circle avatar-sm">
-                                                                            </a>
-                                                                        </div>
-                                                                    @endforeach
-                                                                </div><!-- end avatar group -->
-                                                            </div>
-                                                            <div class="dropdown ms-2">
-                                                                <a href="#" class="dropdown-toggle font-size-16 text-muted"
-                                                                    data-bs-toggle="dropdown" aria-haspopup="true"
-                                                                    aria-expanded="false">
-                                                                    <i class="mdi mdi-dots-horizontal"></i>
-                                                                </a>
-    
-                                                                <div class="dropdown-menu dropdown-menu-end">
-                                                                    <a class="dropdown-item"
-                                                                    href="{{route('conversations')}}">Go to chat</a>
-                                                                    {{-- <div class="dropdown-divider"></div> --}}
-                                                                    {{-- <a class="dropdown-item text-danger leave-team"
-                                                                    data-id="1" data-bs-toggle="modal"
-                                                                    data-bs-target=".bs-add-leave-team"
-                                                                    href="javascript: void(0);">
-                                                                    Leave Team</a> --}}
+                                            @forelse ($groupMessages as $groupMessage)    
+                                                <div class="col-xl-4 col-md-6" id="team-1">
+                                                    <div class="card">
+                                                        <div class="card-body">
+                                                            <div class="d-flex mb-4">
+                                                                <div class="flex-grow-1 align-items-start">
+                                                                    <div class="avatar-group float-start flex-grow-1">
+                                                                        @forelse ($groupMessage->members->unique('id') as $member)
+                                                                            <div class="avatar-group-item">
+                                                                                <a href="javascript: void(0);"
+                                                                                class="d-inline-block" data-bs-toggle="tooltip"
+                                                                                data-bs-placement="top" title=""
+                                                                                data-bs-original-title="{{ $member->name }}">
+                                                                                    <img src="assets/images/users/avatar-6.jpg"
+                                                                                        alt="" class="rounded-circle avatar-sm">
+                                                                                </a>
+                                                                            </div>
+                                                                        @empty
+                                                                            <div class="alert alert-warning">
+                                                                                Empty
+                                                                            </div>
+                                                                        @endforelse
+                                                                    </div><!-- end avatar group -->
                                                                 </div>
-                                                            </div><!-- end dropdown -->
-                                                        </div>
-                                                        <div>
-                                                            <h5 class="mb-1 font-size-17">{{$groupMessage->name}}</h5>
-                                                            {{-- <p class="text-muted  font-size-13 mb-0">4 Projects</p> --}}
-                                                        </div>
-                                                    </div><!-- end card-body -->
-                                                </div><!-- end card -->
-                                            </div><!-- end col -->
-                                            @endforeach
+                                                                <div class="dropdown ms-2">
+                                                                    <a href="#" class="dropdown-toggle font-size-16 text-muted"
+                                                                        data-bs-toggle="dropdown" aria-haspopup="true"
+                                                                        aria-expanded="false">
+                                                                        <i class="mdi mdi-dots-horizontal"></i>
+                                                                    </a>
+        
+                                                                    <div class="dropdown-menu dropdown-menu-end">
+                                                                        <a class="dropdown-item"
+                                                                        href="{{route('conversations')}}">Go to chat</a>
+                                                                        {{-- <div class="dropdown-divider"></div> --}}
+                                                                        {{-- <a class="dropdown-item text-danger leave-team"
+                                                                        data-id="1" data-bs-toggle="modal"
+                                                                        data-bs-target=".bs-add-leave-team"
+                                                                        href="javascript: void(0);">
+                                                                        Leave Team</a> --}}
+                                                                    </div>
+                                                                </div><!-- end dropdown -->
+                                                            </div>
+                                                            <div>
+                                                                <h5 class="mb-1 font-size-17">{{$groupMessage->name}}</h5>
+                                                                {{-- <p class="text-muted  font-size-13 mb-0">4 Projects</p> --}}
+                                                            </div>
+                                                        </div><!-- end card-body -->
+                                                    </div><!-- end card -->
+                                                </div><!-- end col -->
+                                            @empty
+                                                <div class="alert alert-warning">
+                                                    Empty
+                                                </div>
+                                            @endforelse
                                         </div><!-- end row -->
                                     </div><!-- end tab pane -->
                                 </div>
@@ -330,7 +341,7 @@
                             <div class="card">
                                 <h5 class="mx-4 mt-4">Lastest posts</h5>
                                 <div class="card-body scrollable-posts">
-                                    @foreach ($posts as $post)
+                                    @forelse ($posts as $post)
                                             <div class="col-sm-12 mb-4 shadow-lg">
                                                 <!-- Header du post : avatar, auteur, date -->
                                                 <div class="d-flex align-items-center mb-3">
@@ -402,7 +413,7 @@
                                                         
                                                         <!-- Affichage des commentaires existants avec un conteneur défilable -->
                                                         <div class="comment-section" style="max-height: 200px; overflow-y: auto;">
-                                                            @foreach ($post->comments as $comment)
+                                                            @forelse ($post->comments as $comment)
                                                             <div class="d-flex align-items-center mb-2">
                                                                 <img src="{{ asset('assets/images/small/img-4.png') }}" alt="Comment Author Avatar" class="rounded-circle me-2" width="30" height="30">
                                                                 <div class="bg-light rounded p-2 w-100">
@@ -411,12 +422,20 @@
                                                                     <small class="text-muted">{{ $comment->created_at->diffForHumans() }}</small>
                                                                 </div>
                                                             </div>
-                                                            @endforeach
+                                                            @empty
+                                                                <div class="alert alert-warning">
+                                                                    Empty
+                                                                </div>
+                                                            @endforelse
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                    @endforeach
+                                            @empty
+                                                <div class="alert alert-warning">
+                                                    Empty
+                                                </div>
+                                            @endforelse
                                 </div><!-- end cardbody -->
                             </div><!-- end card -->
                         </div><!-- end col -->

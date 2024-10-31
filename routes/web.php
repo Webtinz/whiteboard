@@ -83,7 +83,7 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 // Route::middleware(['auth', 'role:platform_master|platform_users_management'])->group(function () {
-    Route::resource('/admin_users', PlateformUserController::class);
+    Route::resource('/admin_users', PlatformUserController::class);
 // });
 
 Route::middleware('auth')->group(function () {
