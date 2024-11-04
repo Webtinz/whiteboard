@@ -10,13 +10,21 @@ class ProjectTask extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name',
-        'description',
-        'progress',
-        'project_id',
-        'etat_id',
-        'end_date'
+        'name', 'description', 'estimate_time','real_time','start_date', 'end_date', 'progress', 
+        'project_id', 'etat_id', 'parent_id', 'type'
     ];
+
+    // Relation vers la tâche parente
+    public function parent()
+    {
+        return $this->belongsTo(ProjectTask::class, 'parent_id');
+    }
+
+    // Relation vers les sous-tâches
+    public function children()
+    {
+        return $this->hasMany(ProjectTask::class, 'parent_id');
+    }
 
     /**
      * Relation avec le modèle Etat.

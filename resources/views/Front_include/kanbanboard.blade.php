@@ -1,5 +1,7 @@
 @extends('layouts.dashboardlayout')
 @section('links')
+<!-- CSS de Select2 -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
 @endsection
 @section('content')
 <div class="main-content">
@@ -121,7 +123,16 @@
                                                                         <i class="mdi mdi-dots-horizontal"></i>
                                                                     </a>
                                                                     <div class="dropdown-menu dropdown-menu-end">
-                                                                        <a class="dropdown-item edit-task-btn" data-bs-toggle="modal" href="#" data-id="{{ $task->id }}" data-name="{{ $task->name }}" data-description="{{ $task->description }}" data-progress="{{ $task->progress }}" data-end-date="{{ $task->end_date }}" data-assigned-members="{{ json_encode($task->users->pluck('id')->toArray()) }}">Edit</a>
+                                                                        <a class="dropdown-item edit-task-btn" data-bs-toggle="modal" href="#" data-id="{{ $task->id }}"
+                                                                            data-name="{{ $task->name }}"
+                                                                            data-description="{{ $task->description }}"
+                                                                            data-progress="{{ $task->progress }}"
+                                                                            data-end_date="{{ $task->real_time }}"
+                                                                            data-estimate_date="{{ $task->estimate_time }}"
+                                                                            {{-- data-status="{{ $task->status }}" --}}
+                                                                            data-type="{{ $task->type }}"
+                                                                            data-parent-id="{{ $task->parent_id }}"
+                                                                            data-assigned-members="{{ json_encode($task->users) }}">Edit</a>
                                                                         <a class="dropdown-item delete-itemt" href="#" data-id="{{ $task->id }}">Remove</a>
                                                                         
                                                                         <!-- Menu pour déplacer la tâche -->
@@ -516,76 +527,42 @@
                             <label for="editTaskDescription" class="form-label">Description</label>
                             <textarea class="form-control" id="editTaskDescription" name="description" rows="3" required></textarea>
                         </div>
-
+    
+                        <div class="mb-3">
+                            <label for="editEstimateDate" class="form-label">Estimate Time</label>
+                            <input type="number" step="0.01" class="form-control" id="editEstimateDate" name="estimate_time" required>
+                        </div>
+    
+                        <div class="mb-3">
+                            <label for="editTaskEndDate" class="form-label">Real Time</label>
+                            <input type="number" step="0.01" class="form-control" id="editTaskEndDate" name="real_time" required>
+                        </div>
+    
                         <div class="mb-3">
                             <label for="editTaskProgress" class="form-label">Progress</label>
                             <input type="number" class="form-control" id="editTaskProgress" name="progress" max="100" required>
                         </div>
-
+    
                         <div class="mb-3">
-                            <label for="editTaskEndDate" class="form-label">End Date</label>
-                            <input type="date" class="form-control" id="editTaskEndDate" name="end_date" required>
+                            <label for="editTaskType" class="form-label">Task Type</label>
+                            <select id="editTaskType" name="type" class="form-control" required>
+                                <option value="epic">Epic</option>
+                                <option value="feature">Feature</option>
+                                <option value="user_story">User Story</option>
+                                <option value="simple_task">Simple Task</option>
+                            </select>
                         </div>
-                        <div class="pt-2">
-                            <p class="fw-medium mb-3">Assign Team Members</p>
-                            <ul class="list-unstyled user-list validate mt-2" id="taskassignee" data-simplebar style="max-height: 160px;">
-                                @foreach ($users as $user)
-                                    <li>
-                                        <div class="form-check form-check-primary mb-2 font-size-16 d-flex align-items-center">
-                                            <input class="form-check-input me-3" type="checkbox" id="member-{{ $user->id }}" name="assigned_members[]" value="{{ $user->id }}">
-                                            <img src="{{ asset('assets/images/users/avatar-' . $user->id . '.jpg') }}" class="rounded-circle avatar-sm" alt="">
-                                            <label class="form-check-label font-size-14 mb-0 ms-3" for="member-{{ $user->id }}">{{ $user->name }}</label>
-                                        </div>
-                                    </li>
+    
+                        <div class="mb-3">
+                            <label for="editParentTask" class="form-label">Parent Task</label>
+                            <select id="editParentTask" name="parent_id" class="form-control select2">
+                                <option value="">None</option>
+                                @foreach ($projecttasks as $task)
+                                    <option value="{{ $task->id }}">{{ $task->name }} ({{ $task->type }})</option>
                                 @endforeach
-                            </ul>
+                            </select>
                         </div>
-
-                        <input type="hidden" id="editTaskId" name="task_id">
-                        
-                        <div class="modal-footer">
-                            <button type="submit" class="btn btn-primary">Save changes</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    <!-- KanbanBoard Card Edit Modal -->
-    <div class="modal fade bs-task-details-edit" tabindex="-1" role="dialog" id="modalForm" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-scrollable">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title mt-0 add-task-title" id="add-task-title">Add New Task</h5>
-                    <h5 class="modal-title mt-0 update-task-title" id="update-task-title" style="display: none;">
-                        Update Task</h5>
-                    <button type="button" id="update-task" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="NewtaskForm" method="POST" action="{{ route('projecttasks.store') }}">
-                        @csrf
-                        <div class="mb-3">
-                            <label for="taskname" class="form-label">Name</label>
-                            <input id="taskname" name="title" type="text" class="form-control validate" placeholder="Enter Task Name..." required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="taskdesc" class="form-label">Description</label>
-                            <textarea id="taskdesc" class="form-control" name="description" placeholder="Add Description" required></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label for="task-due-date" class="form-label">Due Date</label>
-                            <input class="form-control" type="date" name='end_date' value="2021-09-20" id="task-due-date"
-                                required>
-                        </div><!-- end -->
-                        <div class="mb-3">
-                            <label for="taskprogressbar" class="form-label">Progress</label>
-                            <input id="taskprogressbar" name="progress" type="number" class="form-control validate" placeholder="Enter Progress Bar Number..." required>
-                        </div>
-                        <input id="taskprogressbar" name="etat_id" value="{{$etat->id}}" type="number" class="form-control validate" placeholder="Enter Progress Bar Number..."hidden>
-                        <input id="taskprogressbar" name="project_id" value="{{$projectChoose->id}}" type="number" class="form-control validate" placeholder="Enter Progress Bar Number..."hidden>
-            
+    
                         <div class="pt-2">
                             <p class="fw-medium mb-3">Assign Team Members</p>
                             <ul class="list-unstyled user-list validate mt-2" id="taskassignee" data-simplebar style="max-height: 160px;">
@@ -601,12 +578,104 @@
                             </ul>
                         </div>
     
+                        <input type="hidden" id="editTaskId" name="task_id">
+                        
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>    
+
+
+    <!-- KanbanBoard Card Edit Modal -->
+    <div class="modal fade bs-task-details-edit" tabindex="-1" role="dialog" id="modalForm" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title mt-0 add-task-title" id="add-task-title">Add New Task</h5>
+                    <h5 class="modal-title mt-0 update-task-title" id="update-task-title" style="display: none;">
+                        Update Task</h5>
+                    <button type="button" id="update-task" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="NewtaskForm" method="POST" action="{{ route('projecttasks.store') }}">
+                        @csrf
+                        <!-- Nom de la tâche -->
+                        <div class="mb-3">
+                            <label for="taskname" class="form-label">Name</label>
+                            <input id="taskname" name="name" type="text" class="form-control" placeholder="Enter Task Name..." required>
+                        </div>
+                    
+                        <!-- Description de la tâche -->
+                        <div class="mb-3">
+                            <label for="taskdesc" class="form-label">Description</label>
+                            <textarea id="taskdesc" class="form-control" name="description" placeholder="Add Description" required></textarea>
+                        </div>
+                    
+                        <!-- Date d'estimation -->
+                        <div class="mb-3">
+                            <label for="estimate_date" class="form-label">Estimate Time</label>
+                            <input class="form-control" type="number" name="estimate_time" id="estimate_date" step="0.01" required>
+                        </div>
+                        
+                        <!-- Date de fin -->
+                        <div class="mb-3">
+                            <label for="task-due-date" class="form-label">Real Time</label>
+                            <input class="form-control" type="number" name="real_time" id="task-due-date" step="0.01" required>
+                        </div>                        
+                    
+                        <!-- Progression -->
+                        <div class="mb-3">
+                            <label for="taskprogressbar" class="form-label">Progress</label>
+                            <input id="taskprogressbar" name="progress" type="number" class="form-control" placeholder="Enter Progress..." required>
+                        </div>
+                    
+                        <!-- Type de tâche -->
+                        <div class="mb-3">
+                            <label for="tasktype" class="form-label">Task Type</label>
+                            <select id="tasktype" name="type" class="form-control" required>
+                                <option value="epic">Epic</option>
+                                <option value="feature">Feature</option>
+                                <option value="user_story">User Story</option>
+                                <option value="simple_task">Simple Task</option>
+                            </select>
+                        </div>
+                    
+                        <!-- Tâche parente avec recherche -->
+                        <div class="mb-3">
+                            <label for="parenttask" class="form-label">Parent Task</label>
+                            <select id="parenttask" name="parent_id" class="form-control select2">
+                                <option value="">None</option>
+                                @foreach ($projecttasks as $task)
+                                    <option value="{{ $task->id }}">{{ $task->name }} ({{ $task->type }})</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    
+                        <!-- Projet et État cachés -->
+                        <input type="hidden" name="etat_id" value="{{ $etat->id }}">
+                        <input type="hidden" name="project_id" value="{{ $projectChoose->id }}">
+                    
+                        <!-- Membres assignés avec recherche -->
+                        <div class="mb-3">
+                            <label for="taskassignee" class="form-label">Assign Team Members</label>
+                            <select id="taskassignee" name="assigned_members[]" class="form-control select2" multiple>
+                                @foreach ($users as $user)
+                                    <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    
+                        <!-- Bouton de soumission -->
                         <div class="row mt-4">
                             <div class="col-lg-10">
                                 <button type="submit" class="btn btn-primary addtask" id="addtask">Create Task</button>
                             </div>
                         </div>
-                    </form>
+                    </form>                                        
                 </div>
             </div>
         </div>
@@ -1064,7 +1133,8 @@ taskModal.addEventListener('show.bs.modal', function (event) {
             },
             error: function(response) {
                 // Gérer les erreurs
-                alert('An error occurred while creating the task.');
+                console.log(response);
+                alert(response);
             }
         });
     });
@@ -1129,42 +1199,59 @@ taskModal.addEventListener('show.bs.modal', function (event) {
     });
 </script>
 <script>
-$(document).on('click', '.edit-task-btn', function (e) {
-    e.preventDefault();
-
-    // Récupère les informations de la tâche à partir des attributs data-*
-    var taskId = $(this).data('id');
-    var taskName = $(this).data('name');
-    var taskDescription = $(this).data('description');
-    var taskProgress = $(this).data('progress');
-    var taskEndDate = $(this).data('end-date');
-    var assignedMembers = $(this).data('assigned-members'); // Tableau des membres assignés
-
-    // Remplir les champs du formulaire
-    $('#editTaskId').val(taskId);
-    $('#editTaskName').val(taskName);
-    $('#editTaskDescription').val(taskDescription);
-    $('#editTaskProgress').val(taskProgress);
-    $('#editTaskEndDate').val(taskEndDate);
-
-    // Réinitialiser toutes les cases à cocher
-    $('#taskassignee input[type="checkbox"]').prop('checked', false);
-
-    // Coche les cases des membres déjà assignés
-    if (assignedMembers && Array.isArray(assignedMembers)) {
-        assignedMembers.forEach(function (memberId) {
-            $('#member-' + memberId).prop('checked', true); // Coche la case correspondant au membre
+    $(document).on('click', '.edit-task-btn', function (e) {
+        e.preventDefault();
+    
+        // Récupère les informations de la tâche à partir des attributs data-*
+        var taskId = $(this).data('id');
+        var taskName = $(this).data('name');
+        var taskDescription = $(this).data('description');
+        var taskProgress = $(this).data('progress');
+        var taskEndDate = $(this).data('end_date');
+        var taskEstimateDate = $(this).data('estimate_date'); // Nouvelle donnée pour estimate_date
+        // var taskStatus = $(this).data('status'); // Nouvelle donnée pour status
+        var taskType = $(this).data('type'); // Nouvelle donnée pour type
+        var taskParentId = $(this).data('parent-id'); // Nouvelle donnée pour parent_id
+        var assignedMembers = $(this).data('assigned-members'); // Tableau des membres assignés
+    
+        // Remplir les champs du formulaire
+        $('#editTaskId').val(taskId);
+        $('#editTaskName').val(taskName);
+        $('#editTaskDescription').val(taskDescription);
+        $('#editTaskProgress').val(taskProgress);
+        $('#editTaskEndDate').val(taskEndDate);
+        $('#editEstimateDate').val(taskEstimateDate); // Remplir estimate_date
+        // $('#editTaskStatus').val(taskStatus); // Remplir status
+        $('#editTaskType').val(taskType); // Remplir type
+        $('#editParentTask').val(taskParentId); // Remplir parent_id
+    
+        // Réinitialiser toutes les cases à cocher
+        $('#taskassignee input[type="checkbox"]').prop('checked', false);
+        // Coche les cases des membres déjà assignés
+        if (assignedMembers && Array.isArray(assignedMembers)) {
+            assignedMembers.forEach(function (memberId) {
+                $('#member-' + memberId.id).prop('checked', true); // Coche la case correspondant au membre
+            });
+        }
+    
+        // Définir l'action du formulaire avec l'URL de la tâche
+        $('#editTaskForm').attr('action', '/projecttasks/' + taskId);
+    
+        // Affiche le modal d'édition
+        $('#editTaskModal').modal('show');
+    });
+</script>    
+<script>
+    $(document).ready(function() {
+        // Initialiser Select2 sur les champs avec la classe 'select2'
+        $('.select2').select2({
+            placeholder: "Select an option",
+            allowClear: true
         });
-    }
-
-    // Définir l'action du formulaire avec l'URL de la tâche
-    $('#editTaskForm').attr('action', '/projecttasks/' + taskId);
-
-    // Affiche le modal d'édition
-    $('#editTaskModal').modal('show');
-});
-
+    });
 </script>
+<!-- JavaScript de Select2 -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 @endsection

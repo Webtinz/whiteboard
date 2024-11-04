@@ -59,6 +59,9 @@ Route::get('/signup', function () {
     return view('Front_include.signup');
 })->name('signup');
 
+Route::get('/search/users', [ProjectTaskController::class, 'searchUsers'])->name('users.search');
+Route::get('/search/tasks', [ProjectTaskController::class, 'searchTasks'])->name('tasks.search');
+
 // // Récupérer toutes les conversations (directes et groupes) pour l'utilisateur connecté
 // Route::get('user/conversations', [MessageController::class, 'getUserConversations']);
 
