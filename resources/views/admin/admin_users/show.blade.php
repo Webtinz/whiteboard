@@ -174,27 +174,62 @@
                                         {{-- <th scope="col">Rights</th> --}}
                                         <th scope="col">Name</th>
                                         <th scope="col">Email</th>
-                                        <th scope="col">Country</th>
-                                        <th scope="col">Agency Type</th>
-                                        <th scope="col"></th>
+                                        <th scope="col">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach ($create_user as $userc)
-                                        <tr>
-                                            <a href="{{ route('users.show', $user->id) }}">
+                                            <tr>
                                                 <td>{{ $loop->iteration }}</td>
                                                 <td>{{ $userc->name }}</td>
                                                 <td>{{ $userc->email }}</td>
+                                                {{-- <td>
+                                                    <a href="{{ route('admin_users.show', $userc->id) }}">
+                                                        {{ $userc->name }}
+                                                    </a>
+                                                </td> --}}
 
                                                 <td>
-                                                    {{ $userc->country }}
+                                                    <a href="{{ route('admin_users.show', $userc->id) }}" class="btn btn-warning btn-sm"><i
+                                                            class="fas fa-eye"></i></a>
+                                                    @if (Auth::user()->hasDirectPermission('edit_platform_user'))
+                                                        <a href="{{ route('admin_users.edit', $userc->id) }}"
+                                                            class="btn btn-primary btn-sm"><i class="fas fa-edit"></i></a>
+                                                    @endif
+    
+                                                    @if (Auth::user()->hasDirectPermission('delete_platform_user'))
+                                                        <button type="submit" class="btn btn-danger btn-sm" data-bs-toggle="modal"
+                                                            data-bs-target="#exampleModal"><i class="fas fa-trash-alt"></i></i></button>
+                                                    @endif
                                                 </td>
-                                                <td>
-                                                    {{ $userc->agency_type }}
-                                                </td>
-                                            </a>
-                                        </tr>
+                                                <!-- Modal -->
+                                                <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+                                                    aria-hidden="true">
+                                                    <div class="modal-dialog">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                                    aria-label="Close"></button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                Do you really want to remove this platform user ?
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <form action="{{ route('admin_users.destroy', $user->id) }}" method="POST"
+                                                                    style="display: inline-block;">
+                                                                    @csrf
+                                                                    @method('DELETE')
+                                                                    <button type="submit" class="btn btn-danger " data-bs-toggle="modal"
+                                                                        data-bs-target="#exampleModal">Confirm</button>
+                                                                </form>
+                                                                <button type="button" class="btn btn-success"
+                                                                    data-bs-dismiss="modal">Close</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </tr>
                                     @endforeach
                                 </tbody>
                             </table>
