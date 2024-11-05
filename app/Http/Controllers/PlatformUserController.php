@@ -18,9 +18,9 @@ class PlatformUserController extends Controller
     public function index()
     {
         $roles = Role::all();
-        $admin_users = User::where('user_type','platform user')
-        ->orderBy('id', 'desc')
-        ->paginate(10);
+        $admin_users = User::all(); //where('user_type','platform user')
+       // ->orderBy('id', 'desc')
+        // ->paginate(10);
         return view("admin.admin_users.index", compact("admin_users"));
     }
 
@@ -46,12 +46,13 @@ class PlatformUserController extends Controller
                 "name"=> 'required|max:50',
                 "email" => 'required|max:50|email|unique:users,email',
                 "password"=> 'required',
-                'user_type' => 'required|string|in:platform user,platform master,sales manager,sales rep',
+                'user_type' => 'required|string|in:platform user,platform master,internal,external',
                 'roles' => 'array',
                 'roles.*' => 'exists:roles,id',
                 'permissions' => 'array',
                 'permissions.*' => 'exists:permissions,id',  
             ]) ;
+
             if ($validated) {
                 $validated['created_by'] = Auth::id();
                 $user = User::create([
@@ -67,7 +68,7 @@ class PlatformUserController extends Controller
             ->with('error', 'Error : '.$e->getMessage());
         }
         // dd($validated);
-        
+                
         if ($request->user_type == 'platform user') {
             // Fetch role objects based on the submitted IDs
             $roles = Role::whereIn('id', $request->roles)->get();
@@ -82,20 +83,21 @@ class PlatformUserController extends Controller
                 // Assign permissions using the permission objects
                 $user->givePermissionTo($permissions);
             }
-        }elseif ($request->user_type == 'sales manager') {
-            $query_start = 'leads';
-            $defaultRoles = Role::where('name', 'LIKE', "%{$query_start}%")->get();
-            $permissions = Permission::where('name','LIKE', "{$query_start}%" )
-            ->where('name', 'edit_profile')->get();
-            $user->assignRole($defaultRoles);
-            $user->givePermissionTo($permissions);
-        }elseif ($request->user_type == 'sales rep') {
-            $query_start = 'leads';
-            $defaultRoles = Role::where('name', 'LIKE', "%{$query_start}%")->get();
-            $permissions = Permission::where('name','LIKE', "{$query_start}%" )
-            ->where('name', 'edit_profile')->get();
-            $user->assignRole($defaultRoles);
-            $user->givePermissionTo($permissions);
+        }
+        elseif ($request->user_type == 'internal' || $request->user_type == 'external') {
+            // Fetch role objects based on the submitted IDs
+            $roles = Role::whereIn('id', $request->roles)->get();
+            
+            // Assign roles using the role objects
+            $user->assignRole($roles);
+
+            if ($request->has('permissions')) {
+                // Fetch permission objects based on the submitted IDs
+                $permissions = Permission::whereIn('id', $request->permissions)->get();
+                
+                // Assign permissions using the permission objects
+                $user->givePermissionTo($permissions);
+            }
         }
         else {
             //Give platform roles and permissions
@@ -146,45 +148,67 @@ class PlatformUserController extends Controller
     {
         $user = User::findOrFail($id);
         // dd($user->getPermissionNames());
-        $validateData = $request->validate([
-            "name"=> 'max:50',
-            "email" => 'max:50|email',
-            'user_type' => 'string|in:platform user,platform master',
-            'roles' => 'array',
-            'permissions' => 'array|exists:permissions,id',
-            "password"=> ''
-        ]) ;
-
+        try {
+            $validateData = $request->validate([
+                "name"=> 'max:50',
+                "email" => 'max:50|email',
+                'user_type' => 'string|in:platform user,platform master,internal,external',
+                'roles' => 'array',
+                'permissions' => 'array|exists:permissions,id',
+                "password"=> ''
+            ]) ;
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error : '.$e->getMessage());
+        }
+    
         
         DB::beginTransaction();
+        // dd($validateData);
 
-        if ($validateData["password"] != "") {
-            try {
-                $user->update([
-                    'name'=> $request->name,
-                    'email'=> $request->email,
-                    'user_type'=> $request->user_type,
-                    'created_by'=>  Auth::id(),
-                ]);
-            }
-            catch (\Exception $e) {
-                return back()->with('error', 'An error occurred while updating the user: ' . $e->getMessage());
-            }
-        }else{
+        // if ($validateData["password"] != "") {
+        //     try {
+        //         $update = $user->update([
+        //             'name'=> $request->name,
+        //             'email'=> $request->email,
+        //             'user_type'=> $request->user_type,
+        //             'created_by'=>  Auth::id(),
+        //         ]);
+        
+        //     }
+        //     catch (\Exception $e) {
+        //         return back()->with('error', 'An error occurred while updating the user: ' . $e->getMessage());
+        //     }
+        // }else{
             
-            try {
-                $user->update([
-                    'name'=> $request->name,
-                    'email'=> $request->email,
-                    'user_type'=> $request->user_type,
-                    'created_by'=>  Auth::id(),
-                ]);
-            }
-            catch (\Exception $e) {
-                return back()->with('error', 'An error occurred while updating the user: ' . $e->getMessage());
-            }
+        //     try {
+        //         $user->update([
+        //             'name'=> $request->name,
+        //             'email'=> $request->email,
+        //             'user_type'=> $request->user_type,
+        //             'created_by'=>  Auth::id(),
+        //         ]);
+        //     }
+        //     catch (\Exception $e) {
+        //         return back()->with('error', 'An error occurred while updating the user: ' . $e->getMessage());
+        //     }
+        // }
+        $updateData = [
+            'name' => $request->name,
+            'email' => $request->email,
+            'user_type' => $request->user_type,
+            'created_by' => Auth::id(),
+        ];
+        
+        // Ajoute le mot de passe uniquement s'il est présent
+        if (!empty($validateData["password"])) {
+            $updateData['password'] = bcrypt($validateData["password"]);
         }
         
+        try {
+            $user->update($updateData);
+        } catch (\Exception $e) {
+            return back()->with('error', 'An error occurred while updating the user: ' . $e->getMessage());
+        }
             
         if($request->user_type == 'platform master') { 
             // Remove all roles and permissions for platform master
@@ -199,18 +223,29 @@ class PlatformUserController extends Controller
             DB::commit();
         }else {
  
-            $roles = Role::whereIn('id', $request->roles)->get();
-            $user->syncRoles($roles);
-            
-            $permissions = Permission::whereIn('id', $request->permissions)->get();
-            $user->syncPermissions($permissions);
-            
-            if ($request->has('permissions')) {
-                // Fetch permission objects based on the submitted IDs
-                // $permissions = Permission::whereIn('id', $request->permissions)->get();
+            if (!empty($request->roles)) {
+                $roles = Role::whereIn('id', $request->roles)->get();
+                $user->syncRoles($roles);
+            } else {
+                // Supprime tous les rôles si aucun rôle n'est sélectionné
+                $user->syncRoles([]);
+            }
+
+            if (!empty($request->permissions)) {
+                $permissions = Permission::whereIn('id', $request->permissions)->get();
                 $user->syncPermissions($permissions);
-                // dd($user->getRoleNames(),$user->getPermissionNames());
-            } 
+                
+                if ($request->has('permissions')) {
+                    // Fetch permission objects based on the submitted IDs
+                    // $permissions = Permission::whereIn('id', $request->permissions)->get();
+                    $user->syncPermissions($permissions);
+                    // dd($user->getRoleNames(),$user->getPermissionNames());
+                } 
+
+            }else {
+                // Supprime toutes les permissions si aucune permission n'est sélectionnée
+                $user->syncPermissions([]);
+            }
             DB::commit();
         }
         

@@ -18,6 +18,9 @@
 
     <!-- CSS -->
     <link href="{{ asset('asset/dist/css/style.css') }}" rel="stylesheet" type="text/css">
+    {{-- Assurez-vous d'avoir inclus les fichiers CSS et JS de Select2 dans votre page --}}
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
     {{-- <style>
         body {
             margin: 40px 10px;
@@ -31,6 +34,51 @@
             margin: 0 auto;
         }
     </style> --}}
+    <style>
+        /* Styles pour Select2 dans le modal */
+        .select2-container {
+            z-index: 1056 !important; /* Pour être sûr que le dropdown s'affiche au-dessus du modal */
+        }
+
+        .select2-dropdown {
+            z-index: 1056 !important;
+        }
+
+        .select2-container--default .select2-selection--multiple {
+            border-color: #dee2e6;
+            border-radius: 0.375rem;
+        }
+
+        .select2-container--default.select2-container--focus .select2-selection--multiple {
+            border-color: #86b7fe;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+
+        .user-tag .badge {
+            font-size: 0.9em;
+            padding: 0.5em 0.7em;
+        }
+
+        .user-tag .btn-close {
+            padding: 0.4em;
+            margin-top: -0.2em;
+            cursor: pointer;
+            opacity: 0.7;
+        }
+
+        .user-tag .btn-close:hover {
+            opacity: 1;
+        }
+
+        /* Style pour améliorer l'apparence dans Bootstrap */
+        .select2-container--default .select2-selection--multiple {
+            min-height: 38px;
+        }
+
+        .select2-container--default .select2-search--inline .select2-search__field {
+            margin-top: 7px;
+        }
+    </style>
 @endsection
 
 @section('content')
@@ -177,24 +225,24 @@
                                         <div class="col-sm-12">
                                             <label class="form-label">Public or Private: </label> <br>
                                             <div class="form-check form-check-inline">
-                                                <input class="form-check-input" type="radio" name="public_or_private" id="edit-public" value="public" checked>
+                                                <input class="form-check-input" type="radio" name="public_or_private" id="public" value="public" checked>
                                                 <label class="form-check-label" for="public">Public</label>
                                             </div>
                                             <div class="form-check form-check-inline">
-                                                <input class="form-check-input" type="radio" name="public_or_private" id="edit-private" value="private">
+                                                <input class="form-check-input" type="radio" name="public_or_private" id="private" value="private">
                                                 <label class="form-check-label" for="private">Private</label>
                                             </div>
                                         </div>
                                     </div>          
                                     
                                     <!-- Conteneur pour afficher les utilisateurs sélectionnés -->
-                                    <div id="edit-selected_users_container" class="mb-3"></div>
+                                    <div id="selected_users_container" class="mb-3"></div>
                                     
                                     <!-- Champ spécifique pour les utilisateurs privés -->
-                                    <div class="row gx-3" id="edit-specific_users_field" style="display:none;">
+                                    <div class="row gx-3" id="specific_users_field" style="display:none;">
                                         <div class="col-sm-12">
                                             <label class="form-label">Specific Users</label>
-                                            <select class="form-control" id="edit-specific_users" name="specific_users[]" multiple>
+                                            <select class="form-control" id="specific_users" name="specific_users[]" multiple>
                                                 @foreach($users as $user)
                                                     <option value="{{ $user->id }}">{{ $user->name }}</option>
                                                 @endforeach
@@ -427,6 +475,233 @@
     {{-- <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script> --}}
     <!-- jQuery -->
     <script src="{{ asset('asset/vendors/jquery/dist/jquery.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    {{-- Select 2 for event/task creation --}}
+    <script>
+        // S'assurer que Select2 est correctement initialisé après l'ouverture du modal
+        $(document).ready(function() {
+            // Initialiser Select2 lors de l'ouverture du modal
+            $('#create_new_event').on('shown.bs.modal', function () {
+                $('#specific_users').select2({
+                    placeholder: 'Rechercher un utilisateur...',
+                    allowClear: true,
+                    dropdownParent: $('#create_new_event'), // Important : attacher le dropdown au modal
+                    width: '100%', // Forcer la largeur à 100%
+                    language: {
+                        noResults: function() {
+                            return "Aucun utilisateur trouvé";
+                        }
+                    }
+                });
+            });
+
+            // Réinitialiser Select2 à la fermeture du modal
+            $('#create_new_event').on('hidden.bs.modal', function () {
+                $('#specific_users').select2('destroy');
+            });
+
+            // Gestion de l'affichage du champ specific_users selon le choix public/private
+            $('input[name="public_or_private"]').change(function() {
+                if ($(this).val() === 'private') {
+                    $('#specific_users_field').show();
+                    // Réinitialiser Select2 après l'affichage pour corriger le rendu
+                    $('#specific_users').select2('destroy').select2({
+                        placeholder: 'Rechercher un utilisateur...',
+                        allowClear: true,
+                        dropdownParent: $('#create_new_event'),
+                        width: '100%',
+                        language: {
+                            noResults: function() {
+                                return "Aucun utilisateur trouvé";
+                            }
+                        }
+                    });
+                } else {
+                    $('#specific_users_field').hide();
+                    $('#specific_users').val(null).trigger('change');
+                    $('#selected_users_container').empty();
+                }
+            });
+
+            // Gestion de l'affichage des utilisateurs sélectionnés
+            $('#specific_users').on('select2:select', function(e) {
+                const userId = e.params.data.id;
+                const userName = e.params.data.text;
+                addUserToContainer(userId, userName);
+            });
+
+            // Gestion de la suppression lors de la désélection dans Select2
+            $('#specific_users').on('select2:unselect', function(e) {
+                const userId = e.params.data.id;
+                removeUserFromContainer(userId);
+            });
+        });
+
+        // Fonction pour ajouter un utilisateur au conteneur
+        function addUserToContainer(userId, userName) {
+            const userTag = `
+                <div class="user-tag mb-2 me-2 d-inline-block" data-user-id="${userId}">
+                    <span class="badge bg-primary">
+                        ${userName}
+                        <button type="button" class="btn-close btn-close-white ms-2" 
+                            style="font-size: 0.5em;" 
+                            onclick="removeUser('${userId}')">
+                        </button>
+                    </span>
+                </div>
+            `;
+            $('#selected_users_container').append(userTag);
+        }
+
+        // Fonction pour supprimer un utilisateur
+        function removeUser(userId) {
+            // Supprime le tag
+            $(`.user-tag[data-user-id="${userId}"]`).remove();
+            
+            // Désélectionne l'option dans Select2
+            const option = $('#specific_users').find(`option[value="${userId}"]`);
+            option.prop('selected', false);
+            $('#specific_users').trigger('change');
+        }
+
+        // Fonction pour supprimer un utilisateur du conteneur
+        function removeUserFromContainer(userId) {
+            $(`.user-tag[data-user-id="${userId}"]`).remove();
+        }
+
+        // Style CSS à ajouter
+        const style = `
+        <style>
+            .select2-container {
+                z-index: 99999; /* S'assurer que le dropdown s'affiche au-dessus du modal */
+            }
+            
+            .user-tag .badge {
+                font-size: 0.9em;
+                padding: 0.5em 0.7em;
+            }
+            
+            .user-tag .btn-close {
+                padding: 0.4em;
+                margin-top: -0.2em;
+                cursor: pointer;
+                opacity: 0.7;
+            }
+            
+            .user-tag .btn-close:hover {
+                opacity: 1;
+            }
+
+            /* Correction pour l'affichage dans le modal */
+            .select2-dropdown {
+                z-index: 99999;
+            }
+        </style>
+        `;
+    </script>
+
+    {{-- Select 2 for event/task edition --}}
+    <script>
+        $(document).ready(function() {
+        // Initialiser Select2 lors de l'ouverture du modal d'édition
+        $('#edit_event_modal').on('shown.bs.modal', function () {
+            // Récupérer les utilisateurs sélectionnés depuis le serveur
+
+    // Initialiser Select2 lors de l'ouverture du modal d'édition
+    $('#edit_event_modal').on('shown.bs.modal', function () {
+        // Récupérer les utilisateurs sélectionnés depuis le serveur
+        let selectedUsers = JSON.parse('{{ $task->specific_users }}');
+
+        $('select[name="specific_usersd[]"]').select2({
+            placeholder: 'Rechercher un utilisateur...',
+            allowClear: true,
+            dropdownParent: $('#edit_event_modal'),
+            width: '100%',
+            language: {
+                noResults: function() {
+                    return "Aucun utilisateur trouvé";
+                }
+            },
+            data: selectedUsers.map(user => ({ id: user.id, text: user.name }))
+        }).val(selectedUsers.map(user => user.id)).trigger('change');
+
+        // Afficher les utilisateurs sélectionnés
+        selectedUsers.forEach(user => {
+            addUserToContainerEdit(user.id, user.name);
+        });
+    });
+        
+            // Réinitialiser Select2 à la fermeture du modal
+            $('#edit_event_modal').on('hidden.bs.modal', function () {
+                $('select[name="specific_usersd[]"]').select2('destroy');
+            });
+        
+            // Gestion de l'affichage du champ specific_users selon le choix public/private
+            $('input[name="public_or_privated"]').change(function() {
+                if ($(this).val() === 'private') {
+                    $('#edit-specific_users_fieldd').show();
+                    // Réinitialiser Select2 après l'affichage pour corriger le rendu
+                    $('select[name="specific_usersd[]"]').select2('destroy').select2({
+                        placeholder: 'Rechercher un utilisateur...',
+                        allowClear: true,
+                        dropdownParent: $('#edit_event_modal'),
+                        width: '100%',
+                        language: {
+                            noResults: function() {
+                                return "Aucun utilisateur trouvé";
+                            }
+                        }
+                    });
+                } else {
+                    $('#edit-specific_users_fieldd').hide();
+                    $('select[name="specific_usersd[]"]').val(null).trigger('change');
+                    $('#edit-selected_users_container').empty();
+                }
+            });
+        
+            // Gestion de l'affichage des utilisateurs sélectionnés
+            $('select[name="specific_usersd[]"]').on('select2:select', function(e) {
+                const userId = e.params.data.id;
+                const userName = e.params.data.text;
+                addUserToContainerEdit(userId, userName);
+            });
+        
+            // Gestion de la suppression lors de la désélection dans Select2
+            $('select[name="specific_usersd[]"]').on('select2:unselect', function(e) {
+                const userId = e.params.data.id;
+                removeUserFromContainerEdit(userId);
+            });
+        });
+        
+        // Fonction pour ajouter un utilisateur au conteneur
+        function addUserToContainerEdit(userId, userName) {
+            const userTag = `
+                <div class="user-tag mb-2 me-2 d-inline-block" data-user-id="${userId}">
+                    <span class="badge bg-primary">
+                        ${userName}
+                        <button type="button" class="btn-close btn-close-white ms-2" 
+                            style="font-size: 0.5em;" 
+                            onclick="removeUserEdit('${userId}')">
+                        </button>
+                    </span>
+                </div>
+            `;
+            $('#edit-selected_users_container').append(userTag);
+        }
+        
+        // Fonction pour supprimer un utilisateur
+        function removeUserEdit(userId) {
+            $(`.user-tag[data-user-id="${userId}"]`).remove();
+            const option = $('select[name="specific_usersd[]"]').find(`option[value="${userId}"]`);
+            option.prop('selected', false);
+            $('select[name="specific_usersd[]"]').trigger('change');
+        }
+        
+        // Fonction pour supprimer un utilisateur du conteneur
+        function removeUserFromContainerEdit(userId) {
+            $(`.user-tag[data-user-id="${userId}"]`).remove();
+        }
+    </script>
 
     <!-- Bootstrap Core JS -->
     <script src="{{ asset('asset/vendors/bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script>
@@ -683,7 +958,7 @@
 
             // Add new event
             $('#add_event').click(function() {
-                var selectedUsers = $('#edit-specific_users').val();
+                var selectedUsers = $('#specific_users').val();
                 var newEvent = {
                     // user_id-specific_users-public_or_private
                     title: $('.cal-event-name').val(),
@@ -734,50 +1009,52 @@
         });
     </script>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const publicRadio = document.getElementById('edit-public');
-        const privateRadio = document.getElementById('edit-private');
-        const specificUsersField = document.getElementById('edit-specific_users_field');
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const publicRadio = document.getElementById('edit-public');
+            const privateRadio = document.getElementById('edit-private');
+            const specificUsersField = document.getElementById('edit-specific_users_field');
 
-        // Fonction pour afficher ou masquer le champ des utilisateurs privés
-        function toggleSpecificUsers() {
-            if (privateRadio.checked) {
-                specificUsersField.style.display = 'block';
-            } else {
-                specificUsersField.style.display = 'none';
+            // Fonction pour afficher ou masquer le champ des utilisateurs privés
+            function toggleSpecificUsers() {
+                if (privateRadio.checked) {
+                    specificUsersField.style.display = 'block';
+                } else {
+                    specificUsersField.style.display = 'none';
+                }
             }
-        }
 
-        // Écouter les changements sur les radios
-        publicRadio.addEventListener('change', toggleSpecificUsers);
-        privateRadio.addEventListener('change', toggleSpecificUsers);
+            // Écouter les changements sur les radios
+            publicRadio.addEventListener('change', toggleSpecificUsers);
+            privateRadio.addEventListener('change', toggleSpecificUsers);
 
-        // Appeler la fonction une fois pour initialiser l'affichage correct
-        toggleSpecificUsers();
-    });
-</script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const publicRadio = document.getElementById('edit-publicd');
-        const privateRadio = document.getElementById('edit-privated');
-        const specificUsersField = document.getElementById('edit-specific_users_fieldd');
+            // Appeler la fonction une fois pour initialiser l'affichage correct
+            toggleSpecificUsers();
+        });
+    </script>
 
-        // Fonction pour afficher ou masquer le champ des utilisateurs privés
-        function toggleSpecificUsers() {
-            if (privateRadio.checked) {
-                specificUsersField.style.display = 'block';
-            } else {
-                specificUsersField.style.display = 'none';
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const publicRadio = document.getElementById('edit-publicd');
+            const privateRadio = document.getElementById('edit-privated');
+            const specificUsersField = document.getElementById('edit-specific_users_fieldd');
+
+            // Fonction pour afficher ou masquer le champ des utilisateurs privés
+            function toggleSpecificUsers() {
+                if (privateRadio.checked) {
+                    specificUsersField.style.display = 'block';
+                } else {
+                    specificUsersField.style.display = 'none';
+                }
             }
-        }
 
-        // Écouter les changements sur les radios
-        publicRadio.addEventListener('change', toggleSpecificUsers);
-        privateRadio.addEventListener('change', toggleSpecificUsers);
+            // Écouter les changements sur les radios
+            publicRadio.addEventListener('change', toggleSpecificUsers);
+            privateRadio.addEventListener('change', toggleSpecificUsers);
 
-        // Appeler la fonction une fois pour initialiser l'affichage correct
-        toggleSpecificUsers();
-    });
-</script>
+            // Appeler la fonction une fois pour initialiser l'affichage correct
+            toggleSpecificUsers();
+        });
+    </script>
+
 @endsection

@@ -85,6 +85,10 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+Route::middleware(['auth'/*, 'role:platform_master|platform_users_management'*/])->group(function () {
+    Route::resource('/admin_users', PlatformUserController::class);
+});
+
 Route::middleware('auth')->group(function () {
     // Messages
     Route::post('/messages/send', [MessageController::class, 'sendMessage'])->name('message.inbox.send');
@@ -131,6 +135,6 @@ Route::middleware('auth')->group(function () {
 
 require __DIR__.'/auth.php';
 
-Route::middleware(['auth', 'role:platform_master|platform_users_management'])->group(function () {
-});
-Route::resource('/admin_users', PlatformUserController::class);
+// Route::middleware(['auth', 'role:platform_master|platform_users_management'])->group(function () {
+// });
+// Route::resource('/admin_users', PlatformUserController::class);

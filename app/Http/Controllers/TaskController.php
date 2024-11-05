@@ -2,19 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
+use App\Models\Etat;
 use App\Models\Task;
 use App\Models\User;
 use App\Models\Project;
 use App\Models\ProjectTask;
-use App\Models\Etat;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use App\Events\MeetingScheduled;
-use App\Notifications\ReunionReminder;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Notification;
 use App\Mail\ReunionNotification;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use App\Notifications\ReunionReminder;
+use Illuminate\Support\Facades\Notification;
 
 class TaskController extends Controller
 {
@@ -103,7 +104,17 @@ class TaskController extends Controller
 
             $validated = $request->validate([
                 'title' => 'required|string|max:255',
-                'start_date' => 'required|date',
+                'start_date' => [
+                    'required',
+                    'date',
+                    // Ici on met la règle d'unicité sur start_date car on sait déjà le user_id
+                    Rule::unique('tasks')->where(function ($query) {
+                        return $query->where('user_id', Auth::user()->id)
+                                    ->where('start_time', request('start_time'))
+                                    ->where('end_date', request('end_date'))
+                                    ->where('end_time', request('end_time'));
+                    })->ignore($task->id ?? null)
+                ],
                 'start_time' => 'nullable|date_format:H:i:s',
                 'end_date' => 'nullable|date|after_or_equal:start_date',
                 'end_time' => 'nullable|date_format:H:i:s',
