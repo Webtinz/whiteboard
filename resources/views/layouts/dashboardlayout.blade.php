@@ -29,7 +29,7 @@ use App\Models\Project;
     <!-- Bootstrap Css -->
     <link href="{{ asset('assets/css/bootstrap.min.css' )}}" id="bootstrap-style" rel="stylesheet" type="text/css" />
     <!-- Icons Css -->
-    <link href="{{ asset('assets/css/icons.min.css' )}}" rel="stylesheet" type="text/css" />
+    {{-- <link href="{{ asset('assets/css/icons.min.css' )}}" rel="stylesheet" type="text/css" /> --}}
     <!-- App Css-->
     <link href="{{ asset('assets/css/app.min.css' )}}" id="app-style" rel="stylesheet" type="text/css" />
 
@@ -507,7 +507,7 @@ use App\Models\Project;
       }
     </script>
     {{-- End Script Go back --}}
-    <script src="{  { asset('assets/libs/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('assets/libs/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
 
     <!-- Metismenu Js -->
     <script src="{{ asset('assets/libs/metismenujs/metismenujs.min.js') }}"></script>
