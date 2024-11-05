@@ -34,11 +34,17 @@
                             <div class="pb-3 mb-3">
                                 <div class="row">
                                     <div class="col-sm-6">
-                                        <div class="d-flex">
+                                        <div class="d-flex" style="justify-content: space-between">
                                             <div class="flex-1">
                                                 <h5 class="mb-1 text-uppercas">{{$projectChoose->name}}</h5>
                                                 <p class="text-muted mb-0">A Kanban template will ease your
                                                     transition into a new project management method.</p>
+                                            </div>
+                                            <div class="flex-2">
+                                                <p class="bg-success bg-gradient">Epic</p>
+                                                <p class="bg-dark text-white">Feature</p>
+                                                <p class="bg-info bg-gradient">User storie</p>
+                                                <p class="bg-warning bg-gradient">Task</p>
                                             </div>
                                         </div>
                                         {{-- <div class="text-cente mt-4">
@@ -48,44 +54,12 @@
                                         </div> --}}
                                     </div><!-- end col -->
 
-                                    <div class="col-sm-6">
-                                        {{-- <div
-                                            class="d-flex flex-wrap justify-content-sm-end align-items-center mt-4 mt-md-0">
-                                            <div class="me-3">
-                                                <h6 class="fw-medium text-muted mb-0">Members :-</h6>
-                                            </div>
-                                            <div class="avatar-group">
-                                                @foreach ($projecttasks as $task)
-                                                    @foreach ($task->users->unique('id') as $member )
-                                                    <div class="avatar-group-item">
-                                                        <a href="javascript: void(0);" class="d-inline-block"
-                                                        data-bs-toggle="tooltip" data-bs-placement="top"
-                                                        title="{{$member->name}}">
-                                                        <img src="{{ asset('assets/images/users/avatar-1.jpg') }}" alt=""
-                                                        class="rounded-circle avatar-sm">
-                                                        </a>
-                                                    </div>
-                                                    @endforeach
-                                                @endforeach
-                                            </div><!-- end avatar group -->
-                                        </div><!-- end --> --}}
-                                        {{-- <div class="d-flex align-items-center justify-content-sm-end mt-4">
-                                            <div class="search-box ">
-                                                <div class="position-relative">
-                                                    <input type="text" class="form-control rounded"
-                                                        id="search-kanbanboard" onkeyup="searchKanban()"
-                                                        placeholder="Search...">
-                                                    <i class="uil uil-search search-icon"></i>
-                                                </div>
-                                            </div><!-- end seacrh-box -->
-                                        </div> --}}
-                                    </div><!-- end col -->
                                 </div><!-- end row -->
                             </div>
 
                             <div class="task-board" id="kanbanboard">
                                 @foreach ($etats as $etat)
-                                <div class="task-list" id="remove-item-19">
+                                <div class="task-list" id="remove-item-19" data-etat-id="{{ $etat->id }}">
                                     <div class="card bg-light shadow-none card-h-100">
                                         <div class="card-header bg-transparent border-bottom-0 d-flex align-items-center">
                                             <div class="flex-1">
@@ -109,17 +83,22 @@
                                                 @foreach ($projecttasks as $task)
                                                 @if ($task->etat->id == $etat->id)
                                                     
-                                                <div id="backlog-task" class="task d-flex flex-column">
+                                                <div id="backlog-task" class="task d-flex flex-column" draggable="true" data-task-id="{{ $task->id }}">
                                                     <div class="card task-box shadow-none">
-                                                        <div class="card-body">
+                                                        <div class="card-body 
+                                                            @if ($task->type === 'epic') bg-success bg-gradient text-dark
+                                                            @elseif ($task->type === 'feature') bg-dark text-white 
+                                                            @elseif ($task->type === 'user_story') bg-info bg-gradient text-dark
+                                                            @else bg-warning bg-gradient text-dark
+                                                            @endif">
                                                             <div class="d-flex mb-3">
                                                                 <div class="flex-grow-1 align-items-start">
                                                                     <div>
-                                                                        <p class="text-primary fw-medium mb-0 current-id">#{{ $task->id }}</p>
+                                                                        <p class="fw-medium mb-0 current-id">#{{ $task->id }}</p>
                                                                     </div>
                                                                 </div>
                                                                 <div class="dropdown ms-2">
-                                                                    <a href="#" class="dropdown-toggle font-size-16 text-muted" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                                    <a href="#" class="dropdown-toggle font-size-16" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                                         <i class="mdi mdi-dots-horizontal"></i>
                                                                     </a>
                                                                     <div class="dropdown-menu dropdown-menu-end">
@@ -132,7 +111,8 @@
                                                                             {{-- data-status="{{ $task->status }}" --}}
                                                                             data-type="{{ $task->type }}"
                                                                             data-parent-id="{{ $task->parent_id }}"
-                                                                            data-assigned-members="{{ json_encode($task->users) }}">Edit</a>
+                                                                            data-assigned-members="{{ json_encode($task->users) }}"
+                                                                            data-children="{{ json_encode($task->children) }}">Edit</a>
                                                                         <a class="dropdown-item delete-itemt" href="#" data-id="{{ $task->id }}">Remove</a>
                                                                         
                                                                         <!-- Menu pour déplacer la tâche -->
@@ -152,11 +132,11 @@
                                                                 </div>                                                                
                                                             </div>
 
-                                                            <a href="#" class="font-size-15 fw-medium text-dark task-name" data-bs-toggle="modal" onclick="editTaskDetails('remove-item-{{ $task->id }}', 1)">
+                                                             <a href="#" class="font-size-15 fw-medium task-name" data-bs-toggle="modal" {{--data-bs-target=".bs-task-details" --}}onclick="editTaskDetails({{ $task->id }})"> 
                                                                 {{ $task->name }}
-                                                            </a>
+                                                            </a>                                                            
 
-                                                            <p class="text-muted text-truncate mt-1 font-size-13 task-desc">{{ $task->description }}</p>
+                                                            <p class="text-truncate mt-1 font-size-13 task-desc">{{ $task->description }}</p>
 
                                                             <div class="progress progress-sm animated-progess mb-3"
                                                                 style="height: 4px;">
@@ -166,13 +146,13 @@
                                                             </div>
                                                             <div class="d-flex">
                                                                 <div class="flex-grow-1">
-                                                                    <p class="text-muted font-size-13 fw-medium mb-2">
+                                                                    <p class="font-size-13 fw-medium mb-2">
                                                                         <i class="mdi mdi-calendar-range me-1"></i>
                                                                         <span class="due-date">{{ $task->end_date }}</span>
                                                                     </p>
                                                                 </div>
                                                                 <div>
-                                                                    <p class="text-muted font-size-13 fw-medium mb-2">
+                                                                    <p class="font-size-13 fw-medium mb-2">
                                                                         <i class="mdi mdi-check-all me-1 align-middle"></i>{{ $task->progress == 100 ? 'Completed' : 'Not Completed' }}
                                                                     </p>
                                                                 </div>
@@ -233,7 +213,7 @@
                 <div class="modal-body pt-0 py-4">
                     <div class="ps-2 pe-4">
                         <h5 class="modal-title font-size-14 text-primary mb-2">#PM0020</h5>
-                        <h5 class="mb-2">Probic : Dashboard UI</h5>
+                        <h5 class="mb-2 title-show">Probic : Dashboard UI</h5>
                     </div>
                     <div class="row">
                         <div class="col-xl-8">
@@ -302,72 +282,6 @@
                                             </div>
                                         </div><!-- end -->
                                     </div><!-- end -->
-                                    <div class="mt-4">
-                                        <h5 class="font-size-17 mb-0">Comments</h5>
-                                    </div>
-                                    <div class="border rounded mt-3">
-                                        <form action="#">
-                                            <textarea rows="3"
-                                                class="form-control border-0 resize-none task-comment"
-                                                placeholder="Add a Comments..."></textarea>
-                                            <div class="px-2 bg-light">
-                                                <div class="btn-group" role="group">
-                                                    <button type="button"
-                                                        class="btn btn-sm btn-link shadow-none text-dark">
-                                                        <i class="mdi mdi-link-variant"></i></button>
-                                                    <button type="button"
-                                                        class="btn btn-sm btn-link shadow-none text-dark">
-                                                        <i class="mdi mdi-emoticon-excited-outline"></i></button>
-                                                    <button type="button"
-                                                        class="btn btn-sm btn-link shadow-none text-dark">
-                                                        <i class="mdi mdi-at"></i></button>
-                                                </div>
-                                                <div class="float-end">
-                                                    <button type="button"
-                                                        class="btn btn-sm btn-link shadow-none text-dark">
-                                                        <i class="mdi mdi-send send-task-comment"></i>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </form><!-- end form -->
-                                    </div>
-                                    <div id="comments">
-                                        <div class="d-flex mt-2 align-items-start border-bottom py-4">
-                                            <img class="me-3 rounded-circle avatar-sm"
-                                                src="assets/images/users/avatar-2.jpg" alt="">
-                                            <div class="flex-1">
-                                                <h5 class="font-size-15 mt-0 mb-1">Denny Silva
-                                                    <small class="text-muted float-end">01:23 PM</small>
-                                                </h5>
-                                                <p class="text-muted">To achieve this, it would be necessary to have
-                                                    uniform pronunciation. But I must explain to you how all this
-                                                    mistaken idea of denouncing pleasure and praising pain was born
-                                                    and
-                                                    I will complete account the system, and expound the actual
-                                                    teachings
-                                                    of the great explorer.</p>
-
-                                                <a href="javascript: void(0);"
-                                                    class="text-muted font-size-13 d-inline-block"><i
-                                                        class="mdi mdi-reply me-1"></i>Reply</a>
-                                            </div>
-                                        </div><!-- end -->
-
-                                        <div class="d-flex mt-2 align-items-start border-bottom py-4">
-                                            <img class="me-3 rounded-circle avatar-sm"
-                                                src="assets/images/users/avatar-10.jpg" alt="">
-                                            <div class="flex-1">
-                                                <h5 class="font-size-15 mt-0 mb-1">Jansh Wells
-                                                    <small class="text-muted float-end">11:06 AM</small>
-                                                </h5>
-                                                <p class="text-muted">Thanks for the help !!</p>
-
-                                                <a href="javascript: void(0);"
-                                                    class="text-muted font-size-13 d-inline-block"><i
-                                                        class="mdi mdi-reply me-1"></i>Reply</a>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
 
@@ -383,42 +297,6 @@
                             <div class="pe-2 mt-4 mt-xl-0">
                                 <div class="card bg-light">
                                     <div class="card-body">
-                                        <h6 class="mb-0">Attributes</h6>
-                                        <hr>
-                                        <div class="table-responsive">
-                                            <table class="table table-borderless table-sm mb-0">
-                                                <tbody>
-                                                    <tr>
-                                                        <th class="text-muted font-size-14">Status</th>
-                                                        <th class="text-end font-size-13">
-                                                            <span class="badge badge-soft-primary p-2">In
-                                                                Progress</span>
-                                                        </th>
-                                                    </tr>
-                                                    <tr>
-                                                        <th class="text-muted font-size-14">Priority</th>
-                                                        <th class="text-end font-size-13">
-                                                            <span class="badge badge-soft-danger p-2">
-                                                                <i
-                                                                    class="mdi mdi-alert-circle-outline text-danger me-1"></i>High</span>
-                                                        </th>
-                                                    </tr>
-                                                    <tr>
-                                                        <th class="text-muted font-size-14">Label</th>
-                                                        <th class="text-end font-size-13">None</th>
-                                                    </tr>
-                                                    <tr>
-                                                        <th class="text-muted font-size-14">Repoter</th>
-                                                        <th class="text-end font-size-13">Ayaan Curry</th>
-                                                    </tr>
-                                                </tbody><!-- end tbody -->
-                                            </table><!-- end table -->
-                                        </div><!-- end table responsive -->
-                                    </div><!-- end card-body -->
-                                </div><!-- end card -->
-
-                                <div class="card bg-light">
-                                    <div class="card-body">
                                         <h6 class="mb-0">Team Members</h6>
                                         <hr>
                                         <div class="d-flex">
@@ -429,72 +307,6 @@
                                                     data-bs-target=".add-members">+ Add Members</button>
                                             </div>
                                         </div>
-                                    </div><!-- end card body -->
-                                </div><!-- end card -->
-
-                                <div class="card mb-0 bg-light">
-                                    <div class="card-body">
-                                        <h6 class="mb-0">Files</h6>
-                                        <hr>
-                                        <div class="card mb-2 p-2 fade show" id="file-items-1">
-                                            <div class="d-flex align-items-center">
-                                                <div class="avatar-sm me-3 ms-0 flex-shrink-0">
-                                                    <div
-                                                        class="avatar-title bg-light text-muted rounded font-size-20">
-                                                        <i class="mdi mdi-folder-zip"></i>
-                                                    </div>
-                                                </div>
-                                                <div class="flex-grow-1">
-                                                    <div class="text-start">
-                                                        <h5 class="font-size-14 mb-1">document.zip</h5>
-                                                        <p class="text-muted font-size-13 mb-0">5.9 MB</p>
-                                                    </div>
-                                                </div>
-                                                <a href="#" class="delete-item" data-id="file-items-1"><i
-                                                        class="mdi mdi-trash-can-outline text-danger font-size-16"></i></a>
-                                            </div>
-                                        </div>
-                                        <!-- end card -->
-                                        <div class="card mb-2 p-2 fade show" id="file-items-2">
-                                            <div class="d-flex align-items-center">
-                                                <div class="avatar-sm me-3 ms-0 flex-shrink-0">
-                                                    <div
-                                                        class="avatar-title bg-light text-muted rounded font-size-20">
-                                                        <i class="mdi mdi-text-box-check"></i>
-                                                    </div>
-                                                </div>
-                                                <div class="flex-grow-1">
-                                                    <div class="text-start">
-                                                        <h5 class="font-size-14 mb-1">file_update.docx</h5>
-                                                        <p class="text-muted font-size-13 mb-0">2.0 MB</p>
-                                                    </div>
-                                                </div>
-                                                <a href="#" class="delete-item" data-id="file-items-2">
-                                                    <i
-                                                        class="mdi mdi-trash-can-outline text-danger font-size-16"></i>
-                                                </a>
-                                            </div>
-                                        </div>
-                                        <!-- end card -->
-
-                                        <div class="card mb-0 p-2 fade show" id="file-items-3">
-                                            <div class="d-flex align-items-center">
-                                                <div class="avatar-sm me-3 ms-0 flex-shrink-0">
-                                                    <div
-                                                        class="avatar-title bg-light text-muted rounded font-size-20">
-                                                        <i class="mdi mdi-file-code"></i>
-                                                    </div>
-                                                </div>
-                                                <div class="flex-1">
-                                                    <div class="text-start">
-                                                        <h5 class="font-size-14 mb-1">widgets-changes.txt</h5>
-                                                        <p class="text-muted font-size-13 mb-0">2.0 MB</p>
-                                                    </div>
-                                                </div>
-                                                <a href="#" class="delete-item" data-id="file-items-3"><i
-                                                        class="mdi mdi-trash-can-outline text-danger font-size-16"></i></a>
-                                            </div>
-                                        </div><!-- end card -->
                                     </div><!-- end card body -->
                                 </div><!-- end card -->
                             </div>
@@ -535,7 +347,7 @@
     
                         <div class="mb-3">
                             <label for="editTaskEndDate" class="form-label">Real Time</label>
-                            <input type="number" step="0.01" class="form-control" id="editTaskEndDate" name="real_time" required>
+                            <input type="number" step="0.01" class="form-control" id="editTaskEndDate" name="real_time">
                         </div>
     
                         <div class="mb-3">
@@ -553,7 +365,7 @@
                             </select>
                         </div>
     
-                        <div class="mb-3">
+                        <div class="mb-3" id="parentTaskField">
                             <label for="editParentTask" class="form-label">Parent Task</label>
                             <select id="editParentTask" name="parent_id" class="form-control select2">
                                 <option value="">None</option>
@@ -576,6 +388,10 @@
                                     </li>
                                 @endforeach
                             </ul>
+                        </div>
+                        <div class="mb-3">
+                            <label for="childrenList" class="form-label">Children's tasks :</label>
+                            <ul id="childrenList" class="list-unstyled"></ul>
                         </div>
     
                         <input type="hidden" id="editTaskId" name="task_id">
@@ -624,7 +440,7 @@
                         <!-- Date de fin -->
                         <div class="mb-3">
                             <label for="task-due-date" class="form-label">Real Time</label>
-                            <input class="form-control" type="number" name="real_time" id="task-due-date" step="0.01" required>
+                            <input class="form-control" type="number" name="real_time" id="task-due-date" step="0.01" >
                         </div>                        
                     
                         <!-- Progression -->
@@ -645,7 +461,7 @@
                         </div>
                     
                         <!-- Tâche parente avec recherche -->
-                        <div class="mb-3">
+                        <div class="mb-3" id="cparentTaskField">
                             <label for="parenttask" class="form-label">Parent Task</label>
                             <select id="parenttask" name="parent_id" class="form-control select2">
                                 <option value="">None</option>
@@ -1200,46 +1016,58 @@ taskModal.addEventListener('show.bs.modal', function (event) {
 </script>
 <script>
     $(document).on('click', '.edit-task-btn', function (e) {
-        e.preventDefault();
+    e.preventDefault();
+
+    // Récupère les informations de la tâche à partir des attributs data-*
+    var taskId = $(this).data('id');
+    var taskName = $(this).data('name');
+    var taskDescription = $(this).data('description');
+    var taskProgress = $(this).data('progress');
+    var taskEndDate = $(this).data('end_date');
+    var taskEstimateDate = $(this).data('estimate_date');
+    var taskType = $(this).data('type');
+    var taskParentId = $(this).data('parent-id');
+    var assignedMembers = $(this).data('assigned-members');
+    var childrens = $(this).data('children'); // Récupère les enfants en JSON
+
+    // Remplir les champs du formulaire
+    $('#editTaskId').val(taskId);
+    $('#editTaskName').val(taskName);
+    $('#editTaskDescription').val(taskDescription);
+    $('#editTaskProgress').val(taskProgress);
+    $('#editTaskEndDate').val(taskEndDate);
+    $('#editEstimateDate').val(taskEstimateDate);
+    $('#editTaskType').val(taskType);
+    $('#editParentTask').val(taskParentId);
+
+    // Affiche les membres assignés
+    $('#taskassignee input[type="checkbox"]').prop('checked', false);
+    if (assignedMembers && Array.isArray(assignedMembers)) {
+        assignedMembers.forEach(function (memberId) {
+            $('#member-' + memberId.id).prop('checked', true);
+        });
+    }
+
+    // Afficher la liste des tâches enfants
+    var childrenContainer = $('#childrenList');
+    childrenContainer.empty(); // Vider le contenu précédent
     
-        // Récupère les informations de la tâche à partir des attributs data-*
-        var taskId = $(this).data('id');
-        var taskName = $(this).data('name');
-        var taskDescription = $(this).data('description');
-        var taskProgress = $(this).data('progress');
-        var taskEndDate = $(this).data('end_date');
-        var taskEstimateDate = $(this).data('estimate_date'); // Nouvelle donnée pour estimate_date
-        // var taskStatus = $(this).data('status'); // Nouvelle donnée pour status
-        var taskType = $(this).data('type'); // Nouvelle donnée pour type
-        var taskParentId = $(this).data('parent-id'); // Nouvelle donnée pour parent_id
-        var assignedMembers = $(this).data('assigned-members'); // Tableau des membres assignés
-    
-        // Remplir les champs du formulaire
-        $('#editTaskId').val(taskId);
-        $('#editTaskName').val(taskName);
-        $('#editTaskDescription').val(taskDescription);
-        $('#editTaskProgress').val(taskProgress);
-        $('#editTaskEndDate').val(taskEndDate);
-        $('#editEstimateDate').val(taskEstimateDate); // Remplir estimate_date
-        // $('#editTaskStatus').val(taskStatus); // Remplir status
-        $('#editTaskType').val(taskType); // Remplir type
-        $('#editParentTask').val(taskParentId); // Remplir parent_id
-    
-        // Réinitialiser toutes les cases à cocher
-        $('#taskassignee input[type="checkbox"]').prop('checked', false);
-        // Coche les cases des membres déjà assignés
-        if (assignedMembers && Array.isArray(assignedMembers)) {
-            assignedMembers.forEach(function (memberId) {
-                $('#member-' + memberId.id).prop('checked', true); // Coche la case correspondant au membre
-            });
-        }
-    
-        // Définir l'action du formulaire avec l'URL de la tâche
-        $('#editTaskForm').attr('action', '/projecttasks/' + taskId);
-    
-        // Affiche le modal d'édition
-        $('#editTaskModal').modal('show');
-    });
+    if (childrens && Array.isArray(childrens)) {
+        childrens.forEach(function (child) {
+            var childItem = `<li>${child.name} - ${child.progress}% completed</li>`;
+            childrenContainer.append(childItem);
+        });
+    } else {
+        childrenContainer.append('<li>Aucune tâche enfant</li>');
+    }
+
+    // Définir l'action du formulaire
+    $('#editTaskForm').attr('action', '/projecttasks/' + taskId);
+
+    // Affiche le modal d'édition
+    $('#editTaskModal').modal('show');
+});
+
 </script>    
 <script>
     $(document).ready(function() {
@@ -1250,8 +1078,206 @@ taskModal.addEventListener('show.bs.modal', function (event) {
         });
     });
 </script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll('.tasklist-content').forEach(taskList => {
+        new Sortable(taskList, {
+            group: 'tasks', 
+            animation: 150,
+            onEnd: function (event) {
+            const taskElement = event.item;
+            console.log("Task Element:", taskElement); // Vérifier la présence de l'élément
+
+            const taskId = taskElement.dataset.taskId;
+            console.log("taskId récupéré :", taskId); // Vérifier l'ID récupéré
+            
+            const newEtatId = event.to.closest('.task-list').dataset.etatId;
+            console.log("newEtatId récupéré :", newEtatId); // Vérifier l'état récupéré
+
+            if (taskId && newEtatId) {
+                console.log("Tâche et état cibles correctement récupérés.");
+                updateTaskEtat(taskId, newEtatId);
+            } else {
+                console.error("Erreur: Impossible de récupérer les IDs.");
+            }
+        }
+
+
+        });
+    });
+});
+
+    
+    // Fonction pour mettre à jour l'état de la tâche côté serveur
+    function updateTaskEtat(taskId, newEtatId) {
+        fetch(`/projecttasks/${taskId}/move`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            },
+            body: JSON.stringify({ etat_id: newEtatId }),
+        }).then(response => {
+            if (response.ok) {
+                console.log('État de la tâche mis à jour');
+            } else {
+                console.error('Erreur lors de la mise à jour de l\'état de la tâche');
+            }
+        }).catch(error => {
+            console.error('Erreur de requête:', error);
+        });
+    }
+</script>
+<script>
+$(document).ready(function () {
+    // Stocke toutes les options du sélecteur de tâches parentes
+    const allParentTasksOption = $('#editParentTask option').clone();
+
+    // Écoute les changements sur le champ du type de tâche
+    $('#editTaskType').on('change', function () {
+        var selectedType = $(this).val(); // Récupère le type sélectionné
+
+        if (selectedType === 'user_story') {
+            // Affiche les tâches de type "Feature" et montre le champ Parent Task
+            $('#editParentTask').empty().append(allParentTasksOption.filter(function () {
+                return $(this).val() === '' || $(this).text().includes('(feature)');
+            }));
+            $('#parentTaskField').show(); // Affiche le champ Parent Task
+
+        } else if (selectedType === 'feature') {
+            // Affiche les tâches de type "Epic" et montre le champ Parent Task
+            $('#editParentTask').empty().append(allParentTasksOption.filter(function () {
+                return $(this).val() === '' || $(this).text().includes('(epic)');
+            }));
+            $('#parentTaskField').show(); // Affiche le champ Parent Task
+
+        }
+        else if (selectedType === 'simple_task') {
+            // Affiche les tâches de type "Epic" et montre le champ Parent Task
+            $('#editParentTask').empty().append(allParentTasksOption.filter(function () {
+                return $(this).val() === '' || $(this).text().includes('(user_story)');
+            }));
+            $('#parentTaskField').show(); // Affiche le champ Parent Task
+
+        } else {
+            // Cache le champ Parent Task pour les autres types
+            $('#parentTaskField').hide();
+        }
+    });
+
+    // Masque le champ Parent Task au chargement de la page si aucun type n'est sélectionné
+    $('#parentTaskField').hide();
+});
+
+</script>
+<script>
+    $(document).ready(function () {
+        // Stocke toutes les options du sélecteur de tâches parentes
+        const allParentTasksOptions = $('#parenttask option').clone();
+    
+        // Écoute les changements sur le champ du type de tâche
+        $('#tasktype').on('change', function () {
+            var selectedType = $(this).val(); // Récupère le type sélectionné
+    
+            if (selectedType === 'user_story') {
+                // Affiche les tâches de type "Feature" et montre le champ Parent Task
+                $('#parenttask').empty().append(allParentTasksOptions.filter(function () {
+                    return $(this).val() === '' || $(this).text().includes('(feature)');
+                }));
+                $('#cparentTaskField').show(); // Affiche le champ Parent Task
+    
+            } else if (selectedType === 'feature') {
+                // Affiche les tâches de type "Epic" et montre le champ Parent Task
+                $('#parenttask').empty().append(allParentTasksOptions.filter(function () {
+                    return $(this).val() === '' || $(this).text().includes('(epic)');
+                }));
+                $('#cparentTaskField').show(); // Affiche le champ Parent Task
+    
+            }
+            else if (selectedType === 'simple_task') {
+                // Affiche les tâches de type "Epic" et montre le champ Parent Task
+                $('#parenttask').empty().append(allParentTasksOptions.filter(function () {
+                    return $(this).val() === '' || $(this).text().includes('(user_story)');
+                }));
+                $('#cparentTaskField').show(); // Affiche le champ Parent Task
+    
+            } else {
+                // Cache le champ Parent Task pour les autres types
+                $('#cparentTaskField').hide();
+            }
+        });
+    
+        // Masque le champ Parent Task au chargement de la page si aucun type n'est sélectionné
+        $('#cparentTaskField').hide();
+    });
+    
+    </script>
+<script>
+function editTaskDetails(taskId) {
+    fetch(`/projecttasks/${taskId}`)
+        .then(response => response.json())
+        .then(data => {
+            // Remplir les informations de la tâche
+            document.querySelector('.modal-title').textContent = `#${data.id || 'PM0020'}`; // Numéro de la tâche
+            document.querySelector('.modal-body h5.title-show').textContent = data.name || 'Probic : Dashboard UI'; // Nom de la tâche
+            document.querySelector('.modal-body p.text-muted').textContent = data.description || 'Description de la tâche...'; // Description
+
+            // Attributs supplémentaires
+            document.querySelector('.badge-status').textContent = data.status || 'In Progress'; // Status
+            document.querySelector('.badge-priority').textContent = data.priority || 'High'; // Priorité
+            document.querySelector('.label-reporter').textContent = data.reporter || 'Nom du reporter';
+
+            // Remplir les commentaires
+            let commentsContainer = document.querySelector('#comments');
+            commentsContainer.innerHTML = ''; // Vider les commentaires précédents
+            data.comments.forEach(comment => {
+                commentsContainer.innerHTML += `
+                    <div class="d-flex mt-2 align-items-start border-bottom py-4">
+                        <img class="me-3 rounded-circle avatar-sm" src="${comment.avatar || 'default-avatar.jpg'}" alt="">
+                        <div class="flex-1">
+                            <h5 class="font-size-15 mt-0 mb-1">${comment.author}
+                                <small class="text-muted float-end">${comment.time}</small>
+                            </h5>
+                            <p class="text-muted">${comment.content}</p>
+                            <a href="javascript: void(0);" class="text-muted font-size-13 d-inline-block">
+                                <i class="mdi mdi-reply me-1"></i>Reply
+                            </a>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Remplir les fichiers associés
+            let filesContainer = document.querySelector('#file-items');
+            filesContainer.innerHTML = ''; // Vider les fichiers précédents
+            data.files.forEach(file => {
+                filesContainer.innerHTML += `
+                    <div class="card mb-2 p-2 fade show">
+                        <div class="d-flex align-items-center">
+                            <div class="avatar-sm me-3 ms-0 flex-shrink-0">
+                                <div class="avatar-title bg-light text-muted rounded font-size-20">
+                                    <i class="mdi mdi-folder-zip"></i>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="text-start">
+                                    <h5 class="font-size-14 mb-1">${file.name}</h5>
+                                    <p class="text-muted font-size-13 mb-0">${file.size}</p>
+                                </div>
+                            </div>
+                            <a href="#" class="delete-item" data-id="${file.id}"><i class="mdi mdi-trash-can-outline text-danger font-size-16"></i></a>
+                        </div>
+                    </div>
+                `;
+            });
+        })
+        .catch(error => console.error('Erreur:', error));
+}
+
+</script>
 <!-- JavaScript de Select2 -->
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
 @endsection

@@ -7,7 +7,6 @@ use App\Models\ProjectTask;
 use App\Models\User;
 use DateTime;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Facade;
 
 class ProjectTaskController extends Controller
 {
@@ -127,13 +126,19 @@ class ProjectTaskController extends Controller
         }
     }
 
+    public function show($id)
+    {
+        $task = ProjectTask::with('users')->find($id);
+        return response()->json($task);
+    }
+
     public function move(Request $request, $id)
     {
         try {
             $task = ProjectTask::findOrFail($id);
             $etat = Etat::findOrFail($request->etat_id);
             if ($etat->name == "Active") {
-                // $task->start_date = date('Y-m-d H:i:s');
+                $task->start_date = date('Y-m-d H:i:s');
                 $date = new DateTime($task->start_date);
                 if(empty($task->real_time)){
                     $estimateTime = $task->estimate_time;
@@ -156,7 +161,7 @@ class ProjectTaskController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Erreur lors du déplacement de la tâche'
+                'message' => $id
             ], 500);
         }
     }
