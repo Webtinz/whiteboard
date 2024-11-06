@@ -204,60 +204,81 @@ use App\Models\Project;
                                     @endforeach
                             </ul>
                         </li>
-                        <li>
-                            <a href="{{route('posts.index')}}">
-                                <i class="icon nav-icon" data-feather="briefcase"></i>
-                                <span class="menu-item" data-key="t-contacts">Posts</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="{{ route('projects.index') }}">
-                                <i class="icon nav-icon" data-feather="briefcase"></i>
-                                <span class="menu-item" data-key="t-contacts">Projects</span>
-                            </a>
-                        </li>
+                        @if (Auth::user()->hasRole('platform_users_management') || Auth::user()->hasRole('platform_master'))
+                            <li>
+                                <a href="{{ route('admin_users.index') }}">
+                                    <i class="icon nav-icon" data-feather="briefcase"></i>
+                                    <span class="menu-item" data-key="t-contacts">Users Management</span>
+                                </a>
+                            </li>
+                        @endif
+                        @if(Auth::user()->hasRole('manage_posts') || Auth::user()->hasRole('platform_master'))
+                            <li>
+                                <a href="{{ route('posts.index')}}">
+                                    <i class="icon nav-icon" data-feather="briefcase"></i>
+                                    <span class="menu-item" data-key="t-contacts">Posts</span>
+                                </a>
+                            </li>
+                        @endif
+                        @if(Auth::user()->hasRole('manage_projects') || Auth::user()->hasRole('platform_master'))
+                            <li>
+                                <a href="{{ route('projects.index') }}">
+                                    <i class="icon nav-icon" data-feather="briefcase"></i>
+                                    <span class="menu-item" data-key="t-contacts">Projects</span>
+                                </a>
+                            </li>
+                        @endif
 
-                        <li>
-                            <a href="{{ route('task') }}">
-                                <i class="icon nav-icon" data-feather="message-square"></i>
-                                <span class="menu-item" data-key="t-chat">Tasks</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/calendar">
-                                <i class="icon nav-icon" data-feather="message-square"></i>
-                                <span class="menu-item" data-key="t-chat">Calendar</span>
-                            </a>
-                        </li>
+                        @if (Auth::user()->hasRole('users_tasks_management') || Auth::user()->hasRole('platform_master'))
+                            <li>
+                                <a href="{{ route('task') }}">
+                                    <i class="icon nav-icon" data-feather="message-square"></i>
+                                    <span class="menu-item" data-key="t-chat">Tasks</span>
+                                </a>
+                            </li>
+                        @endif
+
+                        @if (Auth::user()->hasRole('calendar_management') || Auth::user()->hasRole('platform_master'))
+                            <li>
+                                <a href="/calendar">
+                                    <i class="icon nav-icon" data-feather="message-square"></i>
+                                    <span class="menu-item" data-key="t-chat">Calendar</span>
+                                </a>
+                            </li>
+                        @endif
                         {{-- <li>
                             <a href="apps-chat.html">
                                 <i class="icon nav-icon" data-feather="message-square"></i>
                                 <span class="menu-item" data-key="t-chat">Files</span>
                             </a>
                         </li> --}}
+         
 
-                        
-                        <li>
-                            <a href="{{ route('conversations') }}">
-                                <i class="icon nav-icon" data-feather="message-square"></i>
-                                <span class="menu-item" data-key="t-chat">Chat</span>
-                            </a>
-                        </li>
+                        @if(Auth::user()->hasRole('users_chat') || Auth::user()->hasRole('platform_master')) 
+                            <li>
+                                <a href="{{ route('conversations') }}">
+                                    <i class="icon nav-icon" data-feather="message-square"></i>
+                                    <span class="menu-item" data-key="t-chat">Chat</span>
+                                </a>
+                            </li>
+                        @endif
                         {{-- <li>
                             <a href="{{ route('activityzone') }}">
                                 <i class="icon nav-icon" data-feather="message-square"></i>
                                 <span class="menu-item" data-key="t-chat">Activity Zone</span>
                             </a>
                         </li> --}}
-                        <li>
-                            <a href="javascript: void(0);" class="has-arrow">
-                                <i class="icon nav-icon" data-feather="users"></i>
-                                <span class="menu-item" data-key="t-team-overview">Team Overview</span>
-                            </a>
-                            <ul class="sub-menu" aria-expanded="false">
-                                <li><a href="{{ route('allemployee.index') }}" data-key="t-employee">Employee</a></li>
-                            </ul>
-                        </li>
+                        @if(Auth::user()->hasRole('platform_users_management') || Auth::user()->hasRole('platform_master')) 
+                            <li>
+                                <a href="javascript: void(0);" class="has-arrow">
+                                    <i class="icon nav-icon" data-feather="users"></i>
+                                    <span class="menu-item" data-key="t-team-overview">Team Overview</span>
+                                </a>
+                                <ul class="sub-menu" aria-expanded="false">
+                                    <li><a href="{{ route('allemployee.index') }}" data-key="t-employee">Employee</a></li>
+                                </ul>
+                            </li>
+                        @endif
                     </ul>
                 </div>
                 <!-- Sidebar -->

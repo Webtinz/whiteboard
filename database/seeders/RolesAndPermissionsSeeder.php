@@ -78,7 +78,36 @@ class RolesAndPermissionsSeeder extends Seeder
             'create_posts',
             'edit_posts',
         ]);
+        
+        $role = Role::create(['name' => 'calendar_management'])
+            // ->givePermissionTo([
+            // 'view_posts',
+            // 'view_posts_details',
+            // 'view_post_leads',
+            // 'create_posts',
+            // 'edit_posts',
+            // ])
+        ;
 
+        $role = Role::create(['name' => 'users_chat'])
+            // ->givePermissionTo([
+            // 'view_posts',
+            // 'view_posts_details',
+            // 'view_post_leads',
+            // 'create_posts',
+            // 'edit_posts',
+            // ])
+        ;
+
+        $role = Role::create(['name' => 'users_tasks_management'])
+            // ->givePermissionTo([
+            // 'view_posts',
+            // 'view_posts_details',
+            // 'view_post_leads',
+            // 'create_posts',
+            // 'edit_posts',
+            // ])
+        ;        
         $role = Role::create(['name' => 'platform_master']);
         $role->givePermissionTo(Permission::all());
     }
