@@ -42,7 +42,9 @@ class TaskController extends Controller
         ->orderByDesc('created_at')
         ->get(); 
         $users = User::all();
-        return view('admin.calendar', compact('tasks','users'));
+        $task = new Task();
+        $task->specific_users = '';
+        return view('admin.calendar', compact('tasks','users','task'));
     }
     public function tasks()
     {
