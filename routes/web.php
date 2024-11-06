@@ -65,8 +65,9 @@ Route::post('messages/{messageId}/files', [FileController::class, 'uploadFile'])
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
-
-Route::middleware(['auth', 'role:platform_master|platform_users_management'])->group(function () {
+// 'platform_users_management|manage_groups|manage_projects|manage_posts|calendar_management|users_chat|users_tasks_management|platform_master'
+// Route::middleware(['auth', 'role:platform_master|platform_users_management'])->group(function () {
+Route::middleware(['auth', 'role:platform_users_management|manage_groups|manage_projects|manage_posts|calendar_management|users_chat|users_tasks_management|platform_master'])->group(function () {
     Route::resource('/admin_users', PlatformUserController::class);
 
     // Groupes
