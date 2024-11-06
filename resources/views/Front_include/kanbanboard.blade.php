@@ -1,7 +1,7 @@
 @extends('layouts.dashboardlayout')
 @section('links')
 <!-- CSS de Select2 -->
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.css" rel="stylesheet">
 @endsection
 @section('content')
 <div class="main-content">
@@ -47,11 +47,11 @@
                                                 <p class="bg-warning bg-gradient">Task</p>
                                             </div>
                                         </div>
-                                        {{-- <div class="text-cente mt-4">
+                                        <div class="text-cente mt-4">
                                             <a href="javascript: void(0);" class="btn btn-primary"
                                                 data-bs-toggle="modal" data-bs-target=".bs-add-new-board"><i
                                                     class="mdi mdi-plus me-1"></i> Add New Board</a>
-                                        </div> --}}
+                                        </div>
                                     </div><!-- end col -->
 
                                 </div><!-- end row -->
@@ -83,11 +83,11 @@
                                                 @foreach ($projecttasks as $task)
                                                 @if ($task->etat->id == $etat->id)
                                                     
-                                                <div id="backlog-task" class="task d-flex flex-column" draggable="true" data-task-id="{{ $task->id }}">
+                                                <div id="backlog-task" class="task d-flex flex-column mb-2" draggable="true" data-task-id="{{ $task->id }}">
                                                     <div class="card task-box shadow-none">
                                                         <div class="card-body 
                                                             @if ($task->type === 'epic') bg-success bg-gradient text-dark
-                                                            @elseif ($task->type === 'feature') bg-dark text-white 
+                                                            @elseif ($task->type === 'feature') bg-dark bg-gradient text-white 
                                                             @elseif ($task->type === 'user_story') bg-info bg-gradient text-dark
                                                             @else bg-warning bg-gradient text-dark
                                                             @endif">
@@ -132,7 +132,7 @@
                                                                 </div>                                                                
                                                             </div>
 
-                                                             <a href="#" class="font-size-15 fw-medium task-name" data-bs-toggle="modal" {{--data-bs-target=".bs-task-details" --}}onclick="editTaskDetails({{ $task->id }})"> 
+                                                            <a href="#" class="font-size-15 fw-medium task-name" data-bs-toggle="modal" {{--data-bs-target=".bs-task-details" --}}onclick="editTaskDetails({{ $task->id }})"> 
                                                                 {{ $task->name }}
                                                             </a>                                                            
 
@@ -377,13 +377,25 @@
     
                         <div class="pt-2">
                             <p class="fw-medium mb-3">Assign Team Members</p>
+                            
+                            <!-- Barre de recherche -->
+                            <div class="mb-3">
+                                <input type="text" id="userSearch" class="form-control" placeholder="Rechercher un membre...">
+                            </div>
+                        
                             <ul class="list-unstyled user-list validate mt-2" id="taskassignee" data-simplebar style="max-height: 160px;">
                                 @foreach ($users as $user)
-                                    <li>
+                                    <li class="user-item">
                                         <div class="form-check form-check-primary mb-2 font-size-16 d-flex align-items-center">
-                                            <input class="form-check-input me-3" type="checkbox" id="member-{{ $user->id }}" name="assigned_members[]" value="{{ $user->id }}">
-                                            <img src="{{ asset('assets/images/users/avatar-' . $user->id . '.jpg') }}" class="rounded-circle avatar-sm" alt="">
-                                            <label class="form-check-label font-size-14 mb-0 ms-3" for="member-{{ $user->id }}">{{ $user->name }}</label>
+                                            <input class="form-check-input me-3" type="checkbox" 
+                                                   id="member-{{ $user->id }}" 
+                                                   name="assigned_members[]" 
+                                                   value="{{ $user->id }}">
+                                            <img src="{{ asset('assets/images/users/avatar-' . $user->id . '.jpg') }}" 
+                                                 class="rounded-circle avatar-sm" 
+                                                 alt="{{ $user->name }}">
+                                            <label class="form-check-label font-size-14 mb-0 ms-3" 
+                                                   for="member-{{ $user->id }}">{{ $user->name }}</label>
                                         </div>
                                     </li>
                                 @endforeach
@@ -478,7 +490,7 @@
                         <!-- Membres assignés avec recherche -->
                         <div class="mb-3">
                             <label for="taskassignee" class="form-label">Assign Team Members</label>
-                            <select id="taskassignee" name="assigned_members[]" class="form-control select2" multiple>
+                            <select id="taskassigneeC" name="assigned_members[]" class="form-control" multiple>
                                 @foreach ($users as $user)
                                     <option value="{{ $user->id }}">{{ $user->name }}</option>
                                 @endforeach
@@ -1068,7 +1080,91 @@ taskModal.addEventListener('show.bs.modal', function (event) {
     $('#editTaskModal').modal('show');
 });
 
-</script>    
+</script>  
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Fonction pour initialiser les membres assignés
+        function initializeAssignedMembers(members) {
+            if (members && members.length > 0) {
+                members.forEach(memberId => {
+                    const checkbox = document.querySelector(`input[value="${memberId}"]`);
+                    if (checkbox) {
+                        checkbox.checked = true;
+                    }
+                });
+            }
+        }
+    
+        // Fonction de recherche
+        function initializeSearch() {
+            const searchInput = document.getElementById('userSearch');
+            const userItems = document.querySelectorAll('.user-item');
+    
+            searchInput.addEventListener('input', function(e) {
+                const searchTerm = e.target.value.toLowerCase();
+    
+                userItems.forEach(item => {
+                    const userName = item.querySelector('.form-check-label').textContent.toLowerCase();
+                    const shouldShow = userName.includes(searchTerm);
+                    item.style.display = shouldShow ? 'block' : 'none';
+                });
+            });
+        }
+    
+        // Initialiser la recherche
+        initializeSearch();
+    
+        // Pour être utilisé dans votre gestionnaire d'événements d'édition
+        window.initTaskEdit = function(taskData) {
+            // Supposons que assignedMembers soit un tableau d'IDs
+            if (taskData.assignedMembers) {
+                // Si assignedMembers est une chaîne JSON, la parser
+                const members = typeof taskData.assignedMembers === 'string' 
+                    ? JSON.parse(taskData.assignedMembers) 
+                    : taskData.assignedMembers;
+                
+                initializeAssignedMembers(members);
+            }
+        }
+    });
+    </script>
+    
+    <style>
+    .user-item {
+        transition: all 0.3s ease;
+    }
+    
+    .user-item:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+    }
+    
+    #userSearch {
+        border-radius: 6px;
+        padding: 8px 12px;
+        margin-bottom: 10px;
+    }
+    
+    .user-list {
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        padding: 10px;
+    }
+    
+    .avatar-sm {
+        width: 32px;
+        height: 32px;
+        object-fit: cover;
+    }
+    
+    .user-item {
+        animation: fadeIn 0.3s ease-in-out;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    </style>  
 <script>
     $(document).ready(function() {
         // Initialiser Select2 sur les champs avec la classe 'select2'
@@ -1079,54 +1175,164 @@ taskModal.addEventListener('show.bs.modal', function (event) {
     });
 </script>
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-    document.querySelectorAll('.tasklist-content').forEach(taskList => {
-        new Sortable(taskList, {
-            group: 'tasks', 
-            animation: 150,
-            onEnd: function (event) {
-            const taskElement = event.item;
-            console.log("Task Element:", taskElement); // Vérifier la présence de l'élément
+document.addEventListener('DOMContentLoaded', function () {
+    const tasks = document.querySelectorAll('.task');
+    const taskLists = document.querySelectorAll('.task-list');
 
-            const taskId = taskElement.dataset.taskId;
-            console.log("taskId récupéré :", taskId); // Vérifier l'ID récupéré
-            
-            const newEtatId = event.to.closest('.task-list').dataset.etatId;
-            console.log("newEtatId récupéré :", newEtatId); // Vérifier l'état récupéré
-
-            if (taskId && newEtatId) {
-                console.log("Tâche et état cibles correctement récupérés.");
-                updateTaskEtat(taskId, newEtatId);
-            } else {
-                console.error("Erreur: Impossible de récupérer les IDs.");
-            }
-        }
-
-
-        });
+    tasks.forEach(task => {
+        task.addEventListener('dragstart', handleDragStart);
+        task.addEventListener('dragend', handleDragEnd);
     });
-});
 
-    
-    // Fonction pour mettre à jour l'état de la tâche côté serveur
-    function updateTaskEtat(taskId, newEtatId) {
-        fetch(`/projecttasks/${taskId}/move`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-            },
-            body: JSON.stringify({ etat_id: newEtatId }),
-        }).then(response => {
-            if (response.ok) {
-                console.log('État de la tâche mis à jour');
-            } else {
-                console.error('Erreur lors de la mise à jour de l\'état de la tâche');
-            }
-        }).catch(error => {
-            console.error('Erreur de requête:', error);
+    taskLists.forEach(list => {
+        list.addEventListener('dragover', handleDragOver);
+        list.addEventListener('dragenter', handleDragEnter);
+        list.addEventListener('dragleave', handleDragLeave);
+        list.addEventListener('drop', handleDrop);
+    });
+
+    let draggedTask = null;
+    let originalParent = null;
+    let originalPosition = null;
+
+    function handleDragStart(e) {
+        draggedTask = this;
+        originalParent = this.parentNode;
+        const tasks = [...originalParent.children];
+        originalPosition = tasks.indexOf(this);
+        this.classList.add('is-dragging');
+        e.dataTransfer.effectAllowed = 'move';
+        requestAnimationFrame(() => {
+            this.style.opacity = '0.5';
         });
     }
+
+    function handleDragEnd(e) {
+        this.classList.remove('is-dragging');
+        this.style.opacity = '1';
+        taskLists.forEach(list => {
+            list.classList.remove('drag-over');
+        });
+    }
+
+    function handleDragOver(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        return false;
+    }
+
+    function handleDragEnter(e) {
+        this.classList.add('drag-over');
+    }
+
+    function handleDragLeave(e) {
+        this.classList.remove('drag-over');
+    }
+
+    function handleDrop(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (!draggedTask) return;
+
+        const newEtatId = this.dataset.etatId;
+        const taskId = draggedTask.dataset.taskId;
+        const oldEtatId = originalParent.closest('.task-list').dataset.etatId;
+
+        if (newEtatId !== oldEtatId) {
+            const tasklistContent = this.querySelector('.tasklist-content');
+
+            let insertPosition = -1;
+            const mouseY = e.clientY;
+            const tasks = [...tasklistContent.children];
+
+            for (let i = 0; i < tasks.length; i++) {
+                const task = tasks[i];
+                const rect = task.getBoundingClientRect();
+                const taskMiddle = rect.top + rect.height / 2;
+
+                if (mouseY < taskMiddle) {
+                    insertPosition = i;
+                    break;
+                }
+            }
+
+            if (insertPosition !== -1) {
+                tasklistContent.insertBefore(draggedTask, tasks[insertPosition]);
+            } else {
+                tasklistContent.appendChild(draggedTask);
+            }
+
+            updateTaskState(taskId, newEtatId, draggedTask, oldEtatId);
+        }
+
+        this.classList.remove('drag-over');
+        return false;
+    }
+
+    function updateTaskState(taskId, newEtatId, taskElement, oldEtatId) {
+    const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    
+    fetch(`/projecttasks/${taskId}/move`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': token,
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+            etat_id: newEtatId
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Mettre à jour les dates si nécessaire
+            if (data.end_date) {
+                const dueDateElement = taskElement.querySelector('.due-date');
+                if (dueDateElement) {
+                    dueDateElement.textContent = data.end_date;
+                }
+            }
+            
+            // Ajouter une animation de succès
+            taskElement.classList.add('task-moved-success');
+            setTimeout(() => {
+                taskElement.classList.remove('task-moved-success');
+                window.location.reload(); // Recharge la page après succès
+            }, 1000);
+
+            toastr.success('Tâche déplacée avec succès');
+        } else {
+            // En cas d'erreur, replacer la tâche à sa position initiale
+            handleError(taskElement, oldEtatId, originalPosition);
+        }
+    })
+    .catch(error => {
+        console.error('Erreur:', error);
+        handleError(taskElement, oldEtatId, originalPosition);
+    });
+}
+
+
+    function handleError(taskElement, oldEtatId, originalPosition) {
+        const originalList = document.querySelector(`[data-etat-id="${oldEtatId}"] .tasklist-content`);
+        const tasks = [...originalList.children];
+        if (originalPosition >= 0 && originalPosition < tasks.length) {
+            originalList.insertBefore(taskElement, tasks[originalPosition]);
+        } else {
+            originalList.appendChild(taskElement);
+        }
+
+        taskElement.classList.add('task-moved-error');
+        setTimeout(() => {
+            taskElement.classList.remove('task-moved-error');
+        }, 1000);
+
+        toastr.error('Erreur lors du déplacement de la tâche');
+    }
+});
+
 </script>
 <script>
 $(document).ready(function () {
@@ -1169,6 +1375,23 @@ $(document).ready(function () {
     $('#parentTaskField').hide();
 });
 
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        new TomSelect('#taskassigneeC', {
+            plugins: ['remove_button'],
+            maxItems: null, // permet la sélection multiple
+            searchField: ['text'], // champ utilisé pour la recherche
+            placeholder: 'Rechercher des membres...', 
+            createOnBlur: false, // désactive la création de nouveaux éléments
+            create: false,
+            render: {
+                no_results: function(data,escape) {
+                    return '<div class="no-results">Aucun résultat trouvé</div>';
+                },
+            }
+        });
+    });
 </script>
 <script>
     $(document).ready(function () {
@@ -1276,7 +1499,7 @@ function editTaskDetails(taskId) {
 
 </script>
 <!-- JavaScript de Select2 -->
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>

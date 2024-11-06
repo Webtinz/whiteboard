@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Etat;
+use App\Models\Project;
 use App\Models\ProjectTask;
 use App\Models\User;
 use DateTime;
@@ -62,13 +63,65 @@ class ProjectTaskController extends Controller
         if (!empty($validated['assigned_members'])) {
             $task->users()->attach($validated['assigned_members']);
         }
+        $count = 0;
+        $count2 = 0;
+        $allProjectTasks = ProjectTask::where('project_id',$task->project_id)
+                                    ->where('type', 'simple_task')->get();
+        $project = Project::findOrFail($task->project_id);
+        foreach ($allProjectTasks as $all) {
+            if($all->end_date){
+                if($all->end_date < date('Y-m-d H:i:s', strtotime('+1 hour'))){
+                    $count++;
+                }if($all->progress == 100){
+                    $count2++;
+                }
+            }
+        }
+        if($count > ($allProjectTasks->count() / 2)){
+            $project->status = 'Late';
+            $project->save();
+        }else if($count2 == $allProjectTasks->count()){
+            $project->status = 'Completed';
+            $project->save();
+        }
+        else{
+            $project->status = 'Up-to-date';
+            $project->save();
+        }
 
         return redirect()->back();
     }
 
     public function update(Request $request, $id)
     {
+        $count = 0;
+        $count2 = 0;
         $task = ProjectTask::findOrFail($id);
+        $allProjectTasks = ProjectTask::where('project_id',$task->project_id)
+                                    ->where('type', 'simple_task')->get();
+        $project = Project::findOrFail($task->project_id);
+        foreach ($allProjectTasks as $all) {
+            if($all->end_date){
+                if($all->end_date < date('Y-m-d H:i:s', strtotime('+1 hour'))){
+                    $count++;
+                }
+                if($all->progress == 100){
+                    $count2++;
+                }
+            }
+        }
+        if($count > ($allProjectTasks->count() / 2)){
+            $project->status = 'Late';
+            $project->save();
+        }else if($count2 == $allProjectTasks->count()){
+            $project->status = 'Completed';
+            $project->save();
+        }
+        else{
+            $project->status = 'Up-to-date';
+            $project->save();
+        }
+        
         $etat_actuel = Etat::findOrFail($task->etat_id);
         if ($etat_actuel->name == "Active") {
             $startTask = $task->start_date;
@@ -156,7 +209,7 @@ class ProjectTaskController extends Controller
             
             return response()->json([
                 'success' => true,
-                'message' => 'Tâche déplacée avec succès'
+                'message' => 'Tâche déplacée avec succès',
             ]);
         } catch (\Exception $e) {
             return response()->json([

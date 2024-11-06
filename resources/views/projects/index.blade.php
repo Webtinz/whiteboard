@@ -81,10 +81,10 @@
                                 </div>
                                 <div class="d-flex">
                                     <div class="align-self-end">
-                                        @if ($project->status == "Progress")
+                                        @if ($project->status == "Late")
                                             <span class="badge badge-soft-danger p-2 team-status">{{$project->status}}</span>
                                         @endif
-                                        @if ($project->status == "Pending")
+                                        @if ($project->status == "Up-to-date")
                                             <span class="badge badge-soft-warning p-2 team-status">{{$project->status}}</span>
                                         @endif
                                         @if ($project->status == "Completed")
