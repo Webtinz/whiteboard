@@ -35,19 +35,6 @@ Route::get('/home', function () {
     return view('Front_include.index');
 })->name('welcome');
 
-Route::resource('dashboarduser', DashboardController::class);
-
-// vue temporaire
-Route::resource('allemployee', EmployeeController::class);
-
-Route::get('kanbanboard/{id}', [EtatController::class, 'index'])->name('kanbanboard');
-
-Route::get('task', [TaskController::class, 'taskslist'])->name('task');
-
-Route::get('activityzone', function () {
-    return view('Front_include.activityzone');
-})->name('activityzone');
-
 // Route::get('/signup', function () {
 //     return view('Front_include.signup');
 // })->name('signup');
@@ -66,12 +53,6 @@ Route::get('/signup', function () {
 //     return view('admin.calendar');
 // })->name('calendar');
 
-// Groupes
-Route::post('/groups/create', [GroupController::class, 'createGroup'])->name('create.group');
-Route::get('/group-members/{groupId}', [GroupController::class, 'membersGroup'])->name('group.members');
-Route::post('/groups/{groupId}/add-member', [GroupController::class, 'addMember'])/*->name('add.group.members')*/;
-Route::post('/groups/{groupId}/remove-member', [GroupController::class, 'removeMember'])->name('remove.group.members');
-
 // Posts By Ak
 // Route::post('posts', [PostController::class, 'createPost']);
 
@@ -82,11 +63,30 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::middleware(['auth'/*, 'role:platform_master|platform_users_management'*/])->group(function () {
+Route::middleware(['auth', 'role:platform_master|platform_users_management'])->group(function () {
     Route::resource('/admin_users', PlatformUserController::class);
-});
 
-Route::middleware('auth')->group(function () {
+    // Groupes
+    Route::post('/groups/create', [GroupController::class, 'createGroup'])->name('create.group');
+    Route::get('/group-members/{groupId}', [GroupController::class, 'membersGroup'])->name('group.members');
+    Route::post('/groups/{groupId}/add-member', [GroupController::class, 'addMember'])/*->name('add.group.members')*/;
+    Route::post('/groups/{groupId}/remove-member', [GroupController::class, 'removeMember'])->name('remove.group.members');
+
+    Route::resource('dashboarduser', DashboardController::class);
+
+    // vue temporaire
+    Route::resource('allemployee', EmployeeController::class);
+
+    Route::get('kanbanboard/{id}', [EtatController::class, 'index'])->name('kanbanboard');
+
+    Route::get('task', [TaskController::class, 'taskslist'])->name('task');
+
+    Route::get('activityzone', function () {
+        return view('Front_include.activityzone');
+    })->name('activityzone');
+// });
+
+// Route::middleware('auth')->group(function () {
     // Messages
     Route::post('/messages/send', [MessageController::class, 'sendMessage'])->name('message.inbox.send');
     Route::get('/messages/{receiverId}', [MessageController::class, 'getConversationWithUser']);
