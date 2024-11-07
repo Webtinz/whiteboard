@@ -17,10 +17,12 @@ class EtatSeeder extends Seeder
         // Données par défaut à insérer dans la table etats
         $etats = [
             ['name' => 'Backlog'],
+            ['name' => 'Groomed'],
             ['name' => 'Current sprint'],
             ['name' => 'Active'],
             ['name' => 'Reviews'],
-            ['name' => 'Done'],
+            ['name' => 'Ready to deploy'],
+            ['name' => 'Stagging'],
         ];
 
         // Insérer les données
