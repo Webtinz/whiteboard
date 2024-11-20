@@ -119,6 +119,7 @@ Route::middleware(['auth', 'role:platform_users_management|manage_groups|manage_
 
     //Projects tasks routes
     Route::resource('projecttasks', ProjectTaskController::class);
+    Route::get('projecttasks{id}', [ProjectTaskController::class, 'showDetails'])->name('tasks.show');
     // Route::delete('projecttasks/{id}', [ProjectTaskController::class, 'delete'])->name('projecttasks.delete');
     Route::post('projecttasks', [ProjectTaskController::class, 'store'])->name('projecttasks.store');
     Route::post('/projecttasks/{id}/move', [ProjectTaskController::class, 'move'])->name('projecttasks.move');

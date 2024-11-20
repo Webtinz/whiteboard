@@ -185,6 +185,15 @@ class ProjectTaskController extends Controller
         return response()->json($task);
     }
 
+    public function showDetails($id)
+    {
+        $task = ProjectTask::with(['users', 'etat'])->findOrFail($id);
+        $tasks = ProjectTask::all();
+        $users = User::all();
+        return view('Front_include.show', compact('task','tasks', 'users'));
+    }
+
+
     public function move(Request $request, $id)
     {
         try {

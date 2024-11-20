@@ -47,11 +47,11 @@
                                                 <p class="bg-warning bg-gradient">Task</p>
                                             </div>
                                         </div>
-                                        {{-- <div class="text-cente mt-4">
+                                        <div class="text-cente mt-4">
                                             <a href="javascript: void(0);" class="btn btn-primary"
                                                 data-bs-toggle="modal" data-bs-target=".bs-add-new-board"><i
                                                     class="mdi mdi-plus me-1"></i> Add New Board</a>
-                                        </div> --}}
+                                        </div>
                                     </div><!-- end col -->
 
                                 </div><!-- end row -->
@@ -132,9 +132,9 @@
                                                                 </div>                                                                
                                                             </div>
 
-                                                            <a href="#" class="font-size-15 fw-medium task-name" data-bs-toggle="modal" {{--data-bs-target=".bs-task-details" --}}onclick="editTaskDetails({{ $task->id }})"> 
+                                                            <a href="{{ route('tasks.show', $task->id) }}" class="font-size-15 fw-medium task-name">
                                                                 {{ $task->name }}
-                                                            </a>                                                            
+                                                            </a>                                                                                                                     
 
                                                             <p class="text-truncate mt-1 font-size-13 task-desc">{{ $task->description }}</p>
 
