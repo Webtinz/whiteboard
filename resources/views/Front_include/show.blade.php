@@ -73,11 +73,11 @@
                     </div>
                     <div class="mb-4">
                         <h5 class="fw-bold text-secondary">Sub tasks</h5>
-                        <div class="d-flex flex-wrap">
+                        <div>
                             @forelse ($task->children as $user)
                             <a href="{{ route('tasks.show', $user->id) }}" class="font-size-15 fw-medium task-name">
                                # {{$user->id}}  {{ $user->name }}
-                            </a> 
+                            </a> <br>
                             @empty
                                 <p class="text-muted">No subtask link to this task.</p>
                             @endforelse
