@@ -72,7 +72,7 @@
                                # {{$user->id}}  {{ $user->name }}
                             </a> 
                             @empty
-                                <p class="text-muted">No members assigned to this task.</p>
+                                <p class="text-muted">No subtask link to this task.</p>
                             @endforelse
                         </div>
                     </div>
