@@ -34,6 +34,12 @@ class ProjectTask extends Model
     {
         return $this->belongsTo(Etat::class);
     }
+
+    public function files()
+    {
+        return $this->hasMany(TaskFile::class);
+    }
+
     
 
     /**

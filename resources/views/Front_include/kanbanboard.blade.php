@@ -319,43 +319,51 @@
 
     <!-- Modal de modification de tâche -->
     <div class="modal fade" id="editTaskModal" tabindex="-1" aria-labelledby="editTaskModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editTaskModalLabel">Edit Task</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="editTaskForm" method="POST" action="">
-                        @csrf
-                        @method('PUT') <!-- Utilise la méthode PATCH pour la mise à jour -->
-                        
-                        <div class="mb-3">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editTaskModalLabel">Edit Task</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editTaskForm" method="POST" action="" enctype="multipart/form-data">
+                    @csrf
+                    @method('PUT')
+                    
+                    <!-- Task Details Section -->
+                    <h6 class="fw-bold mb-3">Task Details</h6>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
                             <label for="editTaskName" class="form-label">Name</label>
                             <input type="text" class="form-control" id="editTaskName" name="name" required>
                         </div>
-                        
-                        <div class="mb-3">
-                            <label for="editTaskDescription" class="form-label">Description</label>
-                            <textarea class="form-control" id="editTaskDescription" name="description" rows="3" required></textarea>
-                        </div>
-    
-                        <div class="mb-3">
-                            <label for="editEstimateDate" class="form-label">Estimate Time</label>
-                            <input type="number" step="0.01" class="form-control" id="editEstimateDate" name="estimate_time" required>
-                        </div>
-    
-                        <div class="mb-3">
-                            <label for="editTaskEndDate" class="form-label">Real Time</label>
-                            <input type="number" step="0.01" class="form-control" id="editTaskEndDate" name="real_time">
-                        </div>
-    
-                        <div class="mb-3">
+                        <div class="col-md-6 mb-3">
                             <label for="editTaskProgress" class="form-label">Progress</label>
                             <input type="number" class="form-control" id="editTaskProgress" name="progress" max="100" required>
                         </div>
-    
-                        <div class="mb-3">
+                    </div>
+                    <div class="mb-3">
+                        <label for="editTaskDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="editTaskDescription" name="description" rows="3" required></textarea>
+                    </div>
+                    
+                    <!-- Time Estimates Section -->
+                    <h6 class="fw-bold mb-3">Time Estimates</h6>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="editEstimateDate" class="form-label">Estimate Time</label>
+                            <input type="number" step="0.01" class="form-control" id="editEstimateDate" name="estimate_time" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="editTaskEndDate" class="form-label">Real Time</label>
+                            <input type="number" step="0.01" class="form-control" id="editTaskEndDate" name="real_time">
+                        </div>
+                    </div>
+                    
+                    <!-- Task Type and Parent Task -->
+                    <h6 class="fw-bold mb-3">Task Structure</h6>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
                             <label for="editTaskType" class="form-label">Task Type</label>
                             <select id="editTaskType" name="type" class="form-control" required>
                                 <option value="epic">Epic</option>
@@ -364,8 +372,7 @@
                                 <option value="simple_task">Simple Task</option>
                             </select>
                         </div>
-    
-                        <div class="mb-3" id="parentTaskField">
+                        <div class="col-md-6 mb-3">
                             <label for="editParentTask" class="form-label">Parent Task</label>
                             <select id="editParentTask" name="parent_id" class="form-control select2">
                                 <option value="">None</option>
@@ -374,48 +381,58 @@
                                 @endforeach
                             </select>
                         </div>
-    
-                        <div class="pt-2">
-                            <p class="fw-medium mb-3">Assign Team Members</p>
-                            
-                            <!-- Barre de recherche -->
-                            <div class="mb-3">
-                                <input type="text" id="userSearch" class="form-control" placeholder="Rechercher un membre...">
-                            </div>
-                        
-                            <ul class="list-unstyled user-list validate mt-2" id="taskassignee" data-simplebar style="max-height: 160px;">
-                                @foreach ($users as $user)
-                                    <li class="user-item">
-                                        <div class="form-check form-check-primary mb-2 font-size-16 d-flex align-items-center">
-                                            <input class="form-check-input me-3" type="checkbox" 
-                                                   id="member-{{ $user->id }}" 
-                                                   name="assigned_members[]" 
-                                                   value="{{ $user->id }}">
-                                            <img src="{{ asset('assets/images/users/avatar-' . $user->id . '.jpg') }}" 
-                                                 class="rounded-circle avatar-sm" 
-                                                 alt="{{ $user->name }}">
-                                            <label class="form-check-label font-size-14 mb-0 ms-3" 
-                                                   for="member-{{ $user->id }}">{{ $user->name }}</label>
-                                        </div>
-                                    </li>
-                                @endforeach
-                            </ul>
-                        </div>
-                        <div class="mb-3">
-                            <label for="childrenList" class="form-label">Children's tasks :</label>
-                            <ul id="childrenList" class="list-unstyled"></ul>
-                        </div>
-    
-                        <input type="hidden" id="editTaskId" name="task_id">
-                        
-                        <div class="modal-footer">
-                            <button type="submit" class="btn btn-primary">Save changes</button>
-                        </div>
-                    </form>
-                </div>
+                    </div>
+                    
+                    <!-- Assign Team Members -->
+                    <h6 class="fw-bold mb-3">Assign Team Members</h6>
+                    <div class="mb-3">
+                        <input type="text" id="userSearch" class="form-control mb-3" placeholder="Search members...">
+                        <ul class="list-unstyled user-list validate mt-2" id="taskassignee" data-simplebar style="max-height: 160px;">
+                            @foreach ($users as $user)
+                                <li class="user-item">
+                                    <div class="form-check form-check-primary d-flex align-items-center">
+                                        <input class="form-check-input me-3" type="checkbox" 
+                                               id="member-{{ $user->id }}" 
+                                               name="assigned_members[]" 
+                                               value="{{ $user->id }}">
+                                        <img src="{{ asset('assets/images/users/avatar-' . $user->id . '.jpg') }}" 
+                                             class="rounded-circle avatar-sm" 
+                                             alt="{{ $user->name }}">
+                                        <label class="form-check-label font-size-14 mb-0 ms-3" 
+                                               for="member-{{ $user->id }}">{{ $user->name }}</label>
+                                    </div>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </div>
+                    
+                    <!-- Attach Files -->
+                    <h6 class="fw-bold mb-3">Attachments</h6>
+                    <div class="mb-3">
+                        <label for="files" class="form-label">Attach Files</label>
+                        <input type="file" name="files[]" id="files" class="form-control" multiple>
+                    </div>
+                    
+                    <!-- Children's Tasks -->
+                    <div class="mb-3">
+                        <label for="childrenList" class="form-label">Children's Tasks:</label>
+                        <ul id="childrenList" class="list-unstyled"></ul>
+                    </div>
+                    
+                    <!-- Hidden Input -->
+                    <input type="hidden" id="editTaskId" name="task_id">
+                    
+                    <!-- Modal Footer -->
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </form>
             </div>
         </div>
-    </div>    
+    </div>
+</div>
+    
 
 
     <!-- KanbanBoard Card Edit Modal -->
@@ -429,38 +446,39 @@
                     <button type="button" id="update-task" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="NewtaskForm" method="POST" action="{{ route('projecttasks.store') }}">
+                    <!-- Formulaire combiné pour ajouter ou modifier une tâche -->
+                    <form id="NewtaskForm" method="POST" action="{{ route('projecttasks.store') }}" enctype="multipart/form-data">
                         @csrf
                         <!-- Nom de la tâche -->
                         <div class="mb-3">
                             <label for="taskname" class="form-label">Name</label>
                             <input id="taskname" name="name" type="text" class="form-control" placeholder="Enter Task Name..." required>
                         </div>
-                    
+    
                         <!-- Description de la tâche -->
                         <div class="mb-3">
                             <label for="taskdesc" class="form-label">Description</label>
                             <textarea id="taskdesc" class="form-control" name="description" placeholder="Add Description"></textarea>
                         </div>
-                    
-                        <!-- Date d'estimation -->
+    
+                        <!-- Estimation de temps -->
                         <div class="mb-3">
                             <label for="estimate_date" class="form-label">Estimate Time</label>
-                            <input class="form-control" type="number" name="estimate_time" id="estimate_date" step="0.01" >
+                            <input class="form-control" type="number" name="estimate_time" id="estimate_date" step="0.01">
                         </div>
                         
-                        <!-- Date de fin -->
+                        <!-- Temps réel -->
                         <div class="mb-3">
                             <label for="task-due-date" class="form-label">Real Time</label>
-                            <input class="form-control" type="number" name="real_time" id="task-due-date" step="0.01" >
+                            <input class="form-control" type="number" name="real_time" id="task-due-date" step="0.01">
                         </div>                        
-                    
+    
                         <!-- Progression -->
                         <div class="mb-3">
                             <label for="taskprogressbar" class="form-label">Progress</label>
-                            <input id="taskprogressbar" name="progress" type="number" class="form-control" placeholder="Enter Progress..." >
+                            <input id="taskprogressbar" max="100" min="0" value="0" name="progress" type="number" class="form-control" placeholder="Enter Progress...">
                         </div>
-                    
+    
                         <!-- Type de tâche -->
                         <div class="mb-3">
                             <label for="tasktype" class="form-label">Task Type</label>
@@ -471,7 +489,7 @@
                                 <option value="simple_task">Simple Task</option>
                             </select>
                         </div>
-                    
+    
                         <!-- Tâche parente avec recherche -->
                         <div class="mb-3" id="cparentTaskField">
                             <label for="parenttask" class="form-label">Parent Task</label>
@@ -482,32 +500,38 @@
                                 @endforeach
                             </select>
                         </div>
-                    
+    
                         <!-- Projet et État cachés -->
                         <input type="hidden" name="etat_id" value="{{ $etat->id }}">
                         <input type="hidden" name="project_id" value="{{ $projectChoose->id }}">
-                    
+    
                         <!-- Membres assignés avec recherche -->
                         <div class="mb-3">
                             <label for="taskassignee" class="form-label">Assign Team Members</label>
-                            <select id="taskassigneeC" name="assigned_members[]" class="form-control" multiple>
+                            <select id="taskassigneeC" name="assigned_members[]" class="form-control select2" multiple>
                                 @foreach ($users as $user)
                                     <option value="{{ $user->id }}">{{ $user->name }}</option>
                                 @endforeach
                             </select>
                         </div>
-                    
+    
+                        <!-- Section pour uploader des fichiers -->
+                        <div class="mb-3">
+                            <label for="files" class="form-label">Attach Files</label>
+                            <input type="file" name="files[]" id="files" class="form-control" multiple>
+                        </div>
+    
                         <!-- Bouton de soumission -->
                         <div class="row mt-4">
                             <div class="col-lg-10">
                                 <button type="submit" class="btn btn-primary addtask" id="addtask">Create Task</button>
                             </div>
                         </div>
-                    </form>                                        
+                    </form>                                   
                 </div>
             </div>
         </div>
-    </div>
+    </div>        
     
 
     <!-- Add Member Modal -->
@@ -941,31 +965,58 @@ taskModal.addEventListener('show.bs.modal', function (event) {
 
 <script>
     $('#NewtaskForm').on('submit', function(event) {
-        event.preventDefault(); // Empêcher le rechargement de la page
+    event.preventDefault(); // Empêcher le rechargement de la page
 
-        var formData = $(this).serialize();
+    // Récupérer les données du formulaire
+    var formData = new FormData(this);  // Utiliser FormData pour inclure les fichiers
 
-        $.ajax({
-            type: 'POST',
-            url: $(this).attr('action'),
-            data: formData,
-            success: function(response) {
-                // Fermer le modal après la création de la tâche
-                $('#modalForm').modal('hide');
+    // Désactiver le bouton de soumission pour éviter plusieurs clics
+    $('#addtask').prop('disabled', true).text('Submitting...');
 
-                // Afficher un message de succès
-                // alert('Task created successfully!');
+    $.ajax({
+        type: 'POST',
+        url: $(this).attr('action'),
+        data: formData,
+        processData: false,  // Important pour l'envoi des fichiers
+        contentType: false,  // Important pour l'envoi des fichiers
+        success: function(response) {
+            // Fermer le modal après la création de la tâche
+            $('#modalForm').modal('hide');
 
-                // Actualiser la liste des tâches ou la page
-                location.reload();
-            },
-            error: function(response) {
-                // Gérer les erreurs
-                console.log(response);
-                alert(response);
+            // Afficher un message de succès
+            location.reload();
+
+            // Mettre à jour la liste des tâches sans recharger la page
+            // Exemple : ajouter la nouvelle tâche à la liste dynamique
+            $('#taskList').append('<li>' + response.task_name + '</li>');
+
+            // Réinitialiser le formulaire
+            $('#NewtaskForm')[0].reset();
+
+            // Réactiver le bouton de soumission
+            $('#addtask').prop('disabled', false).text('Create Task');
+        },
+        error: function(response) {
+            // Gérer les erreurs de manière plus précise
+            if (response.status === 422) {
+                // Afficher les erreurs de validation
+                var errors = response.responseJSON.errors;
+                var errorMessages = '';
+                $.each(errors, function(key, value) {
+                    errorMessages += value[0] + '\n';  // Afficher les erreurs
+                });
+                alert(errorMessages);
+            } else {
+                // Autres erreurs (ex. serveur)
+                alert('An error occurred. Please try again.');
             }
-        });
+
+            // Réactiver le bouton de soumission
+            $('#addtask').prop('disabled', false).text('Create Task');
+        }
     });
+});
+
 </script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {

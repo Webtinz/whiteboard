@@ -5,160 +5,163 @@ namespace App\Http\Controllers;
 use App\Models\Etat;
 use App\Models\Project;
 use App\Models\ProjectTask;
+use App\Models\TaskFile;
 use App\Models\User;
 use DateTime;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ProjectTaskController extends Controller
 {
     public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'progress' => 'integer|min:0|max:100',
-            'assigned_members' => 'nullable|array',
-            'etat_id' => 'required|integer',
-            'project_id'=> 'required|integer',
-            'estimate_time' => 'nullable|string',
-            'real_time' => 'nullable|string',
-            'type' => 'required|string',
-            'parent_id' => 'nullable|string',
-        ]);
-        $etat_actuel = Etat::findOrFail($validated['etat_id']);
-        if ($etat_actuel->name == "Active") {
-            $startTask = date('Y-m-d H:i:s');
-            $date = new DateTime($startTask);
-            if(empty($validated['real_time'])){
-                $estimateTime = $validated['estimate_time'];
-            }else{
-                $estimateTime = $validated['real_time'];
-            }
-        
-            $hours = floor($estimateTime);
-            $minutes = ($estimateTime - $hours) * 60;
-        
-            $endTask = $date->modify("+{$hours} hours +{$minutes} minutes");
-        } else {
-            $startTask = null;
-            $endTask = null;
-        }
-        
+{
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'description' => 'nullable|string',
+        'progress' => 'nullable|min:0|max:100',
+        'assigned_members' => 'nullable|array',
+        'etat_id' => 'required|integer',
+        'project_id' => 'required|integer',
+        'estimate_time' => 'nullable|string',
+        'real_time' => 'nullable|string',
+        'type' => 'required|string',
+        'parent_id' => 'nullable|string',
+        'files.*' => 'file|max:2048', // Validation des fichiers
+    ]);
 
-        $task = ProjectTask::create([
-            'name' => $validated['name'],
-            'description' => $validated['description'],
-            'progress' => $validated['progress'],
-            'project_id' => $validated['project_id'],
-            'etat_id' => $validated['etat_id'],
-            'start_date' => $startTask,
-            'end_date' => $endTask,
-            'estimate_time' => $validated['estimate_time'],
-            'real_time' => $validated['real_time'],
-            'type' => $validated['type'],
-            'parent_id' => $validated['parent_id']
-        ]);
-
-        // Assigner les membres à la tâche si des membres sont sélectionnés
-        if (!empty($validated['assigned_members'])) {
-            $task->users()->attach($validated['assigned_members']);
-        }
-        $count = 0;
-        $count2 = 0;
-        $allProjectTasks = ProjectTask::where('project_id',$task->project_id)
-                                    ->where('type', 'simple_task')->get();
-        $project = Project::findOrFail($task->project_id);
-        foreach ($allProjectTasks as $all) {
-            if($all->end_date){
-                if($all->end_date < date('Y-m-d H:i:s', strtotime('+1 hour'))){
-                    $count++;
-                }if($all->progress == 100){
-                    $count2++;
-                }
-            }
-        }
-        if($count > ($allProjectTasks->count() / 2)){
-            $project->status = 'Late';
-            $project->save();
-        }else if($count2 == $allProjectTasks->count()){
-            $project->status = 'Completed';
-            $project->save();
-        }
-        else{
-            $project->status = 'Up-to-date';
-            $project->save();
-        }
-
-        return redirect()->back();
+    $etat_actuel = Etat::findOrFail($validated['etat_id']);
+    if ($etat_actuel->name == "Active") {
+        $startTask = date('Y-m-d H:i:s');
+        $date = new DateTime($startTask);
+        $estimateTime = empty($validated['real_time']) ? $validated['estimate_time'] : $validated['real_time'];
+        $hours = floor($estimateTime);
+        $minutes = ($estimateTime - $hours) * 60;
+        $endTask = $date->modify("+{$hours} hours +{$minutes} minutes");
+    } else {
+        $startTask = null;
+        $endTask = null;
     }
+
+    $task = ProjectTask::create([
+        'name' => $validated['name'],
+        'description' => $validated['description'],
+        'progress' => $validated['progress'],
+        'project_id' => $validated['project_id'],
+        'etat_id' => $validated['etat_id'],
+        'start_date' => $startTask,
+        'end_date' => $endTask,
+        'estimate_time' => $validated['estimate_time'],
+        'real_time' => $validated['real_time'],
+        'type' => $validated['type'],
+        'parent_id' => $validated['parent_id']
+    ]);
+
+    if (!empty($validated['assigned_members'])) {
+        $task->users()->attach($validated['assigned_members']);
+    }
+
+    // Gestion des fichiers
+    if ($request->hasFile('files')) {
+        foreach ($request->file('files') as $file) {
+            $path = $file->store('task_files', 'public');
+            $task->files()->create([
+                'file_name' => $file->getClientOriginalName(),
+                'file_path' => $path,
+            ]);
+        }
+    }
+
+    return redirect()->back()->with('success', 'Task and files created successfully!');
+}
+
+
+    public function uploadFiles(Request $request, ProjectTask $task)
+    {
+        $request->validate([
+            'files.*' => 'file|max:2048', // Limite la taille de chaque fichier à 2MB
+        ]);
+        if ($request->hasFile('files')) {
+            foreach ($request->file('files') as $file) {
+                $path = $file->store('task_files', 'public'); // Stocke dans le disque `public`
+
+                $task->files()->create([
+                    'file_name' => $file->getClientOriginalName(),
+                    'file_path' => $path,
+                ]);
+            }
+        }
+
+        return redirect()->back()->with('success', 'Files uploaded successfully!');
+    }
+
+    public function deleteFile(TaskFile $file)
+    {
+        Storage::disk('public')->delete($file->file_path); // Supprime le fichier
+        $file->delete(); // Supprime l'enregistrement dans la base
+        return redirect()->back()->with('success', 'File deleted successfully!');
+    }
+
+
 
     public function update(Request $request, $id)
-    {
-        $count = 0;
-        $count2 = 0;
-        $task = ProjectTask::findOrFail($id);
-        $allProjectTasks = ProjectTask::where('project_id',$task->project_id)
-                                    ->where('type', 'simple_task')->get();
-        $project = Project::findOrFail($task->project_id);
-        foreach ($allProjectTasks as $all) {
-            if($all->end_date){
-                if($all->end_date < date('Y-m-d H:i:s', strtotime('+1 hour'))){
-                    $count++;
-                }
-                if($all->progress == 100){
-                    $count2++;
-                }
-            }
-        }
-        if($count > ($allProjectTasks->count() / 2)){
-            $project->status = 'Late';
-            $project->save();
-        }else if($count2 == $allProjectTasks->count()){
-            $project->status = 'Completed';
-            $project->save();
-        }
-        else{
-            $project->status = 'Up-to-date';
-            $project->save();
-        }
-        
-        $etat_actuel = Etat::findOrFail($task->etat_id);
-        if ($etat_actuel->name == "Active") {
-            $startTask = $task->start_date;
-            $date = new DateTime($startTask);
-            if(empty($request->real_time)){
-                $estimateTime = $request->estimate_time;
-            }else{
-                $estimateTime = $request->real_time;
-            }
-        
-            $hours = floor($estimateTime);
-            $minutes = ($estimateTime - $hours) * 60;
-        
-            $endTask = $date->modify("+{$hours} hours +{$minutes} minutes");
-        } else {
-            $startTask = null;
-            $endTask = null;
-        }
+{
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'description' => 'nullable|string',
+        'progress' => 'integer|min:0|max:100',
+        'assigned_members' => 'nullable|array',
+        'estimate_time' => 'nullable|string',
+        'real_time' => 'nullable|string',
+        'type' => 'required|string',
+        'parent_id' => 'nullable|string',
+        'files.*' => 'file|max:2048', // Validation des fichiers
+    ]);
 
-        $task->update([
-            'name' => $request->name,
-            'description' => $request->description,
-            'progress' => $request->progress,
-            'start_date' => $startTask,
-            'end_date' => $endTask,
-            'estimate_time' => $request->estimate_time,
-            'real_time' => $request->real_time,
-            'type' => $request->type,
-            'parent_id' => $request->parent_id
-        ]);
-        if (!empty($request->assigned_members)) {
-            $task->users()->detach();
-            $task->users()->syncWithoutDetaching($request->assigned_members);
-        }
+    $task = ProjectTask::findOrFail($id);
 
-        return redirect()->back()->with('success', 'Task updated successfully');
+    $etat_actuel = Etat::findOrFail($task->etat_id);
+    if ($etat_actuel->name == "Active") {
+        $startTask = $task->start_date;
+        $date = new DateTime($startTask);
+        $estimateTime = empty($validated['real_time']) ? $validated['estimate_time'] : $validated['real_time'];
+        $hours = floor($estimateTime);
+        $minutes = ($estimateTime - $hours) * 60;
+        $endTask = $date->modify("+{$hours} hours +{$minutes} minutes");
+    } else {
+        $startTask = null;
+        $endTask = null;
     }
+
+    $task->update([
+        'name' => $validated['name'],
+        'description' => $validated['description'],
+        'progress' => $validated['progress'],
+        'start_date' => $startTask,
+        'end_date' => $endTask,
+        'estimate_time' => $validated['estimate_time'],
+        'real_time' => $validated['real_time'],
+        'type' => $validated['type'],
+        'parent_id' => $validated['parent_id']
+    ]);
+
+    if (!empty($validated['assigned_members'])) {
+        $task->users()->sync($validated['assigned_members']);
+    }
+
+    // Gestion des fichiers
+    if ($request->hasFile('files')) {
+        foreach ($request->file('files') as $file) {
+            $path = $file->store('task_files', 'public');
+            $task->files()->create([
+                'file_name' => $file->getClientOriginalName(),
+                'file_path' => $path,
+            ]);
+        }
+    }
+
+    return redirect()->back()->with('success', 'Task and files updated successfully!');
+}
+
 
     public function destroy($id)
     {
@@ -187,7 +190,7 @@ class ProjectTaskController extends Controller
 
     public function showDetails($id)
     {
-        $task = ProjectTask::with(['users', 'etat'])->findOrFail($id);
+        $task = ProjectTask::with(['users', 'etat', 'files'])->findOrFail($id);
         $tasks = ProjectTask::all();
         $users = User::all();
         return view('Front_include.show', compact('task','tasks', 'users'));

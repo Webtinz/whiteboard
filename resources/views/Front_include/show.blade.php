@@ -2,10 +2,17 @@
 @section('links')
 <!-- CSS de Select2 -->
 <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.css" rel="stylesheet">
+<style>
+    .main {
+    max-height: 90vh; /* Pour éviter de dépasser l'écran */
+    overflow-y: auto; /* Activer le défilement vertical */
+}
+
+</style>
 @endsection
 @section('content')
-<div class="main-content">
-    <div class="container-fluid vh-100 d-flex align-items-center justify-content-center">
+<div class="main-content main">
+    <div class="container-fluid d-flex align-items-center justify-content-center" style="margin-top: 100px;">
         <div class="col-lg-10 col-md-12">
             <div class="card shadow-lg border-0">
                 <div class="card-header @if ($task->type === 'epic') bg-success bg-gradient text-dark
@@ -76,7 +83,23 @@
                             @endforelse
                         </div>
                     </div>
+                    <h5 class="fw-bold text-secondary">Attached Files</h5>
+                    <ul class="list-group">
+                        @forelse ($task->files as $file)
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <a href="{{ asset('storage/' . $file->file_path) }}" target="_blank">{{ $file->file_name }}</a>
+                                <form action="{{ route('tasks.delete_file', $file->id) }}" method="POST" style="display: inline;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                </form>
+                            </li>
+                        @empty
+                            <p class="text-muted">No files attached to this task.</p>
+                        @endforelse
+                    </ul>
                 </div>
+
                 <div class="card-footer bg-light d-flex justify-content-between">
                     <a href="{{ route('kanbanboard', $task->project_id) }}" class="btn btn-secondary btn-sm">
                         <i class="mdi mdi-arrow-left"></i> Back to Tasks
@@ -92,9 +115,6 @@
                         data-parent-id="{{ $task->parent_id }}"
                         data-assigned-members="{{ json_encode($task->users) }}"
                         data-children="{{ json_encode($task->children) }}"><i class="mdi mdi-pencil"></i> Edit Task</a>
-                        {{-- <a href="#" class="btn btn-primary btn-sm">
-                        <i class="mdi mdi-pencil"></i> Edit Task
-                    </a> --}}
                 </div>
             </div>
         </div>
@@ -195,6 +215,14 @@
                             <button type="submit" class="btn btn-primary">Save changes</button>
                         </div>
                     </form>
+                    <form action="{{ route('tasks.upload_files', $task->id) }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <div class="mb-3">
+                            <label for="files" class="form-label">Attach Files</label>
+                            <input type="file" name="files[]" id="files" class="form-control" multiple>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Upload Files</button>
+                    </form>   
                 </div>
             </div>
         </div>
