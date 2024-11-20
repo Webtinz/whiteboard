@@ -16,7 +16,7 @@ class ProjectTaskController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'progress' => 'required|integer|min:0|max:100',
+            'progress' => 'integer|min:0|max:100',
             'assigned_members' => 'nullable|array',
             'etat_id' => 'required|integer',
             'project_id'=> 'required|integer',

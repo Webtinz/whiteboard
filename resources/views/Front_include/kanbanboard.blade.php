@@ -440,13 +440,13 @@
                         <!-- Description de la tâche -->
                         <div class="mb-3">
                             <label for="taskdesc" class="form-label">Description</label>
-                            <textarea id="taskdesc" class="form-control" name="description" placeholder="Add Description" required></textarea>
+                            <textarea id="taskdesc" class="form-control" name="description" placeholder="Add Description"></textarea>
                         </div>
                     
                         <!-- Date d'estimation -->
                         <div class="mb-3">
                             <label for="estimate_date" class="form-label">Estimate Time</label>
-                            <input class="form-control" type="number" name="estimate_time" id="estimate_date" step="0.01" required>
+                            <input class="form-control" type="number" name="estimate_time" id="estimate_date" step="0.01" >
                         </div>
                         
                         <!-- Date de fin -->
@@ -458,7 +458,7 @@
                         <!-- Progression -->
                         <div class="mb-3">
                             <label for="taskprogressbar" class="form-label">Progress</label>
-                            <input id="taskprogressbar" name="progress" type="number" class="form-control" placeholder="Enter Progress..." required>
+                            <input id="taskprogressbar" name="progress" type="number" class="form-control" placeholder="Enter Progress..." >
                         </div>
                     
                         <!-- Type de tâche -->
