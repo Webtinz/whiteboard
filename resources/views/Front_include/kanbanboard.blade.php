@@ -59,8 +59,8 @@
 
                             <div class="task-board" id="kanbanboard">
                                 @foreach ($etats as $etat)
-                                <div class="task-list" id="remove-item-19" data-etat-id="{{ $etat->id }}">
-                                    <div class="card bg-light shadow-none card-h-100">
+                                <div class="task-list " id="remove-item-19" data-etat-id="{{ $etat->id }}">
+                                    <div class="card bg-light shadow-none card-h-100" style="width: 350px;">
                                         <div class="card-header bg-transparent border-bottom-0 d-flex align-items-center">
                                             <div class="flex-1">
                                                 <h4 class="card-title mb-0" id="edit-text-1">
@@ -83,7 +83,7 @@
                                                 @foreach ($projecttasks as $task)
                                                 @if ($task->etat->id == $etat->id)
                                                     
-                                                <div id="backlog-task" class="task d-flex flex-column mb-2" draggable="true" data-task-id="{{ $task->id }}">
+                                                <div id="backlog-task" style="width: 300px; height: 200px;" class="task d-flex flex-column mb-2" draggable="true" data-task-id="{{ $task->id }}">
                                                     <div class="card task-box shadow-none">
                                                         <div class="card-body 
                                                             @if ($task->type === 'epic') bg-success bg-gradient text-dark
