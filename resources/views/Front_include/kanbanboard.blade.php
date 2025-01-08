@@ -1499,7 +1499,7 @@ $(document).ready(function () {
     <script>
         $(document).on('click', '.delete-item-etat', function(e) {
     e.preventDefault();
-    if (confirm('Êtes-vous sûr de vouloir supprimer cet état ?')) {
+    if (confirm('Are you sure you want to delete this state ?')) {
         const etatId = $(this).data('etat-id-del');
         console.log("Etat id",etatId)
         $.ajax({
