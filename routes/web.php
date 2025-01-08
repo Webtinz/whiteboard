@@ -82,6 +82,7 @@ Route::middleware(['auth', 'role:platform_users_management|manage_groups|manage_
     Route::resource('allemployee', EmployeeController::class);
 
     Route::get('kanbanboard/{id}', [EtatController::class, 'index'])->name('kanbanboard');
+    Route::delete('/etats/{etat}', [EtatController::class, 'destroy'])->name('etats.destroy');
 
     Route::get('task', [TaskController::class, 'taskslist'])->name('task');
 

@@ -66,6 +66,16 @@
                                                 <h4 class="card-title mb-0" id="edit-text-1">
                                                     <span id="edit-input-1">{{ $etat->name }}</span>
                                                 </h4>
+                                                {{-- <div class="dropdown-menu dropdown-menu-end"> --}}
+                                                    {{-- <a class="dropdown-item font-size-14 fw-medium text-muted edit-heading" href="#"><i class="mdi mdi-file-edit-outline me-1"></i>Edit</a> --}}
+                                                    <form method="POST" action="{{ route('etats.destroy', $etat->id) }}" class="d-inline">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="dropdown-item font-size-14 fw-medium text-danger delete-item-etat" data-etat-id-del="{{ $etat->id }}">
+                                                            <i class="mdi mdi-trash-can-outline me-1"></i>Delete
+                                                        </button>
+                                                    </form>
+                                                {{-- </div> --}}
                                             </div>
                                             <div class="dropdown">
                                                 <a href="#" class="dropdown-toggle arrow-none font-size-16" data-bs-toggle="dropdown" aria-expanded="false">
@@ -1485,6 +1495,29 @@ $(document).ready(function () {
         $('#cparentTaskField').hide();
     });
     
+    </script>
+    <script>
+        $(document).on('click', '.delete-item-etat', function(e) {
+    e.preventDefault();
+    if (confirm('Êtes-vous sûr de vouloir supprimer cet état ?')) {
+        const etatId = $(this).data('etat-id-del');
+        console.log("Etat id",etatId)
+        $.ajax({
+            url: `/etats/${etatId}`,
+            type: 'DELETE',
+            data: {
+                _token: $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(response) {
+                alert('État supprimé avec succès.');
+                location.reload();
+            },
+            error: function(response) {
+                location.reload();
+            }
+        });
+    }
+});
     </script>
 <script>
 function editTaskDetails(taskId) {

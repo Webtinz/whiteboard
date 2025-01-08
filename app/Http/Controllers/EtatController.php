@@ -67,9 +67,18 @@ class EtatController extends Controller
     }
 
     // Supprimer un état
-    public function destroy(Etat $etat)
+    public function destroy($id)
     {
+        // dd($id);
+        $etat = Etat::findOrFail($id);
+
+        // Vérifiez si l'état contient encore des tâches avant de le supprimer
+        // if ($etat->tasks()->count() > 0) {
+        //     return redirect()->back()->with('error', 'Cet état contient encore des tâches et ne peut pas être supprimé.');
+        // }
+
         $etat->delete();
-        return redirect()->route('etats.index')->with('success', 'État supprimé avec succès');
+
+        return redirect()->back()->with('success', 'État supprimé avec succès.');
     }
 }
